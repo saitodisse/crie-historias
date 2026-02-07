@@ -550,19 +550,22 @@ export async function registerRoutes(
 
   app.post("/api/admin/reset", isAuthenticated, async (req, res) => {
     try {
+      const user = await getAppUser(req);
       const { db } = await import("./db");
       const { aiExecutions, scripts, storyCharacters, prompts, creativeProfiles, stories, characters } = await import("@shared/schema");
       const { seedDatabase } = await import("./seed");
+      const { eq } = await import("drizzle-orm");
 
-      await db.delete(aiExecutions);
-      await db.delete(scripts);
-      await db.delete(storyCharacters);
-      await db.delete(prompts);
-      await db.delete(creativeProfiles);
-      await db.delete(stories);
-      await db.delete(characters);
+      // Delete user-specific data
+      await db.delete(aiExecutions).where(eq(aiExecutions.userId, user.id));
+      await db.delete(scripts).where(eq(scripts.storyId, db.select({ id: stories.id }).from(stories).where(eq(stories.userId, user.id))));
+      await db.delete(storyCharacters).where(eq(storyCharacters.storyId, db.select({ id: stories.id }).from(stories).where(eq(stories.userId, user.id))));
+      await db.delete(prompts).where(eq(prompts.userId, user.id));
+      await db.delete(creativeProfiles).where(eq(creativeProfiles.userId, user.id));
+      await db.delete(stories).where(eq(stories.userId, user.id));
+      await db.delete(characters).where(eq(characters.userId, user.id));
 
-      await seedDatabase();
+      await seedDatabase(user.id);
       res.json({ success: true });
     } catch (error: any) {
       console.error("Factory reset error:", error);
