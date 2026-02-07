@@ -404,6 +404,8 @@ export async function registerRoutes(
       const profile = await storage.getActiveProfile(user.id);
       const model = profile?.model || "gpt-5-mini";
       const maxTokens = profile?.maxTokens || 2048;
+      const parsedTemp = profile?.temperature ? parseFloat(profile.temperature) : NaN;
+      const temperature = isNaN(parsedTemp) ? 0.8 : Math.max(0, Math.min(2, parsedTemp));
 
       let contextParts: string[] = [];
       let systemPrompt = "Você é um assistente de escrita criativa habilidoso. ";
@@ -466,7 +468,7 @@ export async function registerRoutes(
         const geminiModel = genAI.getGenerativeModel({ model });
         const geminiResult = await geminiModel.generateContent({
           contents: [{ role: "user", parts: [{ text: `${systemPrompt}\n\n${finalPrompt}` }] }],
-          generationConfig: { maxOutputTokens: maxTokens },
+          generationConfig: { maxOutputTokens: maxTokens, temperature },
         });
         result = geminiResult.response.text();
       } else if (isOpenRouter) {
@@ -482,7 +484,8 @@ export async function registerRoutes(
             { role: "system", content: systemPrompt },
             { role: "user", content: finalPrompt },
           ],
-          max_completion_tokens: maxTokens,
+          max_tokens: maxTokens,
+          temperature,
         });
         result = completion.choices[0]?.message?.content || "";
       } else {
@@ -495,7 +498,8 @@ export async function registerRoutes(
             { role: "system", content: systemPrompt },
             { role: "user", content: finalPrompt },
           ],
-          max_completion_tokens: maxTokens,
+          max_tokens: maxTokens,
+          temperature,
         });
         result = completion.choices[0]?.message?.content || "";
       }
@@ -510,7 +514,7 @@ export async function registerRoutes(
         userPrompt,
         finalPrompt,
         model,
-        parameters: { maxTokens },
+        parameters: { maxTokens, temperature, model },
         result,
       });
 

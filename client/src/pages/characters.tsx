@@ -7,11 +7,18 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Users, Search, Pencil, Trash2, X, Sparkles } from "lucide-react";
-import type { Character } from "@shared/schema";
+import { Plus, Users, Search, Pencil, Trash2, X, Sparkles, Copy, Send, MessageSquare } from "lucide-react";
+import type { Character, AIExecution } from "@shared/schema";
+
+interface AIResult {
+  execution: AIExecution;
+  result: string;
+}
 
 export default function CharactersPage() {
   const [search, setSearch] = useState("");
@@ -21,6 +28,7 @@ export default function CharactersPage() {
   const [aiDialogOpen, setAiDialogOpen] = useState(false);
   const [aiCharId, setAiCharId] = useState<number | null>(null);
   const [aiPrompt, setAiPrompt] = useState("");
+  const [aiResult, setAiResult] = useState<AIResult | null>(null);
   const { toast } = useToast();
 
   const { data: characters, isLoading } = useQuery<Character[]>({
@@ -68,14 +76,12 @@ export default function CharactersPage() {
         userPrompt: aiPrompt,
         type: "character",
       });
-      return res.json();
+      return res.json() as Promise<AIResult>;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/characters"] });
       queryClient.invalidateQueries({ queryKey: ["/api/executions"] });
-      setAiDialogOpen(false);
-      setAiPrompt("");
-      toast({ title: "Geração por IA concluída" });
+      setAiResult(data);
     },
     onError: (err: Error) => {
       toast({ title: "Geração falhou", description: err.message, variant: "destructive" });
@@ -188,6 +194,7 @@ export default function CharactersPage() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Criar Personagem</DialogTitle>
+              <DialogDescription>Preencha os dados do novo personagem.</DialogDescription>
             </DialogHeader>
             <CharacterForm isCreate />
           </DialogContent>
@@ -302,32 +309,120 @@ export default function CharactersPage() {
         )}
       </div>
 
-      <Dialog open={aiDialogOpen} onOpenChange={setAiDialogOpen}>
-        <DialogContent>
+      <Dialog open={aiDialogOpen} onOpenChange={(o) => { setAiDialogOpen(o); if (!o) { setAiResult(null); setAiPrompt(""); } }}>
+        <DialogContent className="max-w-3xl max-h-[85vh]">
           <DialogHeader>
             <DialogTitle>Gerar com IA</DialogTitle>
+            <DialogDescription>Os dados do personagem serão enviados como contexto para a IA.</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 pt-2">
-            <div className="space-y-2">
-              <Label>O que você gostaria de gerar para este personagem?</Label>
-              <Textarea
-                value={aiPrompt}
-                onChange={(e) => setAiPrompt(e.target.value)}
-                placeholder="ex: Expanda o histórico deste personagem, desenvolva suas motivações..."
-                rows={4}
-                data-testid="input-ai-char-prompt"
-              />
+          <ScrollArea className="max-h-[65vh]">
+            <div className="space-y-4 pr-4">
+              {!aiResult ? (
+                <>
+                  <div className="space-y-2">
+                    <Label>O que você gostaria de gerar para este personagem?</Label>
+                    <Textarea
+                      value={aiPrompt}
+                      onChange={(e) => setAiPrompt(e.target.value)}
+                      placeholder="ex: Expanda o histórico deste personagem, desenvolva suas motivações..."
+                      rows={4}
+                      data-testid="input-ai-char-prompt"
+                    />
+                  </div>
+                  <Button
+                    className="w-full"
+                    onClick={() => generateMutation.mutate()}
+                    disabled={!aiPrompt.trim() || generateMutation.isPending}
+                    data-testid="button-submit-ai-char"
+                  >
+                    <Send className="h-4 w-4 mr-2" />
+                    {generateMutation.isPending ? "Gerando..." : "Enviar para IA"}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Badge variant="secondary">{aiResult.execution.model}</Badge>
+                    <Badge variant="outline">
+                      {JSON.stringify((aiResult.execution.parameters as any)?.maxTokens || 0)} tokens máx.
+                    </Badge>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <Label className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Send className="h-3 w-3" /> Enviado (Prompt Final)
+                      </Label>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => {
+                          navigator.clipboard.writeText(aiResult.execution.finalPrompt);
+                          toast({ title: "Prompt copiado" });
+                        }}
+                      >
+                        <Copy className="h-3 w-3 mr-1" />
+                        Copiar
+                      </Button>
+                    </div>
+                    <pre className="mt-1 text-xs bg-muted rounded-md p-3 whitespace-pre-wrap font-mono max-h-32 overflow-auto" data-testid="text-ai-sent">
+                      {aiResult.execution.finalPrompt}
+                    </pre>
+                  </div>
+
+                  {aiResult.execution.systemPromptSnapshot && (
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Prompt de Sistema</Label>
+                      <pre className="mt-1 text-xs bg-muted rounded-md p-3 whitespace-pre-wrap font-mono max-h-24 overflow-auto">
+                        {aiResult.execution.systemPromptSnapshot}
+                      </pre>
+                    </div>
+                  )}
+
+                  <Separator />
+
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <Label className="text-xs text-muted-foreground flex items-center gap-1">
+                        <MessageSquare className="h-3 w-3" /> Recebido (Resultado)
+                      </Label>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => {
+                          if (aiResult.result) {
+                            navigator.clipboard.writeText(aiResult.result);
+                            toast({ title: "Resultado copiado" });
+                          }
+                        }}
+                      >
+                        <Copy className="h-3 w-3 mr-1" />
+                        Copiar
+                      </Button>
+                    </div>
+                    {aiResult.result ? (
+                      <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap font-serif bg-muted rounded-md p-4" data-testid="text-ai-result">
+                        {aiResult.result}
+                      </div>
+                    ) : (
+                      <div className="bg-destructive/10 text-destructive text-sm rounded-md p-4" data-testid="text-ai-empty">
+                        A IA retornou um resultado vazio. Tente um modelo diferente ou reformule o prompt.
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => setAiResult(null)} data-testid="button-ai-new-prompt">
+                      Novo Prompt
+                    </Button>
+                    <Button variant="ghost" onClick={() => { setAiDialogOpen(false); setAiResult(null); setAiPrompt(""); }}>
+                      Fechar
+                    </Button>
+                  </div>
+                </>
+              )}
             </div>
-            <Button
-              className="w-full"
-              onClick={() => generateMutation.mutate()}
-              disabled={!aiPrompt.trim() || generateMutation.isPending}
-              data-testid="button-submit-ai-char"
-            >
-              <Sparkles className="h-4 w-4 mr-2" />
-              {generateMutation.isPending ? "Gerando..." : "Gerar"}
-            </Button>
-          </div>
+          </ScrollArea>
         </DialogContent>
       </Dialog>
     </div>

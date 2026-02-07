@@ -1,5 +1,5 @@
 import { useLocation, Link } from "wouter";
-import { BookOpen, Users, FileText, Sparkles, History, Settings, PenTool, RefreshCw, LogOut } from "lucide-react";
+import { BookOpen, Users, FileText, Sparkles, History, Settings, PenTool, RefreshCw, LogOut, Cpu } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -12,9 +12,11 @@ import {
   SidebarHeader,
   SidebarFooter,
 } from "@/components/ui/sidebar";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -27,6 +29,7 @@ import {
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import type { CreativeProfile } from "@shared/schema";
 
 const creativeItems = [
   { title: "Histórias", url: "/", icon: BookOpen },
@@ -49,6 +52,22 @@ export function AppSidebar() {
   const { user, logout } = useAuth();
   const [isResetting, setIsResetting] = useState(false);
   const [open, setOpen] = useState(false);
+
+  const { data: profiles } = useQuery<CreativeProfile[]>({
+    queryKey: ["/api/profiles"],
+  });
+
+  const activateProfileMutation = useMutation({
+    mutationFn: async (profileId: number) => {
+      await apiRequest("POST", `/api/profiles/${profileId}/activate`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/profiles"] });
+      toast({ title: "Perfil ativado" });
+    },
+  });
+
+  const activeProfile = profiles?.find((p) => p.active);
 
   const handleReset = async () => {
     try {
@@ -126,6 +145,40 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {profiles && profiles.length > 0 && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Perfil Ativo</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <div className="px-2 space-y-2">
+                <Select
+                  value={activeProfile?.id?.toString() || ""}
+                  onValueChange={(val) => activateProfileMutation.mutate(parseInt(val))}
+                  data-testid="select-active-profile"
+                >
+                  <SelectTrigger className="text-xs" data-testid="select-active-profile-trigger">
+                    <SelectValue placeholder="Selecione um perfil" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {profiles.map((p) => (
+                      <SelectItem key={p.id} value={p.id.toString()} data-testid={`select-profile-${p.id}`}>
+                        {p.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {activeProfile && (
+                  <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground px-1">
+                    <Cpu className="h-3 w-3 shrink-0" />
+                    <span className="truncate">{activeProfile.model}</span>
+                    <span className="shrink-0">T:{activeProfile.temperature}</span>
+                  </div>
+                )}
+              </div>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+
         <SidebarGroup>
           <SidebarGroupLabel>Configurações</SidebarGroupLabel>
           <SidebarGroupContent>
