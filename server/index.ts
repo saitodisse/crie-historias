@@ -67,6 +67,10 @@ app.use((req, res, next) => {
     console.log("Seed skipped or failed:", (e as Error).message);
   }
 
+  const { setupAuth, registerAuthRoutes } = await import("./replit_integrations/auth");
+  await setupAuth(app);
+  registerAuthRoutes(app);
+
   await registerRoutes(httpServer, app);
 
   app.use((err: any, _req: Request, res: Response, next: NextFunction) => {

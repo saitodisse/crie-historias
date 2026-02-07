@@ -16,6 +16,8 @@ import { eq, desc, and } from "drizzle-orm";
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByReplitId(replitId: string): Promise<User | undefined>;
+  getOrCreateUserByReplitId(replitId: string, displayName?: string): Promise<User>;
   createUser(user: InsertUser): Promise<User>;
 
   getStories(userId: number): Promise<Story[]>;
@@ -74,6 +76,25 @@ export class DatabaseStorage implements IStorage {
   async getUserByUsername(username: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.username, username));
     return user || undefined;
+  }
+
+  async getUserByReplitId(replitId: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.replitId, replitId));
+    return user || undefined;
+  }
+
+  async getOrCreateUserByReplitId(replitId: string, displayName?: string): Promise<User> {
+    let user = await this.getUserByReplitId(replitId);
+    if (!user) {
+      const username = `user_${replitId.substring(0, 8)}`;
+      [user] = await db.insert(users).values({
+        username,
+        password: "replit-auth",
+        displayName: displayName || username,
+        replitId,
+      }).returning();
+    }
+    return user;
   }
 
   async createUser(data: InsertUser): Promise<User> {

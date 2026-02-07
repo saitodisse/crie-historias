@@ -4,12 +4,14 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export * from "./models/chat";
+export * from "./models/auth";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   displayName: text("display_name"),
+  replitId: varchar("replit_id").unique(),
   openaiKey: text("openai_key"),
   geminiKey: text("gemini_key"),
   openrouterKey: text("openrouter_key"),

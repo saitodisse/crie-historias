@@ -1,5 +1,5 @@
 import { useLocation, Link } from "wouter";
-import { BookOpen, Users, FileText, Sparkles, History, Settings, PenTool, RefreshCw } from "lucide-react";
+import { BookOpen, Users, FileText, Sparkles, History, Settings, PenTool, RefreshCw, LogOut } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -25,16 +25,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useAuth } from "@/hooks/use-auth";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const creativeItems = [
-  { title: "Histórias", url: "/", icon: BookOpen },
+  { title: "Hist\u00f3rias", url: "/", icon: BookOpen },
   { title: "Personagens", url: "/characters", icon: Users },
   { title: "Roteiros", url: "/scripts", icon: FileText },
 ];
 
 const aiItems = [
   { title: "Prompts", url: "/prompts", icon: Sparkles },
-  { title: "Histórico de IA", url: "/executions", icon: History },
+  { title: "Hist\u00f3rico de IA", url: "/executions", icon: History },
 ];
 
 const settingsItems = [
@@ -44,6 +46,7 @@ const settingsItems = [
 export function AppSidebar() {
   const [location] = useLocation();
   const { toast } = useToast();
+  const { user, logout } = useAuth();
   const [isResetting, setIsResetting] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -52,7 +55,7 @@ export function AppSidebar() {
       setIsResetting(true);
       await apiRequest("POST", "/api/admin/reset");
       queryClient.invalidateQueries();
-      toast({ title: "Reset de fábrica concluído", description: "O banco de dados foi limpo e a semente foi reiniciada." });
+      toast({ title: "Reset de f\u00e1brica conclu\u00eddo", description: "O banco de dados foi limpo e a semente foi reiniciada." });
       setOpen(false);
     } catch (error: any) {
       toast({ title: "Erro ao resetar", description: error.message, variant: "destructive" });
@@ -66,6 +69,13 @@ export function AppSidebar() {
     return location.startsWith(url);
   };
 
+  const userInitials = user
+    ? [user.firstName, user.lastName].filter(Boolean).map((n) => n?.[0]).join("").toUpperCase() || "U"
+    : "U";
+  const userName = user
+    ? [user.firstName, user.lastName].filter(Boolean).join(" ") || "Usu\u00e1rio"
+    : "Usu\u00e1rio";
+
   return (
     <Sidebar>
       <SidebarHeader className="p-4">
@@ -76,7 +86,7 @@ export function AppSidebar() {
             </div>
             <div>
               <h1 className="text-sm font-bold tracking-tight">StoryForge</h1>
-              <p className="text-[11px] text-muted-foreground">Estúdio de Escrita Criativa</p>
+              <p className="text-[11px] text-muted-foreground">Est\u00fadio de Escrita Criativa</p>
             </div>
           </div>
         </Link>
@@ -117,7 +127,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarGroupLabel>Configurações</SidebarGroupLabel>
+          <SidebarGroupLabel>Configura\u00e7\u00f5es</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {settingsItems.map((item) => (
@@ -134,19 +144,37 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="p-4 space-y-4">
+      <SidebarFooter className="p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <Avatar className="h-7 w-7">
+            {user?.profileImageUrl && <AvatarImage src={user.profileImageUrl} alt={userName} />}
+            <AvatarFallback className="text-xs">{userInitials}</AvatarFallback>
+          </Avatar>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-medium truncate" data-testid="text-user-name">{userName}</p>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => logout()}
+            data-testid="button-logout"
+            title="Sair"
+          >
+            <LogOut className="h-4 w-4" />
+          </Button>
+        </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button variant="outline" size="sm" className="w-full text-[11px] gap-2" data-testid="button-admin-reset">
               <RefreshCw className="h-3 w-3" />
-              Reset de Fábrica
+              Reset de F\u00e1brica
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Reset de Fábrica</DialogTitle>
+              <DialogTitle>Reset de F\u00e1brica</DialogTitle>
               <DialogDescription>
-                Isso apagará permanentemente todos os dados personalizados e restaurará as histórias e personagens padrão. Esta ação não pode ser desfeita.
+                Isso apagar\u00e1 permanentemente todos os dados personalizados e restaurar\u00e1 as hist\u00f3rias e personagens padr\u00e3o. Esta a\u00e7\u00e3o n\u00e3o pode ser desfeita.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
@@ -159,7 +187,6 @@ export function AppSidebar() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-        <p className="text-[11px] text-muted-foreground">v1.0 - Usuário Único</p>
       </SidebarFooter>
     </Sidebar>
   );
