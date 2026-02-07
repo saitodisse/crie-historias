@@ -1,4 +1,6 @@
-# StoryForge - Estudio de Escrita Criativa
+# Crie Histórias
+## Estudio de Escrita Criativa
+### StoryForge
 
 Plataforma de escrita criativa assistida por inteligencia artificial para gerenciamento de historias, personagens e roteiros, com observabilidade completa das chamadas de IA. Interface em portugues brasileiro (PT-BR).
 
@@ -26,7 +28,7 @@ Plataforma de escrita criativa assistida por inteligencia artificial para gerenc
 
 ## Visao Geral
 
-O StoryForge e uma plataforma completa para escritores criativos que combina gerenciamento de projetos literarios com geracao de conteudo por IA. Cada historia pode ter personagens reutilizaveis, roteiros em diferentes niveis de detalhe e prompts salvos para interacao com multiplos provedores de IA.
+O Crie Histórias e uma plataforma completa para escritores criativos que combina gerenciamento de projetos literarios com geracao de conteudo por IA. Cada historia pode ter personagens reutilizaveis, roteiros em diferentes niveis de detalhe e prompts salvos para interacao com multiplos provedores de IA.
 
 A plataforma registra cada interacao com IA de forma auditavel, armazenando o prompt de sistema, o prompt do usuario, o prompt final montado, os parametros do modelo e o resultado obtido.
 
@@ -156,7 +158,7 @@ O frontend e o backend rodam no mesmo servidor Express na porta 5000. Em desenvo
 ## Estrutura do Projeto
 
 ```
-storyforge/
+root/
 ├── client/
 │   ├── index.html                    # HTML raiz
 │   └── src/
