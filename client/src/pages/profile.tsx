@@ -16,19 +16,30 @@ import { Settings, Plus, Save, Trash2, Check, Pencil, Key } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { CreativeProfile } from "@shared/schema";
 
-const availableModels = [
-  { value: "gpt-5.2", label: "GPT-5.2 (Mais Capaz)" },
-  { value: "gpt-5.1", label: "GPT-5.1" },
-  { value: "gpt-5", label: "GPT-5" },
-  { value: "gpt-5-mini", label: "GPT-5 Mini (Custo-Benefício)" },
-  { value: "gpt-5-nano", label: "GPT-5 Nano (Mais Rápido)" },
-  { value: "gemini-pro", label: "Gemini Pro" },
-  { value: "openrouter/auto", label: "OpenRouter (Auto)" },
-];
+const modelsByProvider: Record<string, { value: string; label: string }[]> = {
+  openai: [
+    { value: "gpt-5.2", label: "GPT-5.2 (Mais Capaz)" },
+    { value: "gpt-5.1", label: "GPT-5.1" },
+    { value: "gpt-5", label: "GPT-5" },
+    { value: "gpt-5-mini", label: "GPT-5 Mini (Custo-Benefício)" },
+    { value: "gpt-5-nano", label: "GPT-5 Nano (Mais Rápido)" },
+  ],
+  gemini: [
+    { value: "gemini-pro", label: "Gemini Pro" },
+    { value: "gemini-1.5-flash", label: "Gemini 1.5 Flash" },
+  ],
+  openrouter: [
+    { value: "openrouter/auto", label: "OpenRouter (Auto)" },
+    { value: "anthropic/claude-3-opus", label: "Claude 3 Opus (via OpenRouter)" },
+    { value: "anthropic/claude-3-sonnet", label: "Claude 3 Sonnet (via OpenRouter)" },
+    { value: "meta-llama/llama-3-70b", label: "Llama 3 70B (via OpenRouter)" },
+  ],
+};
 
 export default function ProfilePage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
+  const [provider, setProvider] = useState("openai");
   const [form, setForm] = useState({
     name: "",
     model: "gpt-5-mini",
@@ -108,11 +119,17 @@ export default function ProfilePage() {
     },
   });
 
-  const resetForm = () =>
+  const resetForm = () => {
+    setProvider("openai");
     setForm({ name: "", model: "gpt-5-mini", temperature: "0.8", maxTokens: 2048, narrativeStyle: "", active: true });
+  };
 
   const startEditing = (p: CreativeProfile) => {
     setEditId(p.id);
+    const initialProvider = Object.keys(modelsByProvider).find(prov => 
+      modelsByProvider[prov].some(m => m.value === p.model)
+    ) || "openai";
+    setProvider(initialProvider);
     setForm({
       name: p.name,
       model: p.model,
@@ -134,18 +151,39 @@ export default function ProfilePage() {
           data-testid="input-profile-name"
         />
       </div>
-      <div className="space-y-2">
-        <Label>Modelo de IA</Label>
-        <Select value={form.model} onValueChange={(v) => setForm({ ...form, model: v })}>
-          <SelectTrigger data-testid="select-profile-model">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {availableModels.map((m) => (
-              <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label>Provedor</Label>
+          <Select 
+            value={provider} 
+            onValueChange={(v) => {
+              setProvider(v);
+              setForm({ ...form, model: modelsByProvider[v][0].value });
+            }}
+          >
+            <SelectTrigger data-testid="select-profile-provider">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="openai">OpenAI</SelectItem>
+              <SelectItem value="gemini">Gemini</SelectItem>
+              <SelectItem value="openrouter">OpenRouter</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label>Modelo de IA</Label>
+          <Select value={form.model} onValueChange={(v) => setForm({ ...form, model: v })}>
+            <SelectTrigger data-testid="select-profile-model">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {modelsByProvider[provider].map((m) => (
+                <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
       <div className="space-y-2">
         <Label>Temperatura: {form.temperature}</Label>
