@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -14,7 +14,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Dialog,
@@ -27,11 +26,9 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Settings,
   Plus,
-  Save,
   Trash2,
   Check,
   Pencil,
-  Key,
   Loader2,
   Search,
   ArrowUpDown,
@@ -50,6 +47,247 @@ function detectProvider(modelId: string): string {
   if (modelId.startsWith("gemini")) return "gemini";
   if (modelId.includes("/")) return "openrouter";
   return "openai";
+}
+
+function ProfileFormFields({
+  form,
+  setForm,
+  provider,
+  setProvider,
+  dynamicModels,
+  isLoadingModels,
+  isModelsError,
+  filteredModels,
+  searchOpen,
+  setSearchOpen,
+  searchTerm,
+  setSearchTerm,
+  sortOrder,
+  setSortOrder,
+  isCreate,
+  onSubmit,
+  isPending,
+}: {
+  form: { name: string; model: string; temperature: string; maxTokens: number; narrativeStyle: string; active: boolean };
+  setForm: React.Dispatch<React.SetStateAction<{ name: string; model: string; temperature: string; maxTokens: number; narrativeStyle: string; active: boolean }>>;
+  provider: string;
+  setProvider: (v: string) => void;
+  dynamicModels: ModelOption[] | undefined;
+  isLoadingModels: boolean;
+  isModelsError: boolean;
+  filteredModels: ModelOption[];
+  searchOpen: boolean;
+  setSearchOpen: (v: boolean) => void;
+  searchTerm: string;
+  setSearchTerm: (v: string) => void;
+  sortOrder: "asc" | "desc" | null;
+  setSortOrder: React.Dispatch<React.SetStateAction<"asc" | "desc" | null>>;
+  isCreate: boolean;
+  onSubmit: () => void;
+  isPending: boolean;
+}) {
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Label>Nome do Perfil</Label>
+        <Input
+          value={form.name}
+          onChange={(e) => setForm(prev => ({ ...prev, name: e.target.value }))}
+          placeholder="ex: Escrita Criativa, Técnico, Conciso"
+          data-testid="input-profile-name"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label>Provedor</Label>
+        <Select
+          value={provider}
+          onValueChange={(v) => {
+            setProvider(v);
+            setForm(prev => ({ ...prev, model: "" }));
+          }}
+        >
+          <SelectTrigger data-testid="select-profile-provider">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="openai">OpenAI</SelectItem>
+            <SelectItem value="gemini">Gemini</SelectItem>
+            <SelectItem value="openrouter">OpenRouter</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <Label>Modelo de IA</Label>
+          <Dialog open={searchOpen} onOpenChange={(open) => {
+            setSearchOpen(open);
+            if (!open) setSearchTerm("");
+          }}>
+            <DialogTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                type="button"
+                className="h-7 px-2 gap-1"
+                disabled={!dynamicModels?.length}
+              >
+                <Search className="h-3.5 w-3.5" />
+                Explorar Modelos
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col" onOpenAutoFocus={(e) => e.preventDefault()}>
+              <DialogHeader>
+                <DialogTitle>
+                  Explorar Modelos - {provider.toUpperCase()}
+                </DialogTitle>
+              </DialogHeader>
+              <div className="flex gap-2 items-center py-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Pesquisar modelos..."
+                    className="pl-9"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key !== "Escape") {
+                        e.stopPropagation();
+                      }
+                    }}
+                    data-testid="input-search-models"
+                  />
+                </div>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  type="button"
+                  onClick={() => setSortOrder(prev => prev === "asc" ? "desc" : "asc")}
+                  title="Ordenar por preço"
+                >
+                  <ArrowUpDown className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+                {filteredModels.map((m) => (
+                  <Button
+                    key={m.id}
+                    variant="outline"
+                    className="w-full justify-between h-auto py-3 px-4 text-left"
+                    onClick={() => {
+                      setForm(prev => ({ ...prev, model: m.id }));
+                      setSearchOpen(false);
+                    }}
+                  >
+                    <div className="flex flex-col gap-0.5">
+                      <span className="font-medium">
+                        {m.displayName.split(" (")[0]}
+                      </span>
+                      <span className="text-xs text-muted-foreground font-mono">
+                        {m.id}
+                      </span>
+                    </div>
+                    {m.price !== undefined && (
+                      <Badge
+                        variant="secondary"
+                        className="ml-2 whitespace-nowrap"
+                      >
+                        ${m.price.toFixed(2)}/M
+                      </Badge>
+                    )}
+                  </Button>
+                ))}
+                {filteredModels.length === 0 && (
+                  <p className="text-center py-8 text-muted-foreground">
+                    Nenhum modelo encontrado.
+                  </p>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
+        {isLoadingModels ? (
+          <div className="flex items-center gap-2 h-9 px-3 border rounded-md text-sm text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Carregando modelos...
+          </div>
+        ) : isModelsError ? (
+          <div className="flex items-center gap-2 h-9 px-3 border border-destructive rounded-md text-sm text-destructive">
+            Falha ao carregar modelos. Verifique sua chave de API.
+          </div>
+        ) : dynamicModels && dynamicModels.length === 0 ? (
+          <div className="flex items-center gap-2 h-9 px-3 border rounded-md text-sm text-muted-foreground">
+            Nenhum modelo disponível para este provedor.
+          </div>
+        ) : (
+          <Select
+            value={form.model}
+            onValueChange={(v) => setForm(prev => ({ ...prev, model: v }))}
+          >
+            <SelectTrigger data-testid="select-profile-model">
+              <SelectValue placeholder="Selecione um modelo" />
+            </SelectTrigger>
+            <SelectContent>
+              {(dynamicModels || []).map((m) => (
+                <SelectItem key={m.id} value={m.id}>
+                  {m.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+      </div>
+      <div className="space-y-2">
+        <Label>Temperatura: {form.temperature}</Label>
+        <Slider
+          value={[parseFloat(form.temperature)]}
+          onValueChange={([v]) =>
+            setForm(prev => ({ ...prev, temperature: v.toFixed(1) }))
+          }
+          min={0}
+          max={2}
+          step={0.1}
+          data-testid="slider-temperature"
+        />
+        <p className="text-xs text-muted-foreground">
+          Menor = mais focado, Maior = mais criativo
+        </p>
+      </div>
+      <div className="space-y-2">
+        <Label>Máximo de Tokens</Label>
+        <Input
+          type="number"
+          value={form.maxTokens}
+          onChange={(e) =>
+            setForm(prev => ({ ...prev, maxTokens: parseInt(e.target.value) || 2048 }))
+          }
+          min={256}
+          max={8192}
+          data-testid="input-max-tokens"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label>Estilo Narrativo</Label>
+        <Textarea
+          value={form.narrativeStyle}
+          onChange={(e) => setForm(prev => ({ ...prev, narrativeStyle: e.target.value }))}
+          placeholder="Descreva o estilo de escrita desejado, tom, voz..."
+          rows={3}
+          className="resize-none"
+          data-testid="input-narrative-style"
+        />
+      </div>
+      <Button
+        className="w-full"
+        onClick={onSubmit}
+        disabled={!form.name.trim() || !form.model || isPending}
+        data-testid="button-submit-profile"
+      >
+        {isCreate
+          ? isPending ? "Criando..." : "Criar Perfil"
+          : isPending ? "Salvando..." : "Salvar Alterações"}
+      </Button>
+    </div>
+  );
 }
 
 export default function ProfilePage() {
@@ -74,7 +312,7 @@ export default function ProfilePage() {
   const [geminiKey, setGeminiKey] = useState("");
   const [openrouterKey, setOpenrouterKey] = useState("");
 
-  const { data: keysData, isLoading: isLoadingKeys } = useQuery<{
+  const { data: keysData } = useQuery<{
     hasOpenai: boolean;
     hasGemini: boolean;
     hasOpenrouter: boolean;
@@ -202,252 +440,21 @@ export default function ProfilePage() {
     });
   };
 
-  const ProfileForm = ({ isCreate }: { isCreate: boolean }) => {
-    const [localForm, setLocalForm] = useState(form);
-
-    useEffect(() => {
-      setLocalForm(form);
-    }, [form]);
-
-    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newName = e.target.value;
-      setLocalForm(prev => ({ ...prev, name: newName }));
-      setForm(prev => ({ ...prev, name: newName }));
-    };
-
-    const handleMaxTokensChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const val = parseInt(e.target.value) || 2048;
-      setLocalForm(prev => ({ ...prev, maxTokens: val }));
-      setForm(prev => ({ ...prev, maxTokens: val }));
-    };
-
-    const handleStyleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      const val = e.target.value;
-      setLocalForm(prev => ({ ...prev, narrativeStyle: val }));
-      setForm(prev => ({ ...prev, narrativeStyle: val }));
-    };
-
-    return (
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <Label>Nome do Perfil</Label>
-          <Input
-            value={localForm.name}
-            onChange={handleNameChange}
-            placeholder="ex: Escrita Criativa, Técnico, Conciso"
-            data-testid="input-profile-name"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label>Provedor</Label>
-          <Select
-            value={provider}
-            onValueChange={(v) => {
-              setProvider(v);
-              setForm({ ...form, model: "" });
-            }}
-          >
-            <SelectTrigger data-testid="select-profile-provider">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="openai">OpenAI</SelectItem>
-              <SelectItem value="gemini">Gemini</SelectItem>
-              <SelectItem value="openrouter">OpenRouter</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label>Modelo de IA</Label>
-            <Dialog open={searchOpen} onOpenChange={(open) => {
-              setSearchOpen(open);
-              if (!open) setSearchTerm("");
-            }}>
-              <DialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  type="button"
-                  className="h-7 px-2 gap-1"
-                  disabled={!dynamicModels?.length}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setSearchOpen(true);
-                  }}
-                >
-                  <Search className="h-3.5 w-3.5" />
-                  Explorar Modelos
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
-                <DialogHeader>
-                  <DialogTitle>
-                    Explorar Modelos - {provider.toUpperCase()}
-                  </DialogTitle>
-                </DialogHeader>
-                <div className="flex gap-2 items-center py-4">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Pesquisar modelos..."
-                      className="pl-9"
-                      value={searchTerm}
-                      onChange={(e) => {
-                        setSearchTerm(e.target.value);
-                      }}
-                      onKeyDown={(e) => {
-                        // Prevent modal from reacting to keyboard events inside the input
-                        if (e.key !== "Escape") {
-                          e.stopPropagation();
-                        }
-                      }}
-                    />
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-                    }}
-                    title="Ordenar por preço"
-                  >
-                    <ArrowUpDown className="h-4 w-4" />
-                  </Button>
-                </div>
-                <div className="flex-1 overflow-y-auto space-y-2 pr-1">
-                  {filteredModels.map((m) => (
-                    <Button
-                      key={m.id}
-                      variant="outline"
-                      className="w-full justify-between h-auto py-3 px-4 text-left"
-                      onClick={() => {
-                        setForm({ ...form, model: m.id });
-                        setSearchOpen(false);
-                      }}
-                    >
-                      <div className="flex flex-col gap-0.5">
-                        <span className="font-medium">
-                          {m.displayName.split(" (")[0]}
-                        </span>
-                        <span className="text-xs text-muted-foreground font-mono">
-                          {m.id}
-                        </span>
-                      </div>
-                      {m.price !== undefined && (
-                        <Badge
-                          variant="secondary"
-                          className="ml-2 whitespace-nowrap"
-                        >
-                          ${m.price.toFixed(2)}/M
-                        </Badge>
-                      )}
-                    </Button>
-                  ))}
-                  {filteredModels.length === 0 && (
-                    <p className="text-center py-8 text-muted-foreground">
-                      Nenhum modelo encontrado.
-                    </p>
-                  )}
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-          {isLoadingModels ? (
-            <div className="flex items-center gap-2 h-9 px-3 border rounded-md text-sm text-muted-foreground">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Carregando modelos...
-            </div>
-          ) : isModelsError ? (
-            <div className="flex items-center gap-2 h-9 px-3 border border-destructive rounded-md text-sm text-destructive">
-              Falha ao carregar modelos. Verifique sua chave de API.
-            </div>
-          ) : dynamicModels && dynamicModels.length === 0 ? (
-            <div className="flex items-center gap-2 h-9 px-3 border rounded-md text-sm text-muted-foreground">
-              Nenhum modelo disponível para este provedor.
-            </div>
-          ) : (
-            <Select
-              value={form.model}
-              onValueChange={(v) => setForm({ ...form, model: v })}
-            >
-              <SelectTrigger data-testid="select-profile-model">
-                <SelectValue placeholder="Selecione um modelo" />
-              </SelectTrigger>
-              <SelectContent>
-                {(dynamicModels || []).map((m) => (
-                  <SelectItem key={m.id} value={m.id}>
-                    {m.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-        </div>
-        <div className="space-y-2">
-          <Label>Temperatura: {form.temperature}</Label>
-          <Slider
-            value={[parseFloat(form.temperature)]}
-            onValueChange={([v]) =>
-              setForm({ ...form, temperature: v.toFixed(1) })
-            }
-            min={0}
-            max={2}
-            step={0.1}
-            data-testid="slider-temperature"
-          />
-          <p className="text-xs text-muted-foreground">
-            Menor = mais focado, Maior = mais criativo
-          </p>
-        </div>
-        <div className="space-y-2">
-          <Label>Máximo de Tokens</Label>
-          <Input
-            type="number"
-            value={localForm.maxTokens}
-            onChange={handleMaxTokensChange}
-            min={256}
-            max={8192}
-            data-testid="input-max-tokens"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label>Estilo Narrativo</Label>
-          <Textarea
-            value={localForm.narrativeStyle}
-            onChange={handleStyleChange}
-            placeholder="Descreva o estilo de escrita desejado, tom, voz..."
-            rows={3}
-            className="resize-none"
-            data-testid="input-narrative-style"
-          />
-        </div>
-        <Button
-          className="w-full"
-          onClick={() =>
-            isCreate ? createMutation.mutate() : updateMutation.mutate()
-          }
-          disabled={
-            !form.name.trim() ||
-            !form.model ||
-            (isCreate ? createMutation.isPending : updateMutation.isPending)
-          }
-          data-testid="button-submit-profile"
-        >
-          {isCreate
-            ? createMutation.isPending
-              ? "Criando..."
-              : "Criar Perfil"
-            : updateMutation.isPending
-              ? "Salvando..."
-              : "Salvar Alterações"}
-        </Button>
-      </div>
-    );
+  const sharedFormProps = {
+    form,
+    setForm,
+    provider,
+    setProvider,
+    dynamicModels,
+    isLoadingModels,
+    isModelsError,
+    filteredModels,
+    searchOpen,
+    setSearchOpen,
+    searchTerm,
+    setSearchTerm,
+    sortOrder,
+    setSortOrder,
   };
 
   return (
@@ -478,12 +485,14 @@ export default function ProfilePage() {
                 value={openaiKey}
                 onChange={(e) => setOpenaiKey(e.target.value)}
                 className="h-8 text-xs"
+                data-testid="input-openai-key"
               />
               <Button
                 size="sm"
                 className="w-full h-8"
                 onClick={() => saveKeysMutation.mutate({ openaiKey })}
                 disabled={!openaiKey}
+                data-testid="button-save-openai-key"
               >
                 Salvar
               </Button>
@@ -507,12 +516,14 @@ export default function ProfilePage() {
                 value={geminiKey}
                 onChange={(e) => setGeminiKey(e.target.value)}
                 className="h-8 text-xs"
+                data-testid="input-gemini-key"
               />
               <Button
                 size="sm"
                 className="w-full h-8"
                 onClick={() => saveKeysMutation.mutate({ geminiKey })}
                 disabled={!geminiKey}
+                data-testid="button-save-gemini-key"
               >
                 Salvar
               </Button>
@@ -536,12 +547,14 @@ export default function ProfilePage() {
                 value={openrouterKey}
                 onChange={(e) => setOpenrouterKey(e.target.value)}
                 className="h-8 text-xs"
+                data-testid="input-openrouter-key"
               />
               <Button
                 size="sm"
                 className="w-full h-8"
                 onClick={() => saveKeysMutation.mutate({ openrouterKey })}
                 disabled={!openrouterKey}
+                data-testid="button-save-openrouter-key"
               >
                 Salvar
               </Button>
@@ -576,11 +589,16 @@ export default function ProfilePage() {
                 Novo Perfil
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
               <DialogHeader>
                 <DialogTitle>Criar Perfil Criativo</DialogTitle>
               </DialogHeader>
-              <ProfileForm isCreate />
+              <ProfileFormFields
+                {...sharedFormProps}
+                isCreate
+                onSubmit={() => createMutation.mutate()}
+                isPending={createMutation.isPending}
+              />
             </DialogContent>
           </Dialog>
         </div>
@@ -607,7 +625,12 @@ export default function ProfilePage() {
                 >
                   {editId === profile.id ? (
                     <CardContent className="pt-4">
-                      <ProfileForm isCreate={false} />
+                      <ProfileFormFields
+                        {...sharedFormProps}
+                        isCreate={false}
+                        onSubmit={() => updateMutation.mutate()}
+                        isPending={updateMutation.isPending}
+                      />
                       <Button
                         variant="ghost"
                         className="w-full mt-2"
