@@ -13,7 +13,7 @@ export function serveStatic(app: Express) {
   app.use(express.static(distPath));
 
   // Skip static serving for API routes
-  app.get("/api/*", (_req, res, next) => {
+  app.use("/api", (req, res, next) => {
     next();
   });
 
