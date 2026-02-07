@@ -10,6 +10,9 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   displayName: text("display_name"),
+  openaiKey: text("openai_key"),
+  geminiKey: text("gemini_key"),
+  openrouterKey: text("openrouter_key"),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({

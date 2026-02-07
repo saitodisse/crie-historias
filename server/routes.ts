@@ -2,6 +2,8 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { encrypt, decrypt } from "./crypto";
 import {
   insertStorySchema, insertCharacterSchema, insertScriptSchema,
   insertPromptSchema, insertCreativeProfileSchema,
@@ -293,6 +295,145 @@ export async function registerRoutes(
       await storage.setActiveProfile(DEFAULT_USER_ID, parseInt(req.params.id));
       res.json({ success: true });
     } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/user/keys", async (req, res) => {
+    try {
+      const user = await storage.getUser(DEFAULT_USER_ID);
+      if (!user) return res.status(404).json({ error: "Usuário não encontrado" });
+      res.json({
+        hasOpenai: !!user.openaiKey,
+        hasGemini: !!user.geminiKey,
+        hasOpenrouter: !!user.openrouterKey,
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/user/keys", async (req, res) => {
+    try {
+      const { openaiKey, geminiKey, openrouterKey } = req.body;
+      const updates: any = {};
+      if (openaiKey !== undefined) updates.openaiKey = openaiKey ? encrypt(openaiKey) : null;
+      if (geminiKey !== undefined) updates.geminiKey = geminiKey ? encrypt(geminiKey) : null;
+      if (openrouterKey !== undefined) updates.openrouterKey = openrouterKey ? encrypt(openrouterKey) : null;
+
+      await storage.updateUser(DEFAULT_USER_ID, updates);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/ai/generate", async (req, res) => {
+    try {
+      await ensureDefaultUser();
+      const user = await storage.getUser(DEFAULT_USER_ID);
+      const { storyId, characterId, scriptId, promptId, userPrompt, type } = req.body;
+
+      const profile = await storage.getActiveProfile(DEFAULT_USER_ID);
+      const model = profile?.model || "gpt-5-mini";
+      const maxTokens = profile?.maxTokens || 2048;
+
+      let contextParts: string[] = [];
+      let systemPrompt = "Você é um assistente de escrita criativa habilidoso. ";
+
+      if (profile?.narrativeStyle) {
+        systemPrompt += `Escreva neste estilo: ${profile.narrativeStyle}. `;
+      }
+
+      let story, character, script, promptRecord;
+
+      if (storyId) {
+        story = await storage.getStory(storyId);
+        if (story) {
+          contextParts.push(`História: "${story.title}"`);
+          if (story.premise) contextParts.push(`Premissa: ${story.premise}`);
+          if (story.tone) contextParts.push(`Tom/Gênero: ${story.tone}`);
+          const chars = await storage.getStoryCharacters(storyId);
+          if (chars.length > 0) {
+            contextParts.push(`Personagens: ${chars.map((c) => `${c.name} - ${c.personality || c.description || ""}`).join("; ")}`);
+          }
+        }
+      }
+
+      if (characterId) {
+        character = await storage.getCharacter(characterId);
+        if (character) {
+          contextParts.push(`Personagem: ${character.name}`);
+          if (character.description) contextParts.push(`Descrição: ${character.description}`);
+          if (character.personality) contextParts.push(`Personalidade: ${character.personality}`);
+          if (character.background) contextParts.push(`Histórico: ${character.background}`);
+        }
+      }
+
+      if (scriptId) {
+        script = await storage.getScript(scriptId);
+        if (script) {
+          contextParts.push(`Roteiro: "${script.title}" (${script.type})`);
+          if (script.content) contextParts.push(`Conteúdo atual:\n${script.content.substring(0, 2000)}`);
+        }
+      }
+
+      if (promptId) {
+        promptRecord = await storage.getPrompt(promptId);
+        if (promptRecord) {
+          systemPrompt += promptRecord.content + " ";
+        }
+      }
+
+      const finalPrompt = contextParts.length > 0
+        ? `Contexto:\n${contextParts.join("\n")}\n\nSolicitação: ${userPrompt}`
+        : userPrompt;
+
+      let result = "";
+      
+      if (model.includes("gemini") && user?.geminiKey) {
+        const genAI = new GoogleGenerativeAI(decrypt(user.geminiKey));
+        const geminiModel = genAI.getGenerativeModel({ model: "gemini-pro" });
+        const geminiResult = await geminiModel.generateContent({
+          contents: [{ role: "user", parts: [{ text: `${systemPrompt}\n\n${finalPrompt}` }] }],
+          generationConfig: { maxOutputTokens: maxTokens },
+        });
+        result = geminiResult.response.text();
+      } else {
+        const clientKey = model.includes("openrouter") ? user?.openrouterKey : user?.openaiKey;
+        const aiClient = new OpenAI({
+          apiKey: clientKey ? decrypt(clientKey) : process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
+          baseURL: model.includes("openrouter") ? "https://openrouter.ai/api/v1" : process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
+        });
+
+        const completion = await aiClient.chat.completions.create({
+          model,
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: finalPrompt },
+          ],
+          max_completion_tokens: maxTokens,
+        });
+        result = completion.choices[0]?.message?.content || "";
+      }
+
+      const execution = await storage.createExecution({
+        userId: DEFAULT_USER_ID,
+        promptId: promptId || null,
+        storyId: storyId || null,
+        scriptId: scriptId || null,
+        characterId: characterId || null,
+        systemPromptSnapshot: systemPrompt,
+        userPrompt,
+        finalPrompt,
+        model,
+        parameters: { maxTokens },
+        result,
+      });
+
+      res.json({ execution, result });
+    } catch (error: any) {
+      console.error("AI generation error:", error);
       res.status(500).json({ error: error.message });
     }
   });
