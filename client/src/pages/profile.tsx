@@ -235,13 +235,22 @@ export default function ProfilePage() {
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <Label>Modelo de IA</Label>
-          <Dialog open={searchOpen} onOpenChange={setSearchOpen}>
+          <Dialog open={searchOpen} onOpenChange={(open) => {
+            setSearchOpen(open);
+            if (!open) setSearchTerm("");
+          }}>
             <DialogTrigger asChild>
               <Button
                 variant="ghost"
                 size="sm"
+                type="button"
                 className="h-7 px-2 gap-1"
                 disabled={!dynamicModels?.length}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setSearchOpen(true);
+                }}
               >
                 <Search className="h-3.5 w-3.5" />
                 Explorar Modelos
@@ -264,16 +273,22 @@ export default function ProfilePage() {
                       setSearchTerm(e.target.value);
                     }}
                     onKeyDown={(e) => {
-                      e.stopPropagation();
+                      // Prevent modal from reacting to keyboard events inside the input
+                      if (e.key !== "Escape") {
+                        e.stopPropagation();
+                      }
                     }}
                   />
                 </div>
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() =>
-                    setSortOrder(sortOrder === "asc" ? "desc" : "asc")
-                  }
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+                  }}
                   title="Ordenar por preço"
                 >
                   <ArrowUpDown className="h-4 w-4" />
