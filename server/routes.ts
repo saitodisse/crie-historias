@@ -339,22 +339,34 @@ export async function registerRoutes(
         const client = new OpenAI({ apiKey, baseURL });
         const list = await client.models.list();
         const models = [];
+        // Hardcoded pricing for common OpenAI models as they don't provide it via API list
+        const pricing: Record<string, string> = {
+          "gpt-4o": "$15.00/M",
+          "gpt-4o-mini": "$0.60/M",
+          "o1-preview": "$60.00/M",
+          "o1-mini": "$12.00/M",
+          "gpt-4-turbo": "$30.00/M",
+          "gpt-3.5-turbo": "$1.50/M",
+        };
         for await (const m of list) {
           if (m.id.startsWith("gpt-") || m.id.startsWith("o") || m.id.includes("chatgpt")) {
-            models.push({ id: m.id, name: m.id });
+            const price = pricing[m.id] || "Preço sob consulta";
+            models.push({ id: m.id, name: `${m.id} (${price})` });
           }
         }
         models.sort((a, b) => a.name.localeCompare(b.name));
         res.json(models);
       } else if (provider === "gemini") {
         const apiKey = user?.geminiKey ? decrypt(user.geminiKey) : null;
+        // Gemini doesn't provide pricing via API, using current standard pricing info
+        const pricingInfo = " (Grátis/Tiered)"; 
         if (!apiKey) {
           return res.json([
-            { id: "gemini-2.0-flash", name: "Gemini 2.0 Flash" },
-            { id: "gemini-2.0-flash-lite", name: "Gemini 2.0 Flash Lite" },
-            { id: "gemini-1.5-flash", name: "Gemini 1.5 Flash" },
-            { id: "gemini-1.5-pro", name: "Gemini 1.5 Pro" },
-            { id: "gemini-pro", name: "Gemini Pro" },
+            { id: "gemini-2.0-flash", name: "Gemini 2.0 Flash" + pricingInfo },
+            { id: "gemini-2.0-flash-lite", name: "Gemini 2.0 Flash Lite" + pricingInfo },
+            { id: "gemini-1.5-flash", name: "Gemini 1.5 Flash" + pricingInfo },
+            { id: "gemini-1.5-pro", name: "Gemini 1.5 Pro" + pricingInfo },
+            { id: "gemini-pro", name: "Gemini Pro" + pricingInfo },
           ]);
         }
         const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
@@ -364,7 +376,7 @@ export async function registerRoutes(
           .filter((m: any) => m.supportedGenerationMethods?.includes("generateContent"))
           .map((m: any) => ({
             id: m.name.replace("models/", ""),
-            name: m.displayName || m.name.replace("models/", ""),
+            name: (m.displayName || m.name.replace("models/", "")) + pricingInfo,
           }));
         res.json(models);
       } else if (provider === "openrouter") {
