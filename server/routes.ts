@@ -372,12 +372,12 @@ export async function registerRoutes(
         if (!resp.ok) throw new Error("Falha ao buscar modelos do OpenRouter");
         const data = await resp.json();
         const models = (data.data || [])
-          .slice(0, 100)
           .map((m: any) => ({
             id: m.id,
-            name: m.name || m.id,
+            name: `${m.name || m.id} ($${((m.pricing?.completion || 0) * 1000000).toFixed(2)}/M)`,
           }));
-        res.json(models);
+        models.sort((a: any, b: any) => a.name.localeCompare(b.name));
+        res.json(models.slice(0, 100));
       } else {
         res.status(400).json({ error: "Provedor inválido" });
       }
