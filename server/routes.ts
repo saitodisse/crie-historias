@@ -416,43 +416,27 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/ai/rerun", async (req, res) => {
+  app.post("/api/admin/reset", async (req, res) => {
     try {
-      const { executionId } = req.body;
-      const original = await storage.getExecution(executionId);
-      if (!original) return res.status(404).json({ error: "Execution not found" });
+      await ensureDefaultUser();
+      const { db } = await import("./db");
+      const { aiExecutions, scripts, storyCharacters, prompts, creativeProfiles, stories, characters } = await import("@shared/schema");
+      const { eq } = await import("drizzle-orm");
+      const { seedDatabase } = await import("./seed");
 
-      const params = (original.parameters || {}) as Record<string, any>;
-      const maxTokens = params.maxTokens || 2048;
+      // Limpeza manual para garantir que CASCADE funcione ou limpar em ordem
+      await db.delete(aiExecutions);
+      await db.delete(scripts);
+      await db.delete(storyCharacters);
+      await db.delete(prompts);
+      await db.delete(creativeProfiles);
+      await db.delete(stories);
+      await db.delete(characters);
 
-      const completion = await openai.chat.completions.create({
-        model: original.model,
-        messages: [
-          { role: "system", content: original.systemPromptSnapshot || "" },
-          { role: "user", content: original.finalPrompt },
-        ],
-        max_completion_tokens: maxTokens,
-      });
-
-      const result = completion.choices[0]?.message?.content || "";
-
-      const execution = await storage.createExecution({
-        userId: original.userId,
-        promptId: original.promptId,
-        storyId: original.storyId,
-        scriptId: original.scriptId,
-        characterId: original.characterId,
-        systemPromptSnapshot: original.systemPromptSnapshot,
-        userPrompt: original.userPrompt,
-        finalPrompt: original.finalPrompt,
-        model: original.model,
-        parameters: original.parameters,
-        result,
-      });
-
-      res.json({ execution, result });
+      await seedDatabase();
+      res.json({ success: true });
     } catch (error: any) {
-      console.error("AI re-run error:", error);
+      console.error("Factory reset error:", error);
       res.status(500).json({ error: error.message });
     }
   });
