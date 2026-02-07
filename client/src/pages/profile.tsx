@@ -202,229 +202,253 @@ export default function ProfilePage() {
     });
   };
 
-  const ProfileForm = ({ isCreate }: { isCreate: boolean }) => (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <Label>Nome do Perfil</Label>
-        <Input
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-          placeholder="ex: Escrita Criativa, Técnico, Conciso"
-          data-testid="input-profile-name"
-        />
-      </div>
-      <div className="space-y-2">
-        <Label>Provedor</Label>
-        <Select
-          value={provider}
-          onValueChange={(v) => {
-            setProvider(v);
-            setForm({ ...form, model: "" });
-          }}
-        >
-          <SelectTrigger data-testid="select-profile-provider">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="openai">OpenAI</SelectItem>
-            <SelectItem value="gemini">Gemini</SelectItem>
-            <SelectItem value="openrouter">OpenRouter</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label>Modelo de IA</Label>
-          <Dialog open={searchOpen} onOpenChange={(open) => {
-            setSearchOpen(open);
-            if (!open) setSearchTerm("");
-          }}>
-            <DialogTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                type="button"
-                className="h-7 px-2 gap-1"
-                disabled={!dynamicModels?.length}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setSearchOpen(true);
-                }}
-              >
-                <Search className="h-3.5 w-3.5" />
-                Explorar Modelos
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
-              <DialogHeader>
-                <DialogTitle>
-                  Explorar Modelos - {provider.toUpperCase()}
-                </DialogTitle>
-              </DialogHeader>
-              <div className="flex gap-2 items-center py-4">
-                <div className="relative flex-1">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Pesquisar modelos..."
-                    className="pl-9"
-                    value={searchTerm}
-                    onChange={(e) => {
-                      setSearchTerm(e.target.value);
-                    }}
-                    onKeyDown={(e) => {
-                      // Prevent modal from reacting to keyboard events inside the input
-                      if (e.key !== "Escape") {
-                        e.stopPropagation();
-                      }
-                    }}
-                  />
-                </div>
+  const ProfileForm = ({ isCreate }: { isCreate: boolean }) => {
+    const [localForm, setLocalForm] = useState(form);
+
+    useEffect(() => {
+      setLocalForm(form);
+    }, [form]);
+
+    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newName = e.target.value;
+      setLocalForm(prev => ({ ...prev, name: newName }));
+      setForm(prev => ({ ...prev, name: newName }));
+    };
+
+    const handleMaxTokensChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const val = parseInt(e.target.value) || 2048;
+      setLocalForm(prev => ({ ...prev, maxTokens: val }));
+      setForm(prev => ({ ...prev, maxTokens: val }));
+    };
+
+    const handleStyleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      const val = e.target.value;
+      setLocalForm(prev => ({ ...prev, narrativeStyle: val }));
+      setForm(prev => ({ ...prev, narrativeStyle: val }));
+    };
+
+    return (
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label>Nome do Perfil</Label>
+          <Input
+            value={localForm.name}
+            onChange={handleNameChange}
+            placeholder="ex: Escrita Criativa, Técnico, Conciso"
+            data-testid="input-profile-name"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>Provedor</Label>
+          <Select
+            value={provider}
+            onValueChange={(v) => {
+              setProvider(v);
+              setForm({ ...form, model: "" });
+            }}
+          >
+            <SelectTrigger data-testid="select-profile-provider">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="openai">OpenAI</SelectItem>
+              <SelectItem value="gemini">Gemini</SelectItem>
+              <SelectItem value="openrouter">OpenRouter</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label>Modelo de IA</Label>
+            <Dialog open={searchOpen} onOpenChange={(open) => {
+              setSearchOpen(open);
+              if (!open) setSearchTerm("");
+            }}>
+              <DialogTrigger asChild>
                 <Button
-                  variant="outline"
-                  size="icon"
+                  variant="ghost"
+                  size="sm"
                   type="button"
+                  className="h-7 px-2 gap-1"
+                  disabled={!dynamicModels?.length}
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+                    setSearchOpen(true);
                   }}
-                  title="Ordenar por preço"
                 >
-                  <ArrowUpDown className="h-4 w-4" />
+                  <Search className="h-3.5 w-3.5" />
+                  Explorar Modelos
                 </Button>
-              </div>
-              <div className="flex-1 overflow-y-auto space-y-2 pr-1">
-                {filteredModels.map((m) => (
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
+                <DialogHeader>
+                  <DialogTitle>
+                    Explorar Modelos - {provider.toUpperCase()}
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="flex gap-2 items-center py-4">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Pesquisar modelos..."
+                      className="pl-9"
+                      value={searchTerm}
+                      onChange={(e) => {
+                        setSearchTerm(e.target.value);
+                      }}
+                      onKeyDown={(e) => {
+                        // Prevent modal from reacting to keyboard events inside the input
+                        if (e.key !== "Escape") {
+                          e.stopPropagation();
+                        }
+                      }}
+                    />
+                  </div>
                   <Button
-                    key={m.id}
                     variant="outline"
-                    className="w-full justify-between h-auto py-3 px-4 text-left"
-                    onClick={() => {
-                      setForm({ ...form, model: m.id });
-                      setSearchOpen(false);
+                    size="icon"
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
                     }}
+                    title="Ordenar por preço"
                   >
-                    <div className="flex flex-col gap-0.5">
-                      <span className="font-medium">
-                        {m.displayName.split(" (")[0]}
-                      </span>
-                      <span className="text-xs text-muted-foreground font-mono">
-                        {m.id}
-                      </span>
-                    </div>
-                    {m.price !== undefined && (
-                      <Badge
-                        variant="secondary"
-                        className="ml-2 whitespace-nowrap"
-                      >
-                        ${m.price.toFixed(2)}/M
-                      </Badge>
-                    )}
+                    <ArrowUpDown className="h-4 w-4" />
                   </Button>
+                </div>
+                <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+                  {filteredModels.map((m) => (
+                    <Button
+                      key={m.id}
+                      variant="outline"
+                      className="w-full justify-between h-auto py-3 px-4 text-left"
+                      onClick={() => {
+                        setForm({ ...form, model: m.id });
+                        setSearchOpen(false);
+                      }}
+                    >
+                      <div className="flex flex-col gap-0.5">
+                        <span className="font-medium">
+                          {m.displayName.split(" (")[0]}
+                        </span>
+                        <span className="text-xs text-muted-foreground font-mono">
+                          {m.id}
+                        </span>
+                      </div>
+                      {m.price !== undefined && (
+                        <Badge
+                          variant="secondary"
+                          className="ml-2 whitespace-nowrap"
+                        >
+                          ${m.price.toFixed(2)}/M
+                        </Badge>
+                      )}
+                    </Button>
+                  ))}
+                  {filteredModels.length === 0 && (
+                    <p className="text-center py-8 text-muted-foreground">
+                      Nenhum modelo encontrado.
+                    </p>
+                  )}
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+          {isLoadingModels ? (
+            <div className="flex items-center gap-2 h-9 px-3 border rounded-md text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Carregando modelos...
+            </div>
+          ) : isModelsError ? (
+            <div className="flex items-center gap-2 h-9 px-3 border border-destructive rounded-md text-sm text-destructive">
+              Falha ao carregar modelos. Verifique sua chave de API.
+            </div>
+          ) : dynamicModels && dynamicModels.length === 0 ? (
+            <div className="flex items-center gap-2 h-9 px-3 border rounded-md text-sm text-muted-foreground">
+              Nenhum modelo disponível para este provedor.
+            </div>
+          ) : (
+            <Select
+              value={form.model}
+              onValueChange={(v) => setForm({ ...form, model: v })}
+            >
+              <SelectTrigger data-testid="select-profile-model">
+                <SelectValue placeholder="Selecione um modelo" />
+              </SelectTrigger>
+              <SelectContent>
+                {(dynamicModels || []).map((m) => (
+                  <SelectItem key={m.id} value={m.id}>
+                    {m.name}
+                  </SelectItem>
                 ))}
-                {filteredModels.length === 0 && (
-                  <p className="text-center py-8 text-muted-foreground">
-                    Nenhum modelo encontrado.
-                  </p>
-                )}
-              </div>
-            </DialogContent>
-          </Dialog>
+              </SelectContent>
+            </Select>
+          )}
         </div>
-        {isLoadingModels ? (
-          <div className="flex items-center gap-2 h-9 px-3 border rounded-md text-sm text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Carregando modelos...
-          </div>
-        ) : isModelsError ? (
-          <div className="flex items-center gap-2 h-9 px-3 border border-destructive rounded-md text-sm text-destructive">
-            Falha ao carregar modelos. Verifique sua chave de API.
-          </div>
-        ) : dynamicModels && dynamicModels.length === 0 ? (
-          <div className="flex items-center gap-2 h-9 px-3 border rounded-md text-sm text-muted-foreground">
-            Nenhum modelo disponível para este provedor.
-          </div>
-        ) : (
-          <Select
-            value={form.model}
-            onValueChange={(v) => setForm({ ...form, model: v })}
-          >
-            <SelectTrigger data-testid="select-profile-model">
-              <SelectValue placeholder="Selecione um modelo" />
-            </SelectTrigger>
-            <SelectContent>
-              {(dynamicModels || []).map((m) => (
-                <SelectItem key={m.id} value={m.id}>
-                  {m.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
-      </div>
-      <div className="space-y-2">
-        <Label>Temperatura: {form.temperature}</Label>
-        <Slider
-          value={[parseFloat(form.temperature)]}
-          onValueChange={([v]) =>
-            setForm({ ...form, temperature: v.toFixed(1) })
+        <div className="space-y-2">
+          <Label>Temperatura: {form.temperature}</Label>
+          <Slider
+            value={[parseFloat(form.temperature)]}
+            onValueChange={([v]) =>
+              setForm({ ...form, temperature: v.toFixed(1) })
+            }
+            min={0}
+            max={2}
+            step={0.1}
+            data-testid="slider-temperature"
+          />
+          <p className="text-xs text-muted-foreground">
+            Menor = mais focado, Maior = mais criativo
+          </p>
+        </div>
+        <div className="space-y-2">
+          <Label>Máximo de Tokens</Label>
+          <Input
+            type="number"
+            value={localForm.maxTokens}
+            onChange={handleMaxTokensChange}
+            min={256}
+            max={8192}
+            data-testid="input-max-tokens"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>Estilo Narrativo</Label>
+          <Textarea
+            value={localForm.narrativeStyle}
+            onChange={handleStyleChange}
+            placeholder="Descreva o estilo de escrita desejado, tom, voz..."
+            rows={3}
+            className="resize-none"
+            data-testid="input-narrative-style"
+          />
+        </div>
+        <Button
+          className="w-full"
+          onClick={() =>
+            isCreate ? createMutation.mutate() : updateMutation.mutate()
           }
-          min={0}
-          max={2}
-          step={0.1}
-          data-testid="slider-temperature"
-        />
-        <p className="text-xs text-muted-foreground">
-          Menor = mais focado, Maior = mais criativo
-        </p>
-      </div>
-      <div className="space-y-2">
-        <Label>Máximo de Tokens</Label>
-        <Input
-          type="number"
-          value={form.maxTokens}
-          onChange={(e) =>
-            setForm({ ...form, maxTokens: parseInt(e.target.value) || 2048 })
+          disabled={
+            !form.name.trim() ||
+            !form.model ||
+            (isCreate ? createMutation.isPending : updateMutation.isPending)
           }
-          min={256}
-          max={8192}
-          data-testid="input-max-tokens"
-        />
+          data-testid="button-submit-profile"
+        >
+          {isCreate
+            ? createMutation.isPending
+              ? "Criando..."
+              : "Criar Perfil"
+            : updateMutation.isPending
+              ? "Salvando..."
+              : "Salvar Alterações"}
+        </Button>
       </div>
-      <div className="space-y-2">
-        <Label>Estilo Narrativo</Label>
-        <Textarea
-          value={form.narrativeStyle}
-          onChange={(e) => setForm({ ...form, narrativeStyle: e.target.value })}
-          placeholder="Descreva o estilo de escrita desejado, tom, voz..."
-          rows={3}
-          className="resize-none"
-          data-testid="input-narrative-style"
-        />
-      </div>
-      <Button
-        className="w-full"
-        onClick={() =>
-          isCreate ? createMutation.mutate() : updateMutation.mutate()
-        }
-        disabled={
-          !form.name.trim() ||
-          !form.model ||
-          (isCreate ? createMutation.isPending : updateMutation.isPending)
-        }
-        data-testid="button-submit-profile"
-      >
-        {isCreate
-          ? createMutation.isPending
-            ? "Criando..."
-            : "Criar Perfil"
-          : updateMutation.isPending
-            ? "Salvando..."
-            : "Salvar Alterações"}
-      </Button>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="flex flex-col h-full p-6 space-y-8 overflow-auto">
