@@ -6,13 +6,36 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Settings, Plus, Save, Trash2, Check, Pencil, Key, Loader2, Search, ArrowUpDown } from "lucide-react";
+import {
+  Settings,
+  Plus,
+  Save,
+  Trash2,
+  Check,
+  Pencil,
+  Key,
+  Loader2,
+  Search,
+  ArrowUpDown,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { CreativeProfile } from "@shared/schema";
 
@@ -51,11 +74,19 @@ export default function ProfilePage() {
   const [geminiKey, setGeminiKey] = useState("");
   const [openrouterKey, setOpenrouterKey] = useState("");
 
-  const { data: keysData, isLoading: isLoadingKeys } = useQuery<{ hasOpenai: boolean; hasGemini: boolean; hasOpenrouter: boolean }>({
+  const { data: keysData, isLoading: isLoadingKeys } = useQuery<{
+    hasOpenai: boolean;
+    hasGemini: boolean;
+    hasOpenrouter: boolean;
+  }>({
     queryKey: ["/api/user/keys"],
   });
 
-  const { data: dynamicModels, isLoading: isLoadingModels, isError: isModelsError } = useQuery<ModelOption[]>({
+  const {
+    data: dynamicModels,
+    isLoading: isLoadingModels,
+    isError: isModelsError,
+  } = useQuery<ModelOption[]>({
     queryKey: ["/api/models", provider],
     queryFn: async () => {
       const resp = await fetch(`/api/models/${provider}`);
@@ -66,7 +97,7 @@ export default function ProfilePage() {
         return {
           ...m,
           displayName: m.name,
-          price: priceMatch ? parseFloat(priceMatch[1]) : undefined
+          price: priceMatch ? parseFloat(priceMatch[1]) : undefined,
         };
       });
     },
@@ -75,7 +106,9 @@ export default function ProfilePage() {
   });
 
   const filteredModels = (dynamicModels || [])
-    .filter(m => m.displayName.toLowerCase().includes(searchTerm.toLowerCase()))
+    .filter((m) =>
+      m.displayName.toLowerCase().includes(searchTerm.toLowerCase()),
+    )
     .sort((a, b) => {
       if (!sortOrder) return 0;
       const priceA = a.price ?? Infinity;
@@ -146,7 +179,14 @@ export default function ProfilePage() {
 
   const resetForm = () => {
     setProvider("openai");
-    setForm({ name: "", model: "", temperature: "0.8", maxTokens: 2048, narrativeStyle: "", active: true });
+    setForm({
+      name: "",
+      model: "",
+      temperature: "0.8",
+      maxTokens: 2048,
+      narrativeStyle: "",
+      active: true,
+    });
   };
 
   const startEditing = (p: CreativeProfile) => {
@@ -175,8 +215,8 @@ export default function ProfilePage() {
       </div>
       <div className="space-y-2">
         <Label>Provedor</Label>
-        <Select 
-          value={provider} 
+        <Select
+          value={provider}
           onValueChange={(v) => {
             setProvider(v);
             setForm({ ...form, model: "" });
@@ -197,14 +237,21 @@ export default function ProfilePage() {
           <Label>Modelo de IA</Label>
           <Dialog open={searchOpen} onOpenChange={setSearchOpen}>
             <DialogTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-7 px-2 gap-1" disabled={!dynamicModels?.length}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 gap-1"
+                disabled={!dynamicModels?.length}
+              >
                 <Search className="h-3.5 w-3.5" />
                 Explorar Modelos
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
               <DialogHeader>
-                <DialogTitle>Explorar Modelos - {provider.toUpperCase()}</DialogTitle>
+                <DialogTitle>
+                  Explorar Modelos - {provider.toUpperCase()}
+                </DialogTitle>
               </DialogHeader>
               <div className="flex gap-2 items-center py-4">
                 <div className="relative flex-1">
@@ -214,15 +261,19 @@ export default function ProfilePage() {
                     className="pl-9"
                     value={searchTerm}
                     onChange={(e) => {
-                      e.stopPropagation();
                       setSearchTerm(e.target.value);
+                    }}
+                    onKeyDown={(e) => {
+                      e.stopPropagation();
                     }}
                   />
                 </div>
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+                  onClick={() =>
+                    setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+                  }
                   title="Ordenar por preço"
                 >
                   <ArrowUpDown className="h-4 w-4" />
@@ -240,18 +291,27 @@ export default function ProfilePage() {
                     }}
                   >
                     <div className="flex flex-col gap-0.5">
-                      <span className="font-medium">{m.displayName.split(" (")[0]}</span>
-                      <span className="text-xs text-muted-foreground font-mono">{m.id}</span>
+                      <span className="font-medium">
+                        {m.displayName.split(" (")[0]}
+                      </span>
+                      <span className="text-xs text-muted-foreground font-mono">
+                        {m.id}
+                      </span>
                     </div>
                     {m.price !== undefined && (
-                      <Badge variant="secondary" className="ml-2 whitespace-nowrap">
+                      <Badge
+                        variant="secondary"
+                        className="ml-2 whitespace-nowrap"
+                      >
                         ${m.price.toFixed(2)}/M
                       </Badge>
                     )}
                   </Button>
                 ))}
                 {filteredModels.length === 0 && (
-                  <p className="text-center py-8 text-muted-foreground">Nenhum modelo encontrado.</p>
+                  <p className="text-center py-8 text-muted-foreground">
+                    Nenhum modelo encontrado.
+                  </p>
                 )}
               </div>
             </DialogContent>
@@ -271,13 +331,18 @@ export default function ProfilePage() {
             Nenhum modelo disponível para este provedor.
           </div>
         ) : (
-          <Select value={form.model} onValueChange={(v) => setForm({ ...form, model: v })}>
+          <Select
+            value={form.model}
+            onValueChange={(v) => setForm({ ...form, model: v })}
+          >
             <SelectTrigger data-testid="select-profile-model">
               <SelectValue placeholder="Selecione um modelo" />
             </SelectTrigger>
             <SelectContent>
               {(dynamicModels || []).map((m) => (
-                <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
+                <SelectItem key={m.id} value={m.id}>
+                  {m.name}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -287,7 +352,9 @@ export default function ProfilePage() {
         <Label>Temperatura: {form.temperature}</Label>
         <Slider
           value={[parseFloat(form.temperature)]}
-          onValueChange={([v]) => setForm({ ...form, temperature: v.toFixed(1) })}
+          onValueChange={([v]) =>
+            setForm({ ...form, temperature: v.toFixed(1) })
+          }
           min={0}
           max={2}
           step={0.1}
@@ -302,7 +369,9 @@ export default function ProfilePage() {
         <Input
           type="number"
           value={form.maxTokens}
-          onChange={(e) => setForm({ ...form, maxTokens: parseInt(e.target.value) || 2048 })}
+          onChange={(e) =>
+            setForm({ ...form, maxTokens: parseInt(e.target.value) || 2048 })
+          }
           min={256}
           max={8192}
           data-testid="input-max-tokens"
@@ -321,13 +390,23 @@ export default function ProfilePage() {
       </div>
       <Button
         className="w-full"
-        onClick={() => (isCreate ? createMutation.mutate() : updateMutation.mutate())}
-        disabled={!form.name.trim() || !form.model || (isCreate ? createMutation.isPending : updateMutation.isPending)}
+        onClick={() =>
+          isCreate ? createMutation.mutate() : updateMutation.mutate()
+        }
+        disabled={
+          !form.name.trim() ||
+          !form.model ||
+          (isCreate ? createMutation.isPending : updateMutation.isPending)
+        }
         data-testid="button-submit-profile"
       >
         {isCreate
-          ? createMutation.isPending ? "Criando..." : "Criar Perfil"
-          : updateMutation.isPending ? "Salvando..." : "Salvar Alterações"}
+          ? createMutation.isPending
+            ? "Criando..."
+            : "Criar Perfil"
+          : updateMutation.isPending
+            ? "Salvando..."
+            : "Salvar Alterações"}
       </Button>
     </div>
   );
@@ -335,7 +414,9 @@ export default function ProfilePage() {
   return (
     <div className="flex flex-col h-full p-6 space-y-8 overflow-auto">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Configurações de API</h1>
+        <h1 className="text-2xl font-bold tracking-tight">
+          Configurações de API
+        </h1>
         <p className="text-sm text-muted-foreground mt-1">
           Suas chaves são criptografadas e armazenadas com segurança.
         </p>
@@ -344,7 +425,11 @@ export default function ProfilePage() {
             <CardHeader className="py-3">
               <div className="flex items-center justify-between">
                 <Label className="text-xs font-semibold">OpenAI</Label>
-                {keysData?.hasOpenai && <Badge variant="secondary" className="text-[10px]">Configurada</Badge>}
+                {keysData?.hasOpenai && (
+                  <Badge variant="secondary" className="text-[10px]">
+                    Configurada
+                  </Badge>
+                )}
               </div>
             </CardHeader>
             <CardContent className="space-y-2 py-0 pb-3">
@@ -355,7 +440,12 @@ export default function ProfilePage() {
                 onChange={(e) => setOpenaiKey(e.target.value)}
                 className="h-8 text-xs"
               />
-              <Button size="sm" className="w-full h-8" onClick={() => saveKeysMutation.mutate({ openaiKey })} disabled={!openaiKey}>
+              <Button
+                size="sm"
+                className="w-full h-8"
+                onClick={() => saveKeysMutation.mutate({ openaiKey })}
+                disabled={!openaiKey}
+              >
                 Salvar
               </Button>
             </CardContent>
@@ -364,7 +454,11 @@ export default function ProfilePage() {
             <CardHeader className="py-3">
               <div className="flex items-center justify-between">
                 <Label className="text-xs font-semibold">Gemini</Label>
-                {keysData?.hasGemini && <Badge variant="secondary" className="text-[10px]">Configurada</Badge>}
+                {keysData?.hasGemini && (
+                  <Badge variant="secondary" className="text-[10px]">
+                    Configurada
+                  </Badge>
+                )}
               </div>
             </CardHeader>
             <CardContent className="space-y-2 py-0 pb-3">
@@ -375,7 +469,12 @@ export default function ProfilePage() {
                 onChange={(e) => setGeminiKey(e.target.value)}
                 className="h-8 text-xs"
               />
-              <Button size="sm" className="w-full h-8" onClick={() => saveKeysMutation.mutate({ geminiKey })} disabled={!geminiKey}>
+              <Button
+                size="sm"
+                className="w-full h-8"
+                onClick={() => saveKeysMutation.mutate({ geminiKey })}
+                disabled={!geminiKey}
+              >
                 Salvar
               </Button>
             </CardContent>
@@ -384,7 +483,11 @@ export default function ProfilePage() {
             <CardHeader className="py-3">
               <div className="flex items-center justify-between">
                 <Label className="text-xs font-semibold">OpenRouter</Label>
-                {keysData?.hasOpenrouter && <Badge variant="secondary" className="text-[10px]">Configurada</Badge>}
+                {keysData?.hasOpenrouter && (
+                  <Badge variant="secondary" className="text-[10px]">
+                    Configurada
+                  </Badge>
+                )}
               </div>
             </CardHeader>
             <CardContent className="space-y-2 py-0 pb-3">
@@ -395,7 +498,12 @@ export default function ProfilePage() {
                 onChange={(e) => setOpenrouterKey(e.target.value)}
                 className="h-8 text-xs"
               />
-              <Button size="sm" className="w-full h-8" onClick={() => saveKeysMutation.mutate({ openrouterKey })} disabled={!openrouterKey}>
+              <Button
+                size="sm"
+                className="w-full h-8"
+                onClick={() => saveKeysMutation.mutate({ openrouterKey })}
+                disabled={!openrouterKey}
+              >
                 Salvar
               </Button>
             </CardContent>
@@ -406,12 +514,23 @@ export default function ProfilePage() {
       <div className="flex flex-col h-full">
         <div className="flex items-center justify-between gap-4 flex-wrap pb-4">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight" data-testid="text-profile-title">Perfis Criativos</h1>
+            <h1
+              className="text-2xl font-bold tracking-tight"
+              data-testid="text-profile-title"
+            >
+              Perfis Criativos
+            </h1>
             <p className="text-sm text-muted-foreground mt-1">
               Gerencie preferências de modelo de IA e estilos narrativos
             </p>
           </div>
-          <Dialog open={createOpen} onOpenChange={(o) => { setCreateOpen(o); if (!o) resetForm(); }}>
+          <Dialog
+            open={createOpen}
+            onOpenChange={(o) => {
+              setCreateOpen(o);
+              if (!o) resetForm();
+            }}
+          >
             <DialogTrigger asChild>
               <Button data-testid="button-create-profile">
                 <Plus className="h-4 w-4 mr-2" />
@@ -450,7 +569,14 @@ export default function ProfilePage() {
                   {editId === profile.id ? (
                     <CardContent className="pt-4">
                       <ProfileForm isCreate={false} />
-                      <Button variant="ghost" className="w-full mt-2" onClick={() => { setEditId(null); resetForm(); }}>
+                      <Button
+                        variant="ghost"
+                        className="w-full mt-2"
+                        onClick={() => {
+                          setEditId(null);
+                          resetForm();
+                        }}
+                      >
                         Cancelar
                       </Button>
                     </CardContent>
@@ -459,7 +585,9 @@ export default function ProfilePage() {
                       <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 pb-2">
                         <div className="flex items-center gap-2 min-w-0">
                           <Settings className="h-4 w-4 text-primary shrink-0" />
-                          <h3 className="font-semibold text-sm truncate">{profile.name}</h3>
+                          <h3 className="font-semibold text-sm truncate">
+                            {profile.name}
+                          </h3>
                           {profile.active && (
                             <div className="flex items-center gap-1 text-primary text-xs">
                               <Check className="h-3 w-3" />
@@ -472,19 +600,28 @@ export default function ProfilePage() {
                             <Button
                               size="sm"
                               variant="ghost"
-                              onClick={() => setActiveMutation.mutate(profile.id)}
+                              onClick={() =>
+                                setActiveMutation.mutate(profile.id)
+                              }
                               data-testid={`button-activate-profile-${profile.id}`}
                             >
                               Ativar
                             </Button>
                           )}
-                          <Button size="icon" variant="ghost" onClick={() => startEditing(profile)}>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => startEditing(profile)}
+                          >
                             <Pencil className="h-4 w-4" />
                           </Button>
                           <Button
                             size="icon"
                             variant="ghost"
-                            onClick={() => { if (window.confirm("Remover este perfil?")) deleteMutation.mutate(profile.id); }}
+                            onClick={() => {
+                              if (window.confirm("Remover este perfil?"))
+                                deleteMutation.mutate(profile.id);
+                            }}
                           >
                             <Trash2 className="h-4 w-4 text-destructive" />
                           </Button>
@@ -493,21 +630,33 @@ export default function ProfilePage() {
                       <CardContent>
                         <div className="space-y-2 text-sm">
                           <div className="flex justify-between gap-2">
-                            <span className="text-muted-foreground">Modelo</span>
-                            <span className="font-mono text-xs">{profile.model}</span>
+                            <span className="text-muted-foreground">
+                              Modelo
+                            </span>
+                            <span className="font-mono text-xs">
+                              {profile.model}
+                            </span>
                           </div>
                           <div className="flex justify-between gap-2">
-                            <span className="text-muted-foreground">Temperatura</span>
+                            <span className="text-muted-foreground">
+                              Temperatura
+                            </span>
                             <span>{profile.temperature}</span>
                           </div>
                           <div className="flex justify-between gap-2">
-                            <span className="text-muted-foreground">Tokens Máximos</span>
+                            <span className="text-muted-foreground">
+                              Tokens Máximos
+                            </span>
                             <span>{profile.maxTokens}</span>
                           </div>
                           {profile.narrativeStyle && (
                             <div>
-                              <span className="text-muted-foreground text-xs">Estilo Narrativo</span>
-                              <p className="text-xs mt-0.5">{profile.narrativeStyle}</p>
+                              <span className="text-muted-foreground text-xs">
+                                Estilo Narrativo
+                              </span>
+                              <p className="text-xs mt-0.5">
+                                {profile.narrativeStyle}
+                              </p>
                             </div>
                           )}
                         </div>
@@ -522,9 +671,12 @@ export default function ProfilePage() {
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-4">
                 <Settings className="h-8 w-8 text-muted-foreground" />
               </div>
-              <h3 className="text-lg font-semibold">Nenhum perfil criativo encontrado</h3>
+              <h3 className="text-lg font-semibold">
+                Nenhum perfil criativo encontrado
+              </h3>
               <p className="text-sm text-muted-foreground mt-1 max-w-sm">
-                Crie um perfil para salvar suas configurações de modelo de IA e estilo narrativo.
+                Crie um perfil para salvar suas configurações de modelo de IA e
+                estilo narrativo.
               </p>
             </div>
           )}
