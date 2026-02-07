@@ -29,14 +29,14 @@ import { useAuth } from "@/hooks/use-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const creativeItems = [
-  { title: "Hist\u00f3rias", url: "/", icon: BookOpen },
+  { title: "Histórias", url: "/", icon: BookOpen },
   { title: "Personagens", url: "/characters", icon: Users },
   { title: "Roteiros", url: "/scripts", icon: FileText },
 ];
 
 const aiItems = [
   { title: "Prompts", url: "/prompts", icon: Sparkles },
-  { title: "Hist\u00f3rico de IA", url: "/executions", icon: History },
+  { title: "Histórico de IA", url: "/executions", icon: History },
 ];
 
 const settingsItems = [
@@ -55,7 +55,7 @@ export function AppSidebar() {
       setIsResetting(true);
       await apiRequest("POST", "/api/admin/reset");
       queryClient.invalidateQueries();
-      toast({ title: "Reset de f\u00e1brica conclu\u00eddo", description: "O banco de dados foi limpo e a semente foi reiniciada." });
+      toast({ title: "Reset de fábrica concluído", description: "O banco de dados foi limpo e a semente foi reiniciada." });
       setOpen(false);
     } catch (error: any) {
       toast({ title: "Erro ao resetar", description: error.message, variant: "destructive" });
@@ -73,8 +73,8 @@ export function AppSidebar() {
     ? [user.firstName, user.lastName].filter(Boolean).map((n) => n?.[0]).join("").toUpperCase() || "U"
     : "U";
   const userName = user
-    ? [user.firstName, user.lastName].filter(Boolean).join(" ") || "Usu\u00e1rio"
-    : "Usu\u00e1rio";
+    ? [user.firstName, user.lastName].filter(Boolean).join(" ") || "Usuário"
+    : "Usuário";
 
   return (
     <Sidebar>
@@ -86,7 +86,7 @@ export function AppSidebar() {
             </div>
             <div>
               <h1 className="text-sm font-bold tracking-tight">StoryForge</h1>
-              <p className="text-[11px] text-muted-foreground">Est\u00fadio de Escrita Criativa</p>
+              <p className="text-[11px] text-muted-foreground">Estúdio de Escrita Criativa</p>
             </div>
           </div>
         </Link>
@@ -127,7 +127,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarGroupLabel>Configura\u00e7\u00f5es</SidebarGroupLabel>
+          <SidebarGroupLabel>Configurações</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {settingsItems.map((item) => (
@@ -167,14 +167,14 @@ export function AppSidebar() {
           <DialogTrigger asChild>
             <Button variant="outline" size="sm" className="w-full text-[11px] gap-2" data-testid="button-admin-reset">
               <RefreshCw className="h-3 w-3" />
-              Reset de F\u00e1brica
+              Reset de Fábrica
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Reset de F\u00e1brica</DialogTitle>
+              <DialogTitle>Reset de Fábrica</DialogTitle>
               <DialogDescription>
-                Isso apagar\u00e1 permanentemente todos os dados personalizados e restaurar\u00e1 as hist\u00f3rias e personagens padr\u00e3o. Esta a\u00e7\u00e3o n\u00e3o pode ser desfeita.
+                Isso apagará permanentemente todos os dados personalizados e restaurará as histórias e personagens padrão. Esta ação não pode ser desfeita.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>

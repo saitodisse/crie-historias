@@ -6,23 +6,23 @@ import { ThemeToggle } from "@/components/theme-toggle";
 const features = [
   {
     icon: BookOpen,
-    title: "Gerencie Suas Hist\u00f3rias",
-    description: "Organize hist\u00f3rias, premissas, tons e g\u00eaneros em um s\u00f3 lugar.",
+    title: "Gerencie Suas Histórias",
+    description: "Organize histórias, premissas, tons e gêneros em um só lugar.",
   },
   {
     icon: Users,
     title: "Crie Personagens",
-    description: "D\u00ea vida aos seus personagens com descri\u00e7\u00f5es, personalidades e hist\u00f3ricos.",
+    description: "Dê vida aos seus personagens com descrições, personalidades e históricos.",
   },
   {
     icon: FileText,
     title: "Escreva Roteiros",
-    description: "Crie roteiros manuais ou gerados por IA vinculados \u00e0s suas hist\u00f3rias.",
+    description: "Crie roteiros manuais ou gerados por IA vinculados às suas histórias.",
   },
   {
     icon: Sparkles,
     title: "IA Assistente",
-    description: "Use OpenAI, Gemini ou OpenRouter para gerar conte\u00fado com auditoria completa.",
+    description: "Use OpenAI, Gemini ou OpenRouter para gerar conteúdo com auditoria completa.",
   },
 ];
 
@@ -47,11 +47,11 @@ export default function LandingPage() {
       <main className="max-w-4xl mx-auto px-4 py-16">
         <div className="text-center space-y-4 mb-16">
           <h2 className="text-4xl font-bold tracking-tight font-serif">
-            Est\u00fadio de Escrita Criativa
+            Estúdio de Escrita Criativa
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Plataforma completa para escritores criativos com gera\u00e7\u00e3o de conte\u00fado assistida por IA,
-            gerenciamento de hist\u00f3rias, personagens e roteiros.
+            Plataforma completa para escritores criativos com geração de conteúdo assistida por IA,
+            gerenciamento de histórias, personagens e roteiros.
           </p>
           <div className="pt-4">
             <Button size="lg" asChild data-testid="button-login-hero">
