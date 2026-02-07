@@ -389,7 +389,7 @@ export async function registerRoutes(
             name: `${m.name || m.id} ($${((m.pricing?.completion || 0) * 1000000).toFixed(2)}/M)`,
           }));
         models.sort((a: any, b: any) => a.name.localeCompare(b.name));
-        res.json(models.slice(0, 100));
+        res.json(models);
       } else {
         res.status(400).json({ error: "Provedor inválido" });
       }
