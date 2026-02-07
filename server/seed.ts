@@ -1,6 +1,14 @@
 import { storage } from "./storage";
 
+const DEFAULT_USER_ID = 1;
+
 export async function seedDatabase() {
+  const existingStories = await storage.getStories(DEFAULT_USER_ID);
+  if (existingStories.length > 0) {
+    console.log("Database already has data, skipping seed.");
+    return;
+  }
+
   const user = await storage.getUserByUsername("creator") || await storage.createUser({ username: "creator", password: "local" });
   const userId = user.id;
 
