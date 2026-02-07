@@ -12,7 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Settings, Plus, Save, Trash2, Check } from "lucide-react";
+import { Settings, Plus, Save, Trash2, Check, Pencil } from "lucide-react";
 import type { CreativeProfile } from "@shared/schema";
 
 const availableModels = [

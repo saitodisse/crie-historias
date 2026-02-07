@@ -45,7 +45,7 @@ export default function ScriptDetailPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/scripts", scriptId] });
       queryClient.invalidateQueries({ queryKey: ["/api/scripts"] });
       setEditing(false);
-      toast({ title: "Script updated" });
+      toast({ title: "Roteiro atualizado" });
     },
   });
 
@@ -56,7 +56,7 @@ export default function ScriptDetailPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/scripts"] });
       navigate("/scripts");
-      toast({ title: "Script deleted" });
+      toast({ title: "Roteiro removido" });
     },
   });
 
@@ -75,10 +75,10 @@ export default function ScriptDetailPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/executions"] });
       setAiOpen(false);
       setAiPrompt("");
-      toast({ title: "AI generation complete" });
+      toast({ title: "Geração por IA concluída" });
     },
     onError: (err: Error) => {
-      toast({ title: "Generation failed", description: err.message, variant: "destructive" });
+      toast({ title: "Geração falhou", description: err.message, variant: "destructive" });
     },
   });
 
@@ -103,10 +103,16 @@ export default function ScriptDetailPage() {
   if (!script) {
     return (
       <div className="flex items-center justify-center h-full">
-        <p className="text-muted-foreground">Script not found</p>
+        <p className="text-muted-foreground">Roteiro não encontrado</p>
       </div>
     );
   }
+
+  const typeLabels: Record<string, string> = {
+    synopsis: "Sinopse",
+    outline: "Esboço",
+    detailed: "Detalhado",
+  };
 
   return (
     <div className="flex flex-col h-full overflow-auto">
@@ -122,17 +128,17 @@ export default function ScriptDetailPage() {
               <h1 className="text-2xl font-bold tracking-tight" data-testid="text-script-title">{script.title}</h1>
             )}
             {script.storyTitle && (
-              <p className="text-sm text-muted-foreground mt-0.5">From: {script.storyTitle}</p>
+              <p className="text-sm text-muted-foreground mt-0.5">História: {script.storyTitle}</p>
             )}
           </div>
         </div>
         <div className="flex items-center gap-2">
           {editing ? (
             <>
-              <Button variant="ghost" onClick={() => setEditing(false)}>Cancel</Button>
+              <Button variant="ghost" onClick={() => setEditing(false)}>Cancelar</Button>
               <Button onClick={() => updateMutation.mutate()} disabled={updateMutation.isPending}>
                 <Save className="h-4 w-4 mr-2" />
-                Save
+                Salvar
               </Button>
             </>
           ) : (
@@ -141,18 +147,18 @@ export default function ScriptDetailPage() {
                 <DialogTrigger asChild>
                   <Button variant="outline" data-testid="button-ai-script">
                     <Sparkles className="h-4 w-4 mr-2" />
-                    Generate with AI
+                    Gerar com IA
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Generate Script Content</DialogTitle>
+                    <DialogTitle>Gerar Conteúdo do Roteiro</DialogTitle>
                   </DialogHeader>
                   <div className="space-y-4 pt-2">
                     <Textarea
                       value={aiPrompt}
                       onChange={(e) => setAiPrompt(e.target.value)}
-                      placeholder="e.g. Expand this into a full screenplay, add more dialogue..."
+                      placeholder="ex: Expanda isto em um roteiro completo, adicione mais diálogos..."
                       rows={4}
                     />
                     <Button
@@ -161,16 +167,16 @@ export default function ScriptDetailPage() {
                       disabled={!aiPrompt.trim() || generateMutation.isPending}
                     >
                       <Sparkles className="h-4 w-4 mr-2" />
-                      {generateMutation.isPending ? "Generating..." : "Generate"}
+                      {generateMutation.isPending ? "Gerando..." : "Gerar"}
                     </Button>
                   </div>
                 </DialogContent>
               </Dialog>
-              <Button variant="outline" onClick={startEditing}>Edit</Button>
+              <Button variant="outline" onClick={startEditing}>Editar</Button>
               <Button
                 size="icon"
                 variant="ghost"
-                onClick={() => { if (window.confirm("Delete this script?")) deleteMutation.mutate(); }}
+                onClick={() => { if (window.confirm("Remover este roteiro?")) deleteMutation.mutate(); }}
               >
                 <Trash2 className="h-4 w-4 text-destructive" />
               </Button>
@@ -184,15 +190,15 @@ export default function ScriptDetailPage() {
           <Select value={type} onValueChange={setType}>
             <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="synopsis">Synopsis</SelectItem>
-              <SelectItem value="outline">Outline</SelectItem>
-              <SelectItem value="detailed">Detailed</SelectItem>
+              <SelectItem value="synopsis">Sinopse</SelectItem>
+              <SelectItem value="outline">Esboço</SelectItem>
+              <SelectItem value="detailed">Detalhado</SelectItem>
             </SelectContent>
           </Select>
         ) : (
           <>
-            <Badge variant="secondary">{script.type}</Badge>
-            <Badge variant="secondary">{script.origin === "ai" ? "AI Generated" : "Manual"}</Badge>
+            <Badge variant="secondary">{typeLabels[script.type] || script.type}</Badge>
+            <Badge variant="secondary">{script.origin === "ai" ? "Gerado por IA" : "Manual"}</Badge>
           </>
         )}
       </div>
@@ -205,12 +211,12 @@ export default function ScriptDetailPage() {
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 className="font-mono text-sm min-h-[400px] resize-none"
-                placeholder="Write your script content..."
+                placeholder="Escreva o conteúdo do roteiro..."
                 data-testid="input-edit-script-content"
               />
             ) : (
               <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap font-serif" data-testid="text-script-content">
-                {script.content || "No content yet. Click Edit to start writing."}
+                {script.content || "Sem conteúdo ainda. Clique em Editar para começar a escrever."}
               </div>
             )}
           </CardContent>

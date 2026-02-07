@@ -60,7 +60,7 @@ export default function StoryDetailPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/stories", storyId] });
       queryClient.invalidateQueries({ queryKey: ["/api/stories"] });
       setEditing(false);
-      toast({ title: "Story updated" });
+      toast({ title: "História atualizada" });
     },
   });
 
@@ -71,7 +71,7 @@ export default function StoryDetailPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/stories"] });
       navigate("/");
-      toast({ title: "Story deleted" });
+      toast({ title: "História removida" });
     },
   });
 
@@ -82,7 +82,7 @@ export default function StoryDetailPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/stories", storyId] });
       setAddCharOpen(false);
-      toast({ title: "Character added to story" });
+      toast({ title: "Personagem vinculado à história" });
     },
   });
 
@@ -92,7 +92,7 @@ export default function StoryDetailPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/stories", storyId] });
-      toast({ title: "Character removed" });
+      toast({ title: "Vínculo removido" });
     },
   });
 
@@ -111,7 +111,7 @@ export default function StoryDetailPage() {
       setScriptDialogOpen(false);
       setScriptTitle("");
       setScriptContent("");
-      toast({ title: "Script created" });
+      toast({ title: "Roteiro criado" });
     },
   });
 
@@ -129,10 +129,10 @@ export default function StoryDetailPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/executions"] });
       setAiDialogOpen(false);
       setAiUserPrompt("");
-      toast({ title: "AI generation complete" });
+      toast({ title: "Geração por IA concluída" });
     },
     onError: (err: Error) => {
-      toast({ title: "Generation failed", description: err.message, variant: "destructive" });
+      toast({ title: "Geração falhou", description: err.message, variant: "destructive" });
     },
   });
 
@@ -165,7 +165,7 @@ export default function StoryDetailPage() {
   if (!story) {
     return (
       <div className="flex items-center justify-center h-full">
-        <p className="text-muted-foreground">Story not found</p>
+        <p className="text-muted-foreground">História não encontrada</p>
       </div>
     );
   }
@@ -191,10 +191,10 @@ export default function StoryDetailPage() {
         <div className="flex items-center gap-2">
           {editing ? (
             <>
-              <Button variant="ghost" onClick={() => setEditing(false)} data-testid="button-cancel-edit">Cancel</Button>
+              <Button variant="ghost" onClick={() => setEditing(false)} data-testid="button-cancel-edit">Cancelar</Button>
               <Button onClick={() => updateMutation.mutate()} disabled={updateMutation.isPending} data-testid="button-save-story">
                 <Save className="h-4 w-4 mr-2" />
-                Save
+                Salvar
               </Button>
             </>
           ) : (
@@ -203,20 +203,20 @@ export default function StoryDetailPage() {
                 <DialogTrigger asChild>
                   <Button variant="outline" data-testid="button-ai-generate">
                     <Sparkles className="h-4 w-4 mr-2" />
-                    Generate with AI
+                    Gerar com IA
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Generate Content with AI</DialogTitle>
+                    <DialogTitle>Gerar Conteúdo com IA</DialogTitle>
                   </DialogHeader>
                   <div className="space-y-4 pt-2">
                     <div className="space-y-2">
-                      <Label>What would you like to generate?</Label>
+                      <Label>O que você gostaria de gerar?</Label>
                       <Textarea
                         value={aiUserPrompt}
                         onChange={(e) => setAiUserPrompt(e.target.value)}
-                        placeholder="e.g. Expand the premise into a detailed synopsis, suggest plot twists..."
+                        placeholder="ex: Expanda a premissa em uma sinopse detalhada, sugira reviravoltas..."
                         rows={4}
                         data-testid="input-ai-prompt"
                       />
@@ -228,17 +228,17 @@ export default function StoryDetailPage() {
                       data-testid="button-submit-ai"
                     >
                       <Sparkles className="h-4 w-4 mr-2" />
-                      {generateMutation.isPending ? "Generating..." : "Generate"}
+                      {generateMutation.isPending ? "Gerando..." : "Gerar"}
                     </Button>
                   </div>
                 </DialogContent>
               </Dialog>
-              <Button variant="outline" onClick={startEditing} data-testid="button-edit-story">Edit</Button>
+              <Button variant="outline" onClick={startEditing} data-testid="button-edit-story">Editar</Button>
               <Button
                 size="icon"
                 variant="ghost"
                 onClick={() => {
-                  if (window.confirm("Delete this story and all related scripts?")) {
+                  if (window.confirm("Deseja remover esta história e todos os seus roteiros?")) {
                     deleteMutation.mutate();
                   }
                 }}
@@ -261,34 +261,34 @@ export default function StoryDetailPage() {
                   <Select value={status} onValueChange={setStatus}>
                     <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="draft">Draft</SelectItem>
-                      <SelectItem value="in-development">In Development</SelectItem>
-                      <SelectItem value="finished">Finished</SelectItem>
+                      <SelectItem value="draft">Rascunho</SelectItem>
+                      <SelectItem value="in-development">Em Desenvolvimento</SelectItem>
+                      <SelectItem value="finished">Finalizado</SelectItem>
                     </SelectContent>
                   </Select>
                 ) : (
-                  <p className="text-sm mt-1 capitalize">{story.status.replace("-", " ")}</p>
+                  <p className="text-sm mt-1 capitalize">{story.status === 'draft' ? 'Rascunho' : story.status === 'in-development' ? 'Em Desenvolvimento' : 'Finalizado'}</p>
                 )}
               </div>
               <div>
-                <Label className="text-muted-foreground text-xs">Tone / Genre</Label>
+                <Label className="text-muted-foreground text-xs">Tom / Gênero</Label>
                 {editing ? (
                   <Input value={tone} onChange={(e) => setTone(e.target.value)} className="mt-1" />
                 ) : (
-                  <p className="text-sm mt-1">{story.tone || "Not specified"}</p>
+                  <p className="text-sm mt-1">{story.tone || "Não especificado"}</p>
                 )}
               </div>
               <div>
-                <Label className="text-muted-foreground text-xs">Created</Label>
-                <p className="text-sm mt-1">{new Date(story.createdAt).toLocaleDateString()}</p>
+                <Label className="text-muted-foreground text-xs">Criado em</Label>
+                <p className="text-sm mt-1">{new Date(story.createdAt).toLocaleDateString('pt-BR')}</p>
               </div>
             </div>
             <div className="mt-4">
-              <Label className="text-muted-foreground text-xs">Premise</Label>
+              <Label className="text-muted-foreground text-xs">Premissa</Label>
               {editing ? (
                 <Textarea value={premise} onChange={(e) => setPremise(e.target.value)} className="mt-1 resize-none" rows={3} />
               ) : (
-                <p className="text-sm mt-1 whitespace-pre-wrap">{story.premise || "No premise defined"}</p>
+                <p className="text-sm mt-1 whitespace-pre-wrap">{story.premise || "Nenhuma premissa definida"}</p>
               )}
             </div>
           </CardContent>
@@ -300,27 +300,27 @@ export default function StoryDetailPage() {
           <TabsList>
             <TabsTrigger value="characters" data-testid="tab-characters">
               <Users className="h-4 w-4 mr-2" />
-              Characters ({story.characters?.length || 0})
+              Personagens ({story.characters?.length || 0})
             </TabsTrigger>
             <TabsTrigger value="scripts" data-testid="tab-scripts">
               <FileText className="h-4 w-4 mr-2" />
-              Scripts ({story.scripts?.length || 0})
+              Roteiros ({story.scripts?.length || 0})
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="characters" className="mt-4">
             <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
-              <p className="text-sm text-muted-foreground">Characters linked to this story</p>
+              <p className="text-sm text-muted-foreground">Personagens vinculados a esta história</p>
               <Dialog open={addCharOpen} onOpenChange={setAddCharOpen}>
                 <DialogTrigger asChild>
                   <Button variant="outline" size="sm" data-testid="button-add-character">
                     <UserPlus className="h-4 w-4 mr-2" />
-                    Add Character
+                    Vincular Personagem
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Add Character to Story</DialogTitle>
+                    <DialogTitle>Vincular Personagem à História</DialogTitle>
                   </DialogHeader>
                   <div className="space-y-2 pt-2 max-h-[50vh] overflow-auto">
                     {availableChars.length > 0 ? (
@@ -330,7 +330,7 @@ export default function StoryDetailPage() {
                             <div>
                               <p className="font-medium text-sm">{char.name}</p>
                               <p className="text-xs text-muted-foreground truncate max-w-xs">
-                                {char.description || "No description"}
+                                {char.description || "Sem descrição"}
                               </p>
                             </div>
                             <Plus className="h-4 w-4 text-muted-foreground" />
@@ -339,7 +339,7 @@ export default function StoryDetailPage() {
                       ))
                     ) : (
                       <p className="text-sm text-muted-foreground text-center py-4">
-                        No available characters. Create one in the Characters section first.
+                        Nenhum personagem disponível. Crie um na seção de Personagens primeiro.
                       </p>
                     )}
                   </div>
@@ -353,7 +353,7 @@ export default function StoryDetailPage() {
                     <CardContent className="flex items-center justify-between py-3">
                       <div className="min-w-0">
                         <p className="font-medium text-sm">{char.name}</p>
-                        <p className="text-xs text-muted-foreground truncate">{char.personality || char.description || "No details"}</p>
+                        <p className="text-xs text-muted-foreground truncate">{char.personality || char.description || "Sem detalhes"}</p>
                       </div>
                       <Button
                         size="icon"
@@ -370,54 +370,54 @@ export default function StoryDetailPage() {
             ) : (
               <div className="flex flex-col items-center py-8 text-center">
                 <Users className="h-8 w-8 text-muted-foreground mb-2" />
-                <p className="text-sm text-muted-foreground">No characters linked yet</p>
+                <p className="text-sm text-muted-foreground">Nenhum personagem vinculado</p>
               </div>
             )}
           </TabsContent>
 
           <TabsContent value="scripts" className="mt-4">
             <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
-              <p className="text-sm text-muted-foreground">Scripts derived from this story</p>
+              <p className="text-sm text-muted-foreground">Roteiros derivados desta história</p>
               <Dialog open={scriptDialogOpen} onOpenChange={setScriptDialogOpen}>
                 <DialogTrigger asChild>
                   <Button variant="outline" size="sm" data-testid="button-create-script">
                     <Plus className="h-4 w-4 mr-2" />
-                    New Script
+                    Novo Roteiro
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-2xl">
                   <DialogHeader>
-                    <DialogTitle>Create Script</DialogTitle>
+                    <DialogTitle>Criar Roteiro</DialogTitle>
                   </DialogHeader>
                   <div className="space-y-4 pt-2">
                     <div className="flex gap-4">
                       <div className="flex-1 space-y-2">
-                        <Label>Title</Label>
+                        <Label>Título</Label>
                         <Input
                           value={scriptTitle}
                           onChange={(e) => setScriptTitle(e.target.value)}
-                          placeholder="Script title..."
+                          placeholder="Título do roteiro..."
                           data-testid="input-script-title"
                         />
                       </div>
                       <div className="w-40 space-y-2">
-                        <Label>Type</Label>
+                        <Label>Tipo</Label>
                         <Select value={scriptType} onValueChange={setScriptType}>
                           <SelectTrigger data-testid="select-script-type"><SelectValue /></SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="synopsis">Synopsis</SelectItem>
-                            <SelectItem value="outline">Outline</SelectItem>
-                            <SelectItem value="detailed">Detailed</SelectItem>
+                            <SelectItem value="synopsis">Sinopse</SelectItem>
+                            <SelectItem value="outline">Esboço</SelectItem>
+                            <SelectItem value="detailed">Detalhado</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label>Content</Label>
+                      <Label>Conteúdo</Label>
                       <Textarea
                         value={scriptContent}
                         onChange={(e) => setScriptContent(e.target.value)}
-                        placeholder="Write your script content..."
+                        placeholder="Escreva o conteúdo do roteiro..."
                         rows={10}
                         className="font-mono text-sm"
                         data-testid="input-script-content"
@@ -429,7 +429,7 @@ export default function StoryDetailPage() {
                       disabled={!scriptTitle.trim() || createScriptMutation.isPending}
                       data-testid="button-submit-script"
                     >
-                      Create Script
+                      Criar Roteiro
                     </Button>
                   </div>
                 </DialogContent>
@@ -450,11 +450,11 @@ export default function StoryDetailPage() {
                         <div className="min-w-0">
                           <p className="font-medium text-sm">{script.title}</p>
                           <p className="text-xs text-muted-foreground">
-                            {script.type} - {script.origin === "ai" ? "AI Generated" : "Manual"}
+                            {script.type === 'synopsis' ? 'Sinopse' : script.type === 'outline' ? 'Esboço' : 'Detalhado'} - {script.origin === "ai" ? "Gerado por IA" : "Manual"}
                           </p>
                         </div>
                       </div>
-                      <Badge variant="secondary">{script.type}</Badge>
+                      <Badge variant="secondary">{script.type === 'synopsis' ? 'Sinopse' : script.type === 'outline' ? 'Esboço' : 'Detalhado'}</Badge>
                     </CardContent>
                   </Card>
                 ))}
@@ -462,7 +462,7 @@ export default function StoryDetailPage() {
             ) : (
               <div className="flex flex-col items-center py-8 text-center">
                 <FileText className="h-8 w-8 text-muted-foreground mb-2" />
-                <p className="text-sm text-muted-foreground">No scripts yet</p>
+                <p className="text-sm text-muted-foreground">Nenhum roteiro encontrado</p>
               </div>
             )}
           </TabsContent>

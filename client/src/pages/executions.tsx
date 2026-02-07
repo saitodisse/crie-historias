@@ -200,7 +200,7 @@ export default function ExecutionsPage() {
                   <div>
                     <Label className="text-xs text-muted-foreground">Parâmetros</Label>
                     <pre className="mt-1 text-xs bg-muted rounded-md p-3 whitespace-pre-wrap font-mono">
-                      {JSON.stringify(selectedExec.parameters, null, 2)}
+                      {JSON.stringify(selectedExec.parameters as any, null, 2)}
                     </pre>
                   </div>
                 )}
