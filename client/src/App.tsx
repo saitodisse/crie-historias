@@ -18,6 +18,8 @@ import PromptsPage from "@/pages/prompts";
 import ExecutionsPage from "@/pages/executions";
 import ProfilePage from "@/pages/profile";
 import LandingPage from "@/pages/landing";
+import SignInPage from "@/pages/sign-in";
+import SignUpPage from "@/pages/sign-up";
 import { Loader2 } from "lucide-react";
 
 function Router() {
@@ -32,6 +34,17 @@ function Router() {
       <Route path="/executions" component={ExecutionsPage} />
       <Route path="/profile" component={ProfilePage} />
       <Route component={NotFound} />
+    </Switch>
+  );
+}
+
+function UnauthenticatedRouter() {
+  return (
+    <Switch>
+      <Route path="/" component={LandingPage} />
+      <Route path="/sign-in" component={SignInPage} />
+      <Route path="/sign-up" component={SignUpPage} />
+      <Route component={LandingPage} />
     </Switch>
   );
 }
@@ -72,7 +85,7 @@ function AppContent() {
   }
 
   if (!isAuthenticated) {
-    return <LandingPage />;
+    return <UnauthenticatedRouter />;
   }
 
   return <AuthenticatedApp />;

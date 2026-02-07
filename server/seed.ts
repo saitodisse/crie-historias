@@ -2,16 +2,33 @@ import { storage } from "./storage";
 
 const DEFAULT_USER_ID = 1;
 
-export async function seedDatabase(userId: number) {
-  const existingStories = await storage.getStories(userId);
+async function ensureSeedUser(preferredUserId?: number) {
+  if (preferredUserId) {
+    const userById = await storage.getUser(preferredUserId);
+    if (userById) return userById;
+  }
+
+  const externalAuthId = process.env.DEV_AUTH_USER_ID || "local-dev-user";
+  return storage.getOrCreateUserByExternalAuthId(
+    externalAuthId,
+    "local",
+    "Dev User",
+  );
+}
+
+export async function seedDatabase(userId: number = DEFAULT_USER_ID) {
+  const seedUser = await ensureSeedUser(userId);
+  const effectiveUserId = seedUser.id;
+
+  const existingStories = await storage.getStories(effectiveUserId);
   if (existingStories.length > 0) {
-    console.log(`Database already has data for user ${userId}, skipping seed.`);
+    console.log(`Database already has data for user ${effectiveUserId}, skipping seed.`);
     return;
   }
 
   // Personagens
   const char1 = await storage.createCharacter({
-    userId,
+    userId: effectiveUserId,
     name: "Elena Voss",
     description: "Alta, traços angulares, cabelos escuros com mechas prateadas presos em um coque severo. Olhos azul-claros que parecem ver através das pessoas. Uma cicatriz fina traça sua mandíbula esquerda.",
     personality: "Brilhante e metódica, Elena aborda problemas com precisão cirúrgica. Demora a confiar, mas é ferozmente leal uma vez que se conquista seu respeito. Tem um humor seco que pega as pessoas desprevenidas.",
@@ -21,7 +38,7 @@ export async function seedDatabase(userId: number) {
   });
 
   const char2 = await storage.createCharacter({
-    userId,
+    userId: effectiveUserId,
     name: "Marcus Reeve",
     description: "Físico atarracado, pele marrom quente, cabelo curto com mechas grisalhas nas têmporas. Olhos escuros expressivos, muitas vezes franzidos de diversão. Veste-se impecavelmente mesmo em situações casuais.",
     personality: "Carismático e desarmantemente honesto, Marcus tem o dom de deixar as pessoas à vontade. Por trás do charme esconde-se uma mente estratégica afiada como uma navalha. Ele é do tipo que ri do perigo e depois o neutraliza.",
@@ -31,7 +48,7 @@ export async function seedDatabase(userId: number) {
   });
 
   const char3 = await storage.createCharacter({
-    userId,
+    userId: effectiveUserId,
     name: "Lian Zhou",
     description: "Baixa, constituição atlética. Cabelo preto liso geralmente meio escondido sob um boné. Olhos escuros com uma qualidade intensa e vigilante. Várias pequenas tatuagens nos antebraços, cada uma com uma história.",
     personality: "Quieta e observadora, Lian fala raramente, mas com precisão devastadora. Ela é profundamente empática apesar de seu exterior guardado. Quando pressionada, revela uma coragem feroz, quase imprudente.",
@@ -41,7 +58,7 @@ export async function seedDatabase(userId: number) {
   });
 
   const char4 = await storage.createCharacter({
-    userId,
+    userId: effectiveUserId,
     name: "Beatriz Silva",
     description: "Mulher na casa dos 40 anos, olhos expressivos e cabelos cacheados. Sempre carrega um caderno de couro gasto.",
     personality: "Intuitiva, resiliente e extremamente observadora. Possui uma calma contagiante, mesmo em situações de crise.",
@@ -52,7 +69,7 @@ export async function seedDatabase(userId: number) {
 
   // Histórias
   const story1 = await storage.createStory({
-    userId,
+    userId: effectiveUserId,
     title: "O Protocolo de Praga",
     premise: "Quando uma operação classificada da Guerra Fria ressurge na Praga moderna, a ex-analista de inteligência Elena Voss deve confrontar os fantasmas de seu passado enquanto corre para evitar um incidente internacional que poderia remodelar o equilíbrio de poder global.",
     tone: "Thriller Político, Espionagem",
@@ -60,7 +77,7 @@ export async function seedDatabase(userId: number) {
   });
 
   const story2 = await storage.createStory({
-    userId,
+    userId: effectiveUserId,
     title: "Sombras de Neon",
     premise: "Em uma metrópole cyberpunk em expansão, a jornalista investigativa Lian Zhou descobre uma conspiração ligando uma poderosa corporação a uma série de desaparecimentos misteriosos na classe baixa da cidade. Quanto mais ela investiga, mais percebe que a conspiração alcança a infraestrutura digital que controla todos os aspectos da vida urbana.",
     tone: "Cyberpunk Noir, Ficção Científica",
@@ -68,7 +85,7 @@ export async function seedDatabase(userId: number) {
   });
 
   const story3 = await storage.createStory({
-    userId,
+    userId: effectiveUserId,
     title: "O Gambito do Diplomata",
     premise: "O articulador político Marcus Reeve é contratado para mediar a paz em uma nação africana volátil, mas descobre que o conflito está sendo deliberadamente arquitetado por potências externas. Ele deve navegar por uma teia de traição onde cada aliado pode ser um inimigo.",
     tone: "Drama Político, Thriller Internacional",
@@ -76,7 +93,7 @@ export async function seedDatabase(userId: number) {
   });
 
   const story4 = await storage.createStory({
-    userId,
+    userId: effectiveUserId,
     title: "O Segredo do Arquivo Nacional",
     premise: "Beatriz Silva descobre um mapa oculto em um documento do século XVIII que aponta para um tesouro esquecido no coração da Amazônia.",
     tone: "Aventura, Mistério",
@@ -109,7 +126,7 @@ export async function seedDatabase(userId: number) {
 
   // Prompts
   await storage.createPrompt({
-    userId,
+    userId: effectiveUserId,
     name: "Gerador Criativo de Sinopses",
     category: "story",
     type: "system",
@@ -119,7 +136,7 @@ export async function seedDatabase(userId: number) {
 
   // Perfis
   await storage.createProfile({
-    userId,
+    userId: effectiveUserId,
     name: "Explorador Criativo",
     model: "gpt-5-mini",
     temperature: "0.9",

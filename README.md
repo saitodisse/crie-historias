@@ -1,8 +1,38 @@
 # Crie Histórias
+
 ## Estudio de Escrita Criativa
+
 ### StoryForge
 
 Plataforma de escrita criativa assistida por inteligencia artificial para gerenciamento de historias, personagens e roteiros, com observabilidade completa das chamadas de IA. Interface em portugues brasileiro (PT-BR).
+
+```sh
+# para liberar porta (ex: 5000) ocupada
+Get-Process -Id (Get-NetTCPConnection -LocalPort 5000).OwningProcess | Stop-Process -Force
+
+# para criar banco de dados
+$env:PGPASSWORD='xxxxxx'; & "C:\Program Files\PostgreSQL\18\bin\psql.exe" -U postgres -h localhost -c "CREATE DATABASE storyforge;"
+```
+
+---
+
+## Atualizacao: Execucao Local (sem Replit)
+
+O projeto foi preparado para rodar localmente com PostgreSQL/Neon e autenticacao via Clerk (com fallback local para desenvolvimento).
+
+- **Banco**: PostgreSQL via `DATABASE_URL` (Neon recomendado).
+- **Auth**:
+  - Com `CLERK_SECRET_KEY` + `VITE_CLERK_PUBLISHABLE_KEY`: usa Clerk.
+  - Sem essas variaveis: usa usuario local de desenvolvimento automaticamente.
+
+Setup rapido:
+
+```bash
+npm install
+copy .env.example .env
+npm run db:push
+npm run dev
+```
 
 ---
 
@@ -37,30 +67,35 @@ A plataforma registra cada interacao com IA de forma auditavel, armazenando o pr
 ## Funcionalidades
 
 ### Gerenciamento de Historias
+
 - Criar, editar e excluir historias com titulo, premissa, tom e status
 - Status de progresso: rascunho, em desenvolvimento, completo
 - Vincular personagens existentes a uma historia (relacao muitos-para-muitos)
 - Visualizar roteiros e personagens associados na pagina de detalhe
 
 ### Gerenciamento de Personagens
+
 - Criar personagens independentes reutilizaveis entre historias
 - Campos: nome, descricao, personalidade, background, notas
 - Ativar/desativar personagens
 - Gerar descricoes de personagens com IA
 
 ### Roteiros (Scripts)
+
 - Criar roteiros vinculados a historias
 - Tipos: sinopse, outline, detalhado
 - Origem: manual ou gerado por IA
 - Editor de conteudo integrado com geracao assistida por IA
 
 ### Biblioteca de Prompts
+
 - Salvar e versionar prompts para reutilizacao
 - Categorias e tipos configuravais (tarefa, sistema, contexto)
 - Versionamento automatico: incrementa versao quando o conteudo muda
 - Ativar/desativar prompts
 
 ### Geracao de Conteudo com IA
+
 - Suporte a tres provedores: OpenAI, Google Gemini e OpenRouter
 - Dialogo de geracao inline com observabilidade completa
 - Visualizacao do prompt enviado, prompt de sistema, parametros e resultado
@@ -70,6 +105,7 @@ A plataforma registra cada interacao com IA de forma auditavel, armazenando o pr
 - Badges mostrando modelo, temperatura e tokens maximos usados
 
 ### Perfis Criativos
+
 - Configurar preferencias de modelo de IA por perfil
 - Campos: modelo, temperatura, tokens maximos, estilo narrativo
 - Seletor de perfil ativo na barra lateral
@@ -77,12 +113,14 @@ A plataforma registra cada interacao com IA de forma auditavel, armazenando o pr
 - Um perfil ativo por usuario
 
 ### Historico de Execucoes
+
 - Registro completo de cada chamada a IA
 - Armazena: prompt de sistema, prompt do usuario, prompt final, modelo, parametros (temperatura, tokens, modelo) e resultado
 - Visualizacao cronologica de todas as execucoes
 - Rastreabilidade completa para auditoria
 
 ### Perfil do Usuario
+
 - Configuracao de chaves de API (OpenAI, Gemini, OpenRouter)
 - Chaves criptografadas com AES-256-CBC
 - Gerenciamento de perfis criativos
@@ -102,7 +140,7 @@ Cliente (React + Vite)
 Servidor (Express.js + TypeScript)
     |
     |-- Rotas REST API
-    |-- Replit Auth (OIDC + Passport)
+    |-- Clerk Auth (com fallback local em desenvolvimento)
     |-- Drizzle ORM
     |-- Integracao IA (OpenAI / Gemini / OpenRouter)
     |
@@ -117,41 +155,44 @@ O frontend e o backend rodam no mesmo servidor Express na porta 5000. Em desenvo
 ## Stack Tecnologico
 
 ### Frontend
-| Tecnologia | Uso |
-|---|---|
-| React 18 | Biblioteca de UI |
-| Vite 7 | Build tool e dev server |
-| TypeScript | Tipagem estatica |
+
+| Tecnologia        | Uso                                 |
+| ----------------- | ----------------------------------- |
+| React 18          | Biblioteca de UI                    |
+| Vite 7            | Build tool e dev server             |
+| TypeScript        | Tipagem estatica                    |
 | TanStack Query v5 | Gerenciamento de estado do servidor |
-| wouter | Roteamento client-side |
-| shadcn/ui | Componentes de UI |
-| Radix UI | Primitivos de acessibilidade |
-| Tailwind CSS 3 | Estilizacao utilitaria |
-| Lucide React | Icones |
-| React Hook Form | Gerenciamento de formularios |
-| Zod | Validacao de schemas |
-| Framer Motion | Animacoes |
-| Recharts | Graficos |
+| wouter            | Roteamento client-side              |
+| shadcn/ui         | Componentes de UI                   |
+| Radix UI          | Primitivos de acessibilidade        |
+| Tailwind CSS 3    | Estilizacao utilitaria              |
+| Lucide React      | Icones                              |
+| React Hook Form   | Gerenciamento de formularios        |
+| Zod               | Validacao de schemas                |
+| Framer Motion     | Animacoes                           |
+| Recharts          | Graficos                            |
 
 ### Backend
-| Tecnologia | Uso |
-|---|---|
-| Express 5 | Framework HTTP |
-| TypeScript | Tipagem estatica |
-| Drizzle ORM | ORM para PostgreSQL |
-| drizzle-zod | Validacao de schemas do banco |
-| Passport.js | Autenticacao |
-| openid-client | OIDC para Replit Auth |
-| connect-pg-simple | Sessoes em PostgreSQL |
-| OpenAI SDK | Cliente para OpenAI e OpenRouter |
-| @google/generative-ai | Cliente para Google Gemini |
-| Node.js crypto | Criptografia AES-256-CBC |
+
+| Tecnologia                          | Uso                              |
+| ----------------------------------- | -------------------------------- |
+| Express 5                           | Framework HTTP                   |
+| TypeScript                          | Tipagem estatica                 |
+| Drizzle ORM                         | ORM para PostgreSQL              |
+| drizzle-zod                         | Validacao de schemas do banco    |
+| Passport.js                         | Autenticacao                     |
+| @clerk/express + @clerk/clerk-react | Autenticacao                     |
+| connect-pg-simple                   | Sessoes em PostgreSQL            |
+| OpenAI SDK                          | Cliente para OpenAI e OpenRouter |
+| @google/generative-ai               | Cliente para Google Gemini       |
+| Node.js crypto                      | Criptografia AES-256-CBC         |
 
 ### Banco de Dados
-| Tecnologia | Uso |
-|---|---|
-| PostgreSQL (Neon) | Banco de dados relacional |
-| Drizzle Kit | Migracao e sincronizacao de schema |
+
+| Tecnologia        | Uso                                |
+| ----------------- | ---------------------------------- |
+| PostgreSQL (Neon) | Banco de dados relacional          |
+| Drizzle Kit       | Migracao e sincronizacao de schema |
 
 ---
 
@@ -194,11 +235,8 @@ root/
 │   ├── crypto.ts                      # Encrypt/decrypt AES-256-CBC
 │   ├── seed.ts                        # Dados iniciais realistas
 │   ├── vite.ts                        # Configuracao Vite para dev/prod
-│   └── replit_integrations/
-│       └── auth/
-│           ├── replitAuth.ts          # Estrategia OIDC do Passport
-│           ├── storage.ts             # Storage para auth_users
-│           └── routes.ts              # Rotas de login/logout/callback
+│   └── auth/
+│       └── index.ts                   # Auth Clerk + fallback local + rotas /api/auth/user
 ├── shared/
 │   ├── schema.ts                      # Schema Drizzle + Zod + tipos
 │   └── models/
@@ -274,6 +312,7 @@ auth_users                      sessions
 ```
 
 ### Relacionamentos
+
 - **users** 1:N stories, characters, prompts, creative_profiles, ai_executions
 - **stories** N:M characters (via story_characters)
 - **stories** 1:N scripts
@@ -283,14 +322,13 @@ auth_users                      sessions
 
 ## Autenticacao
 
-O StoryForge utiliza **Replit Auth** via protocolo OIDC (OpenID Connect):
+O StoryForge utiliza **Clerk** quando as variaveis de ambiente do Clerk estao definidas.
+Sem Clerk, entra automaticamente em modo local (usuario de desenvolvimento), o que facilita execucao fora do Replit.
 
-1. O usuario clica em "Entrar com Replit" na landing page
-2. Redirecionamento para o provedor OIDC do Replit
-3. Apos autenticacao, o callback cria/atualiza o registro em `auth_users`
-4. A funcao `getOrCreateUserByReplitId()` vincula ao usuario na tabela `users`
-5. Sessao armazenada em PostgreSQL via `connect-pg-simple`
-6. Todas as rotas da API protegidas com middleware `isAuthenticated`
+1. Em modo Clerk, o usuario acessa `/sign-in` ou `/sign-up`
+2. O backend valida autenticacao e extrai `userId` do Clerk
+3. A funcao `getOrCreateUserByExternalAuthId()` vincula/cria usuario na tabela `users`
+4. Todas as rotas da API seguem protegidas por middleware `isAuthenticated`
 
 ---
 
@@ -298,12 +336,12 @@ O StoryForge utiliza **Replit Auth** via protocolo OIDC (OpenID Connect):
 
 ### Provedores Suportados
 
-| Provedor | Configuracao | Modelos |
-|---|---|---|
-| **OpenAI** (Replit AI) | Automatica via Replit AI Integrations | gpt-5-mini, gpt-5-nano, etc. |
-| **OpenAI** (chave propria) | Chave informada pelo usuario | Todos os modelos OpenAI |
-| **Google Gemini** | Chave informada pelo usuario | gemini-2.5-flash, gemini-2.5-pro, etc. |
-| **OpenRouter** | Chave informada pelo usuario | 100+ modelos de diversos provedores |
+| Provedor                   | Configuracao                          | Modelos                                |
+| -------------------------- | ------------------------------------- | -------------------------------------- |
+| **OpenAI** (Replit AI)     | Automatica via Replit AI Integrations | gpt-5-mini, gpt-5-nano, etc.           |
+| **OpenAI** (chave propria) | Chave informada pelo usuario          | Todos os modelos OpenAI                |
+| **Google Gemini**          | Chave informada pelo usuario          | gemini-2.5-flash, gemini-2.5-pro, etc. |
+| **OpenRouter**             | Chave informada pelo usuario          | 100+ modelos de diversos provedores    |
 
 ### Fluxo de Geracao
 
@@ -322,6 +360,7 @@ O StoryForge utiliza **Replit Auth** via protocolo OIDC (OpenID Connect):
 ### Parametros de Geracao
 
 Os parametros sao definidos pelo perfil criativo ativo:
+
 - **Modelo**: qual modelo de IA usar
 - **Temperatura**: controle de criatividade (0.0 = conservador, 2.0 = criativo) com fallback para 0.8
 - **Tokens Maximos**: limite de tokens na resposta (padrao: 2048)
@@ -340,6 +379,7 @@ Perfis criativos permitem alternar rapidamente entre configuracoes de IA:
 - Ao gerar conteudo, os parametros do perfil ativo sao usados automaticamente
 
 **Exemplo de perfis:**
+
 - "Explorador Criativo" - modelo criativo, temperatura alta (0.9), prosa literaria
 - "Redator Tecnico" - modelo preciso, temperatura baixa (0.3), linguagem objetiva
 - "Brainstorm Rapido" - modelo rapido, temperatura media (0.7), ideias concisas
@@ -362,17 +402,17 @@ As chaves de API dos usuarios sao gerenciadas com seguranca:
 
 Cada execucao de IA registra:
 
-| Campo | Descricao |
-|---|---|
-| `systemPromptSnapshot` | Copia do prompt de sistema no momento da execucao |
-| `userPrompt` | Prompt original escrito pelo usuario |
-| `finalPrompt` | Prompt final montado com contexto |
-| `model` | Modelo de IA utilizado |
-| `parameters` | JSONB com temperatura, maxTokens, modelo |
-| `result` | Texto gerado pela IA |
-| `storyId` / `scriptId` / `characterId` | Entidade associada (opcional) |
-| `promptId` | Prompt da biblioteca usado (opcional) |
-| `createdAt` | Data/hora da execucao |
+| Campo                                  | Descricao                                         |
+| -------------------------------------- | ------------------------------------------------- |
+| `systemPromptSnapshot`                 | Copia do prompt de sistema no momento da execucao |
+| `userPrompt`                           | Prompt original escrito pelo usuario              |
+| `finalPrompt`                          | Prompt final montado com contexto                 |
+| `model`                                | Modelo de IA utilizado                            |
+| `parameters`                           | JSONB com temperatura, maxTokens, modelo          |
+| `result`                               | Texto gerado pela IA                              |
+| `storyId` / `scriptId` / `characterId` | Entidade associada (opcional)                     |
+| `promptId`                             | Prompt da biblioteca usado (opcional)             |
+| `createdAt`                            | Data/hora da execucao                             |
 
 A pagina de "Execucoes" permite navegar por todo o historico de interacoes com IA.
 
@@ -381,87 +421,97 @@ A pagina de "Execucoes" permite navegar por todo o historico de interacoes com I
 ## Rotas da API
 
 ### Autenticacao
-| Metodo | Rota | Descricao |
-|---|---|---|
-| GET | `/api/auth/user` | Retorna usuario autenticado |
-| GET | `/api/login` | Inicia fluxo OIDC |
-| GET | `/api/callback` | Callback OIDC |
-| GET | `/api/logout` | Encerra sessao |
+
+| Metodo | Rota             | Descricao                           |
+| ------ | ---------------- | ----------------------------------- |
+| GET    | `/api/auth/user` | Retorna usuario autenticado         |
+| GET    | `/api/login`     | Redireciona para login (`/sign-in`) |
+| GET    | `/api/logout`    | Redireciona para logout/login       |
 
 ### Historias
-| Metodo | Rota | Descricao |
-|---|---|---|
-| GET | `/api/stories` | Lista historias do usuario |
-| GET | `/api/stories/:id` | Detalhe com personagens e roteiros |
-| POST | `/api/stories` | Cria historia |
-| PATCH | `/api/stories/:id` | Atualiza historia |
-| DELETE | `/api/stories/:id` | Remove historia |
-| POST | `/api/stories/:id/characters` | Vincula personagem |
-| DELETE | `/api/stories/:storyId/characters/:characterId` | Desvincula personagem |
+
+| Metodo | Rota                                            | Descricao                          |
+| ------ | ----------------------------------------------- | ---------------------------------- |
+| GET    | `/api/stories`                                  | Lista historias do usuario         |
+| GET    | `/api/stories/:id`                              | Detalhe com personagens e roteiros |
+| POST   | `/api/stories`                                  | Cria historia                      |
+| PATCH  | `/api/stories/:id`                              | Atualiza historia                  |
+| DELETE | `/api/stories/:id`                              | Remove historia                    |
+| POST   | `/api/stories/:id/characters`                   | Vincula personagem                 |
+| DELETE | `/api/stories/:storyId/characters/:characterId` | Desvincula personagem              |
 
 ### Personagens
-| Metodo | Rota | Descricao |
-|---|---|---|
-| GET | `/api/characters` | Lista personagens do usuario |
-| POST | `/api/characters` | Cria personagem |
-| PATCH | `/api/characters/:id` | Atualiza personagem |
-| DELETE | `/api/characters/:id` | Remove personagem |
+
+| Metodo | Rota                  | Descricao                    |
+| ------ | --------------------- | ---------------------------- |
+| GET    | `/api/characters`     | Lista personagens do usuario |
+| POST   | `/api/characters`     | Cria personagem              |
+| PATCH  | `/api/characters/:id` | Atualiza personagem          |
+| DELETE | `/api/characters/:id` | Remove personagem            |
 
 ### Roteiros
-| Metodo | Rota | Descricao |
-|---|---|---|
-| GET | `/api/scripts` | Lista roteiros do usuario |
-| GET | `/api/scripts/:id` | Detalhe do roteiro |
-| POST | `/api/scripts` | Cria roteiro |
-| PATCH | `/api/scripts/:id` | Atualiza roteiro |
-| DELETE | `/api/scripts/:id` | Remove roteiro |
+
+| Metodo | Rota               | Descricao                 |
+| ------ | ------------------ | ------------------------- |
+| GET    | `/api/scripts`     | Lista roteiros do usuario |
+| GET    | `/api/scripts/:id` | Detalhe do roteiro        |
+| POST   | `/api/scripts`     | Cria roteiro              |
+| PATCH  | `/api/scripts/:id` | Atualiza roteiro          |
+| DELETE | `/api/scripts/:id` | Remove roteiro            |
 
 ### Prompts
-| Metodo | Rota | Descricao |
-|---|---|---|
-| GET | `/api/prompts` | Lista prompts do usuario |
-| POST | `/api/prompts` | Cria prompt (versionamento automatico) |
-| PATCH | `/api/prompts/:id` | Atualiza prompt |
-| DELETE | `/api/prompts/:id` | Remove prompt |
+
+| Metodo | Rota               | Descricao                              |
+| ------ | ------------------ | -------------------------------------- |
+| GET    | `/api/prompts`     | Lista prompts do usuario               |
+| POST   | `/api/prompts`     | Cria prompt (versionamento automatico) |
+| PATCH  | `/api/prompts/:id` | Atualiza prompt                        |
+| DELETE | `/api/prompts/:id` | Remove prompt                          |
 
 ### Perfis Criativos
-| Metodo | Rota | Descricao |
-|---|---|---|
-| GET | `/api/profiles` | Lista perfis do usuario |
-| POST | `/api/profiles` | Cria perfil |
-| PATCH | `/api/profiles/:id` | Atualiza perfil |
-| DELETE | `/api/profiles/:id` | Remove perfil |
-| POST | `/api/profiles/:id/activate` | Ativa perfil |
+
+| Metodo | Rota                         | Descricao               |
+| ------ | ---------------------------- | ----------------------- |
+| GET    | `/api/profiles`              | Lista perfis do usuario |
+| POST   | `/api/profiles`              | Cria perfil             |
+| PATCH  | `/api/profiles/:id`          | Atualiza perfil         |
+| DELETE | `/api/profiles/:id`          | Remove perfil           |
+| POST   | `/api/profiles/:id/activate` | Ativa perfil            |
 
 ### Inteligencia Artificial
-| Metodo | Rota | Descricao |
-|---|---|---|
-| POST | `/api/ai/generate` | Gera conteudo com IA |
-| POST | `/api/ai/rerun` | Re-executa geracao anterior |
-| GET | `/api/executions` | Historico de execucoes |
-| GET | `/api/models/:provider` | Lista modelos disponiveis |
+
+| Metodo | Rota                    | Descricao                   |
+| ------ | ----------------------- | --------------------------- |
+| POST   | `/api/ai/generate`      | Gera conteudo com IA        |
+| POST   | `/api/ai/rerun`         | Re-executa geracao anterior |
+| GET    | `/api/executions`       | Historico de execucoes      |
+| GET    | `/api/models/:provider` | Lista modelos disponiveis   |
 
 ### Usuario
-| Metodo | Rota | Descricao |
-|---|---|---|
-| POST | `/api/user/keys` | Salva chaves de API (criptografadas) |
+
+| Metodo | Rota             | Descricao                            |
+| ------ | ---------------- | ------------------------------------ |
+| POST   | `/api/user/keys` | Salva chaves de API (criptografadas) |
 
 ---
 
 ## Tema e Design
 
 ### Cores
+
 - **Primaria**: Roxo (HSL 262, 83%, 58%)
 - Suporte completo a **dark mode** via classe CSS
 
 ### Tipografia
-| Familia | Uso |
-|---|---|
-| Plus Jakarta Sans | Texto geral (sans-serif) |
-| Libre Baskerville | Texto literario (serif) |
-| JetBrains Mono | Codigo e prompts (monospace) |
+
+| Familia           | Uso                          |
+| ----------------- | ---------------------------- |
+| Plus Jakarta Sans | Texto geral (sans-serif)     |
+| Libre Baskerville | Texto literario (serif)      |
+| JetBrains Mono    | Codigo e prompts (monospace) |
 
 ### Componentes
+
 - Baseado em **shadcn/ui** com primitivos Radix UI
 - Sidebar colapsavel com navegacao e seletor de perfil
 - Icones via **Lucide React**
@@ -469,6 +519,7 @@ A pagina de "Execucoes" permite navegar por todo o historico de interacoes com I
 - Dialogos modais para geracao de IA
 
 ### Idioma
+
 - Toda a interface em **portugues brasileiro (PT-BR)**
 
 ---
@@ -476,6 +527,7 @@ A pagina de "Execucoes" permite navegar por todo o historico de interacoes com I
 ## Como Executar
 
 ### Pre-requisitos
+
 - Node.js 20+
 - PostgreSQL (ou Neon)
 
@@ -512,18 +564,20 @@ npm run check
 
 ## Variaveis de Ambiente
 
-| Variavel | Obrigatoria | Descricao |
-|---|---|---|
-| `DATABASE_URL` | Sim | URL de conexao PostgreSQL |
-| `SESSION_SECRET` | Sim | Segredo para assinatura de sessoes |
-| `ENCRYPTION_KEY` | Sim | Chave para criptografia AES-256-CBC das chaves de API |
-| `AI_INTEGRATIONS_OPENAI_API_KEY` | Nao | Chave OpenAI via Replit AI Integrations (automatica) |
-| `AI_INTEGRATIONS_OPENAI_BASE_URL` | Nao | Base URL da integracao OpenAI (automatica) |
-| `PGHOST` | Auto | Host do PostgreSQL |
-| `PGPORT` | Auto | Porta do PostgreSQL |
-| `PGUSER` | Auto | Usuario do PostgreSQL |
-| `PGPASSWORD` | Auto | Senha do PostgreSQL |
-| `PGDATABASE` | Auto | Nome do banco PostgreSQL |
+| Variavel                          | Obrigatoria | Descricao                                             |
+| --------------------------------- | ----------- | ----------------------------------------------------- |
+| `DATABASE_URL`                    | Sim         | URL de conexao PostgreSQL                             |
+| `ENCRYPTION_KEY`                  | Sim         | Chave para criptografia AES-256-CBC das chaves de API |
+| `CLERK_SECRET_KEY`                | Nao         | Habilita autenticacao Clerk no backend                |
+| `VITE_CLERK_PUBLISHABLE_KEY`      | Nao         | Habilita telas de sign-in/sign-up no frontend         |
+| `DEV_AUTH_USER_ID`                | Nao         | ID do usuario local (fallback sem Clerk)              |
+| `AI_INTEGRATIONS_OPENAI_API_KEY`  | Nao         | Chave OpenAI via Replit AI Integrations (automatica)  |
+| `AI_INTEGRATIONS_OPENAI_BASE_URL` | Nao         | Base URL da integracao OpenAI (automatica)            |
+| `PGHOST`                          | Auto        | Host do PostgreSQL                                    |
+| `PGPORT`                          | Auto        | Porta do PostgreSQL                                   |
+| `PGUSER`                          | Auto        | Usuario do PostgreSQL                                 |
+| `PGPASSWORD`                      | Auto        | Senha do PostgreSQL                                   |
+| `PGDATABASE`                      | Auto        | Nome do banco PostgreSQL                              |
 
 ---
 

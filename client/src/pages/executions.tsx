@@ -196,7 +196,7 @@ export default function ExecutionsPage() {
                   </pre>
                 </div>
 
-                {selectedExec.parameters && (
+                {Boolean(selectedExec.parameters) && (
                   <div>
                     <Label className="text-xs text-muted-foreground">Parâmetros</Label>
                     <pre className="mt-1 text-xs bg-muted rounded-md p-3 whitespace-pre-wrap font-mono">

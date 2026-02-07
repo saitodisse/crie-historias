@@ -39,7 +39,7 @@ export default function LandingPage() {
         <div className="flex items-center gap-2">
           <ThemeToggle />
           <Button asChild data-testid="button-login-header">
-            <a href="/api/login">Entrar com Replit</a>
+            <a href="/sign-in">Entrar</a>
           </Button>
         </div>
       </header>
@@ -55,7 +55,7 @@ export default function LandingPage() {
           </p>
           <div className="pt-4">
             <Button size="lg" asChild data-testid="button-login-hero">
-              <a href="/api/login">Comece a Escrever</a>
+              <a href="/sign-in">Comece a Escrever</a>
             </Button>
           </div>
         </div>

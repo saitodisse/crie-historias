@@ -60,18 +60,23 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  const { seedDatabase } = await import("./seed");
-  try {
-    await seedDatabase();
-  } catch (e) {
-    console.log("Seed skipped or failed:", (e as Error).message);
-  }
-
-  const { setupAuth, registerAuthRoutes } = await import("./replit_integrations/auth");
+  const { setupAuth, registerAuthRoutes } = await import("./auth");
   await setupAuth(app);
   registerAuthRoutes(app);
 
   await registerRoutes(httpServer, app);
+
+  if (
+    process.env.NODE_ENV !== "production" ||
+    process.env.SEED_ON_STARTUP === "true"
+  ) {
+    const { seedDatabase } = await import("./seed");
+    try {
+      await seedDatabase();
+    } catch (e) {
+      console.log("Seed skipped or failed:", (e as Error).message);
+    }
+  }
 
   app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
@@ -105,7 +110,6 @@ app.use((req, res, next) => {
     {
       port,
       host: "0.0.0.0",
-      reusePort: true,
     },
     () => {
       log(`serving on port ${port}`);

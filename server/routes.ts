@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import OpenAI from "openai";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { encrypt, decrypt } from "./crypto";
-import { isAuthenticated } from "./replit_integrations/auth";
+import { getAuthUser, isAuthenticated } from "./auth";
 import {
   insertStorySchema, insertCharacterSchema, insertScriptSchema,
   insertPromptSchema, insertCreativeProfileSchema,
@@ -15,11 +15,22 @@ const openai = new OpenAI({
   baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
 });
 
+function toInt(value: string | string[]): number {
+  const raw = Array.isArray(value) ? value[0] : value;
+  return Number.parseInt(raw, 10);
+}
+
 async function getAppUser(req: any) {
-  const replitId = req.user?.claims?.sub;
-  if (!replitId) throw new Error("Unauthorized");
-  const displayName = [req.user?.claims?.first_name, req.user?.claims?.last_name].filter(Boolean).join(" ") || undefined;
-  return storage.getOrCreateUserByReplitId(replitId, displayName);
+  const authUser = getAuthUser(req);
+  const displayName =
+    [authUser.firstName, authUser.lastName].filter(Boolean).join(" ") ||
+    undefined;
+
+  return storage.getOrCreateUserByExternalAuthId(
+    authUser.externalAuthId,
+    authUser.provider,
+    displayName,
+  );
 }
 
 export async function registerRoutes(
@@ -39,7 +50,7 @@ export async function registerRoutes(
 
   app.get("/api/stories/:id", isAuthenticated, async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = toInt(req.params.id);
       const story = await storage.getStory(id);
       if (!story) return res.status(404).json({ error: "Story not found" });
       const storyChars = await storage.getStoryCharacters(id);
@@ -64,7 +75,7 @@ export async function registerRoutes(
 
   app.patch("/api/stories/:id", isAuthenticated, async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = toInt(req.params.id);
       const story = await storage.updateStory(id, req.body);
       if (!story) return res.status(404).json({ error: "Story not found" });
       res.json(story);
@@ -75,7 +86,7 @@ export async function registerRoutes(
 
   app.delete("/api/stories/:id", isAuthenticated, async (req, res) => {
     try {
-      await storage.deleteStory(parseInt(req.params.id));
+      await storage.deleteStory(toInt(req.params.id));
       res.status(204).send();
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -84,7 +95,7 @@ export async function registerRoutes(
 
   app.post("/api/stories/:id/characters", isAuthenticated, async (req, res) => {
     try {
-      const storyId = parseInt(req.params.id);
+      const storyId = toInt(req.params.id);
       const { characterId } = req.body;
       const link = await storage.addStoryCharacter({ storyId, characterId });
       res.status(201).json(link);
@@ -95,7 +106,7 @@ export async function registerRoutes(
 
   app.delete("/api/stories/:storyId/characters/:characterId", isAuthenticated, async (req, res) => {
     try {
-      await storage.removeStoryCharacter(parseInt(req.params.storyId), parseInt(req.params.characterId));
+      await storage.removeStoryCharacter(toInt(req.params.storyId), toInt(req.params.characterId));
       res.status(204).send();
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -114,7 +125,7 @@ export async function registerRoutes(
 
   app.get("/api/characters/:id", isAuthenticated, async (req, res) => {
     try {
-      const char = await storage.getCharacter(parseInt(req.params.id));
+      const char = await storage.getCharacter(toInt(req.params.id));
       if (!char) return res.status(404).json({ error: "Character not found" });
       res.json(char);
     } catch (error: any) {
@@ -134,7 +145,7 @@ export async function registerRoutes(
 
   app.patch("/api/characters/:id", isAuthenticated, async (req, res) => {
     try {
-      const char = await storage.updateCharacter(parseInt(req.params.id), req.body);
+      const char = await storage.updateCharacter(toInt(req.params.id), req.body);
       if (!char) return res.status(404).json({ error: "Character not found" });
       res.json(char);
     } catch (error: any) {
@@ -144,7 +155,7 @@ export async function registerRoutes(
 
   app.delete("/api/characters/:id", isAuthenticated, async (req, res) => {
     try {
-      await storage.deleteCharacter(parseInt(req.params.id));
+      await storage.deleteCharacter(toInt(req.params.id));
       res.status(204).send();
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -168,7 +179,7 @@ export async function registerRoutes(
 
   app.get("/api/scripts/:id", isAuthenticated, async (req, res) => {
     try {
-      const script = await storage.getScript(parseInt(req.params.id));
+      const script = await storage.getScript(toInt(req.params.id));
       if (!script) return res.status(404).json({ error: "Script not found" });
       const story = await storage.getStory(script.storyId);
       res.json({ ...script, storyTitle: story?.title });
@@ -188,7 +199,7 @@ export async function registerRoutes(
 
   app.patch("/api/scripts/:id", isAuthenticated, async (req, res) => {
     try {
-      const script = await storage.updateScript(parseInt(req.params.id), req.body);
+      const script = await storage.updateScript(toInt(req.params.id), req.body);
       if (!script) return res.status(404).json({ error: "Script not found" });
       res.json(script);
     } catch (error: any) {
@@ -198,7 +209,7 @@ export async function registerRoutes(
 
   app.delete("/api/scripts/:id", isAuthenticated, async (req, res) => {
     try {
-      await storage.deleteScript(parseInt(req.params.id));
+      await storage.deleteScript(toInt(req.params.id));
       res.status(204).send();
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -227,13 +238,13 @@ export async function registerRoutes(
 
   app.patch("/api/prompts/:id", isAuthenticated, async (req, res) => {
     try {
-      const existing = await storage.getPrompt(parseInt(req.params.id));
+      const existing = await storage.getPrompt(toInt(req.params.id));
       if (!existing) return res.status(404).json({ error: "Prompt not found" });
       const updatedData = { ...req.body };
       if (req.body.content && req.body.content !== existing.content) {
         updatedData.version = existing.version + 1;
       }
-      const prompt = await storage.updatePrompt(parseInt(req.params.id), updatedData);
+      const prompt = await storage.updatePrompt(toInt(req.params.id), updatedData);
       res.json(prompt);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -242,7 +253,7 @@ export async function registerRoutes(
 
   app.delete("/api/prompts/:id", isAuthenticated, async (req, res) => {
     try {
-      await storage.deletePrompt(parseInt(req.params.id));
+      await storage.deletePrompt(toInt(req.params.id));
       res.status(204).send();
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -271,7 +282,7 @@ export async function registerRoutes(
 
   app.patch("/api/profiles/:id", isAuthenticated, async (req, res) => {
     try {
-      const profile = await storage.updateProfile(parseInt(req.params.id), req.body);
+      const profile = await storage.updateProfile(toInt(req.params.id), req.body);
       if (!profile) return res.status(404).json({ error: "Profile not found" });
       res.json(profile);
     } catch (error: any) {
@@ -281,7 +292,7 @@ export async function registerRoutes(
 
   app.delete("/api/profiles/:id", isAuthenticated, async (req, res) => {
     try {
-      await storage.deleteProfile(parseInt(req.params.id));
+      await storage.deleteProfile(toInt(req.params.id));
       res.status(204).send();
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -291,7 +302,7 @@ export async function registerRoutes(
   app.post("/api/profiles/:id/activate", isAuthenticated, async (req, res) => {
     try {
       const user = await getAppUser(req);
-      await storage.setActiveProfile(user.id, parseInt(req.params.id));
+      await storage.setActiveProfile(user.id, toInt(req.params.id));
       res.json({ success: true });
     } catch (error: any) {
       res.status(500).json({ error: error.message });

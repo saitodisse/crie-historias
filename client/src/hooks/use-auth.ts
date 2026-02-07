@@ -1,5 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import type { AuthUser } from "@shared/models/auth";
+import { useClerk } from "@clerk/clerk-react";
+
+export interface AuthUser {
+  id: string;
+  email: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  profileImageUrl: string | null;
+  provider: "clerk" | "local";
+}
 
 async function fetchUser(): Promise<AuthUser | null> {
   const response = await fetch("/api/auth/user", {
@@ -22,6 +31,8 @@ async function logout(): Promise<void> {
 }
 
 export function useAuth() {
+  const hasClerkKey = Boolean(import.meta.env.VITE_CLERK_PUBLISHABLE_KEY);
+  const clerk = hasClerkKey ? useClerk() : null;
   const queryClient = useQueryClient();
   const { data: user, isLoading } = useQuery<AuthUser | null>({
     queryKey: ["/api/auth/user"],
@@ -31,7 +42,14 @@ export function useAuth() {
   });
 
   const logoutMutation = useMutation({
-    mutationFn: logout,
+    mutationFn: async () => {
+      if (hasClerkKey && clerk) {
+        await clerk.signOut({ redirectUrl: "/sign-in" });
+        return;
+      }
+
+      await logout();
+    },
     onSuccess: () => {
       queryClient.setQueryData(["/api/auth/user"], null);
     },

@@ -11,6 +11,8 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   displayName: text("display_name"),
+  authProvider: text("auth_provider").default("legacy"),
+  externalAuthId: varchar("external_auth_id").unique(),
   replitId: varchar("replit_id").unique(),
   openaiKey: text("openai_key"),
   geminiKey: text("gemini_key"),

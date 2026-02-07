@@ -16,8 +16,12 @@ import { eq, desc, and } from "drizzle-orm";
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
-  getUserByReplitId(replitId: string): Promise<User | undefined>;
-  getOrCreateUserByReplitId(replitId: string, displayName?: string): Promise<User>;
+  getUserByExternalAuthId(externalAuthId: string): Promise<User | undefined>;
+  getOrCreateUserByExternalAuthId(
+    externalAuthId: string,
+    provider: string,
+    displayName?: string,
+  ): Promise<User>;
   createUser(user: InsertUser): Promise<User>;
 
   getStories(userId: number): Promise<Story[]>;
@@ -78,21 +82,32 @@ export class DatabaseStorage implements IStorage {
     return user || undefined;
   }
 
-  async getUserByReplitId(replitId: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.replitId, replitId));
+  async getUserByExternalAuthId(externalAuthId: string): Promise<User | undefined> {
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.externalAuthId, externalAuthId));
     return user || undefined;
   }
 
-  async getOrCreateUserByReplitId(replitId: string, displayName?: string): Promise<User> {
-    let user = await this.getUserByReplitId(replitId);
+  async getOrCreateUserByExternalAuthId(
+    externalAuthId: string,
+    provider: string,
+    displayName?: string,
+  ): Promise<User> {
+    let user = await this.getUserByExternalAuthId(externalAuthId);
     if (!user) {
-      const username = `user_${replitId.substring(0, 8)}`;
-      [user] = await db.insert(users).values({
+      const username = `user_${externalAuthId.substring(0, 16).replace(/[^a-zA-Z0-9_]/g, "_")}`;
+      [user] = await db
+        .insert(users)
+        .values({
         username,
-        password: "replit-auth",
+        password: `${provider}-auth`,
         displayName: displayName || username,
-        replitId,
-      }).returning();
+        externalAuthId,
+        authProvider: provider,
+      })
+        .returning();
     }
     return user;
   }

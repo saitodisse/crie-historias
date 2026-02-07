@@ -10,5 +10,17 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+// Log connection attempt (masking password)
+const dbUrl = process.env.DATABASE_URL;
+const maskedUrl = dbUrl.replace(/:([^:@]+)@/, ":*****@");
+console.log(`[DB] Attempting to connect to: ${maskedUrl}`);
+
+const useSsl =
+  process.env.PGSSLMODE === "require" ||
+  process.env.DATABASE_URL.includes("neon.tech");
+
+export const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: useSsl ? { rejectUnauthorized: false } : undefined,
+});
 export const db = drizzle(pool, { schema });

@@ -17,6 +17,10 @@ export function registerImageRoutes(app: Express): void {
         size: size as "1024x1024" | "512x512" | "256x256",
       });
 
+      if (!response.data || response.data.length === 0) {
+        return res.status(502).json({ error: "No image returned by provider" });
+      }
+
       const imageData = response.data[0];
       res.json({
         url: imageData.url,
