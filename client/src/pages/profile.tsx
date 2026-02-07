@@ -12,9 +12,16 @@ import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Settings, Plus, Save, Trash2, Check, Pencil, Key, Loader2 } from "lucide-react";
+import { Settings, Plus, Save, Trash2, Check, Pencil, Key, Loader2, Search, ArrowUpDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { CreativeProfile } from "@shared/schema";
+
+interface ModelOption {
+  id: string;
+  name: string;
+  price?: number;
+  displayName: string;
+}
 
 function detectProvider(modelId: string): string {
   if (modelId.startsWith("gemini")) return "gemini";
@@ -26,6 +33,10 @@ export default function ProfilePage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
   const [provider, setProvider] = useState("openai");
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc" | null>(null);
+
   const [form, setForm] = useState({
     name: "",
     model: "",
@@ -44,16 +55,33 @@ export default function ProfilePage() {
     queryKey: ["/api/user/keys"],
   });
 
-  const { data: dynamicModels, isLoading: isLoadingModels, isError: isModelsError } = useQuery<{ id: string; name: string }[]>({
+  const { data: dynamicModels, isLoading: isLoadingModels, isError: isModelsError } = useQuery<ModelOption[]>({
     queryKey: ["/api/models", provider],
     queryFn: async () => {
       const resp = await fetch(`/api/models/${provider}`);
       if (!resp.ok) throw new Error("Falha ao carregar modelos");
-      return resp.json();
+      const data = await resp.json();
+      return data.map((m: any) => {
+        const priceMatch = m.name.match(/\$(\d+\.?\d*)\/M/);
+        return {
+          ...m,
+          displayName: m.name,
+          price: priceMatch ? parseFloat(priceMatch[1]) : undefined
+        };
+      });
     },
     retry: 1,
     staleTime: 5 * 60 * 1000,
   });
+
+  const filteredModels = (dynamicModels || [])
+    .filter(m => m.displayName.toLowerCase().includes(searchTerm.toLowerCase()))
+    .sort((a, b) => {
+      if (!sortOrder) return 0;
+      const priceA = a.price ?? Infinity;
+      const priceB = b.price ?? Infinity;
+      return sortOrder === "asc" ? priceA - priceB : priceB - priceA;
+    });
 
   const saveKeysMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -165,7 +193,67 @@ export default function ProfilePage() {
         </Select>
       </div>
       <div className="space-y-2">
-        <Label>Modelo de IA</Label>
+        <div className="flex items-center justify-between">
+          <Label>Modelo de IA</Label>
+          <Dialog open={searchOpen} onOpenChange={setSearchOpen}>
+            <DialogTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-7 px-2 gap-1" disabled={!dynamicModels?.length}>
+                <Search className="h-3.5 w-3.5" />
+                Explorar Modelos
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
+              <DialogHeader>
+                <DialogTitle>Explorar Modelos - {provider.toUpperCase()}</DialogTitle>
+              </DialogHeader>
+              <div className="flex gap-2 items-center py-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Pesquisar modelos..."
+                    className="pl-9"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+                  title="Ordenar por preço"
+                >
+                  <ArrowUpDown className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+                {filteredModels.map((m) => (
+                  <Button
+                    key={m.id}
+                    variant="outline"
+                    className="w-full justify-between h-auto py-3 px-4 text-left"
+                    onClick={() => {
+                      setForm({ ...form, model: m.id });
+                      setSearchOpen(false);
+                    }}
+                  >
+                    <div className="flex flex-col gap-0.5">
+                      <span className="font-medium">{m.displayName.split(" (")[0]}</span>
+                      <span className="text-xs text-muted-foreground font-mono">{m.id}</span>
+                    </div>
+                    {m.price !== undefined && (
+                      <Badge variant="secondary" className="ml-2 whitespace-nowrap">
+                        ${m.price.toFixed(2)}/M
+                      </Badge>
+                    )}
+                  </Button>
+                ))}
+                {filteredModels.length === 0 && (
+                  <p className="text-center py-8 text-muted-foreground">Nenhum modelo encontrado.</p>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
         {isLoadingModels ? (
           <div className="flex items-center gap-2 h-9 px-3 border rounded-md text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
