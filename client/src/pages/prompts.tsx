@@ -42,6 +42,100 @@ const categoryLabels: Record<string, string> = {
   refinement: "Refinamento",
 };
 
+const PromptForm = ({
+  form,
+  setForm,
+  isCreate,
+  onSubmit,
+  isPending,
+}: {
+  form: any;
+  setForm: (f: any) => void;
+  isCreate: boolean;
+  onSubmit: () => void;
+  isPending: boolean;
+}) => (
+  <div className="space-y-4">
+    <div className="space-y-2">
+      <Label>Nome</Label>
+      <Input
+        value={form.name}
+        onChange={(e) => setForm({ ...form, name: e.target.value })}
+        placeholder="ex: Gerar Sinopse"
+        data-testid="input-prompt-name"
+      />
+    </div>
+    <div className="flex gap-4">
+      <div className="flex-1 space-y-2">
+        <Label>Categoria</Label>
+        <Select
+          value={form.category}
+          onValueChange={(v) => setForm({ ...form, category: v })}
+        >
+          <SelectTrigger data-testid="select-prompt-category">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="character">Personagem</SelectItem>
+            <SelectItem value="story">História</SelectItem>
+            <SelectItem value="script">Roteiro</SelectItem>
+            <SelectItem value="refinement">Refinamento</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="flex-1 space-y-2">
+        <Label>Tipo</Label>
+        <Select
+          value={form.type}
+          onValueChange={(v) => setForm({ ...form, type: v })}
+        >
+          <SelectTrigger data-testid="select-prompt-type">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="system">Sistema</SelectItem>
+            <SelectItem value="task">Tarefa</SelectItem>
+            <SelectItem value="auxiliary">Auxiliar</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+    <div className="space-y-2">
+      <Label>Conteúdo</Label>
+      <Textarea
+        value={form.content}
+        onChange={(e) => setForm({ ...form, content: e.target.value })}
+        placeholder="Escreva seu modelo de prompt aqui. Use {{story.title}}, {{character.name}} etc. para variáveis."
+        rows={8}
+        className="font-mono text-sm"
+        data-testid="input-prompt-content"
+      />
+    </div>
+    <div className="flex items-center gap-2">
+      <Switch
+        checked={form.active}
+        onCheckedChange={(checked) => setForm({ ...form, active: checked })}
+        data-testid="switch-prompt-active"
+      />
+      <Label>Ativo</Label>
+    </div>
+    <Button
+      className="w-full"
+      onClick={onSubmit}
+      disabled={!form.name.trim() || !form.content.trim() || isPending}
+      data-testid="button-submit-prompt"
+    >
+      {isCreate
+        ? isPending
+          ? "Criando..."
+          : "Criar Prompt"
+        : isPending
+          ? "Salvando..."
+          : "Salvar Alterações"}
+    </Button>
+  </div>
+);
+
 export default function PromptsPage() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
@@ -122,94 +216,6 @@ export default function PromptsPage() {
     return matchSearch && matchCategory;
   });
 
-  const PromptForm = ({ isCreate }: { isCreate: boolean }) => (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <Label>Nome</Label>
-        <Input
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-          placeholder="ex: Gerar Sinopse"
-          data-testid="input-prompt-name"
-        />
-      </div>
-      <div className="flex gap-4">
-        <div className="flex-1 space-y-2">
-          <Label>Categoria</Label>
-          <Select
-            value={form.category}
-            onValueChange={(v) => setForm({ ...form, category: v })}
-          >
-            <SelectTrigger data-testid="select-prompt-category">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="character">Personagem</SelectItem>
-              <SelectItem value="story">História</SelectItem>
-              <SelectItem value="script">Roteiro</SelectItem>
-              <SelectItem value="refinement">Refinamento</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="flex-1 space-y-2">
-          <Label>Tipo</Label>
-          <Select
-            value={form.type}
-            onValueChange={(v) => setForm({ ...form, type: v })}
-          >
-            <SelectTrigger data-testid="select-prompt-type">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="system">Sistema</SelectItem>
-              <SelectItem value="task">Tarefa</SelectItem>
-              <SelectItem value="auxiliary">Auxiliar</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-      <div className="space-y-2">
-        <Label>Conteúdo</Label>
-        <Textarea
-          value={form.content}
-          onChange={(e) => setForm({ ...form, content: e.target.value })}
-          placeholder="Escreva seu modelo de prompt aqui. Use {{story.title}}, {{character.name}} etc. para variáveis."
-          rows={8}
-          className="font-mono text-sm"
-          data-testid="input-prompt-content"
-        />
-      </div>
-      <div className="flex items-center gap-2">
-        <Switch
-          checked={form.active}
-          onCheckedChange={(checked) => setForm({ ...form, active: checked })}
-          data-testid="switch-prompt-active"
-        />
-        <Label>Ativo</Label>
-      </div>
-      <Button
-        className="w-full"
-        onClick={() =>
-          isCreate ? createMutation.mutate() : updateMutation.mutate()
-        }
-        disabled={
-          !form.name.trim() ||
-          !form.content.trim() ||
-          (isCreate ? createMutation.isPending : updateMutation.isPending)
-        }
-        data-testid="button-submit-prompt"
-      >
-        {isCreate
-          ? createMutation.isPending
-            ? "Criando..."
-            : "Criar Prompt"
-          : updateMutation.isPending
-            ? "Salvando..."
-            : "Salvar Alterações"}
-      </Button>
-    </div>
-  );
-
   return (
     <div className="flex h-full flex-col">
       <div className="flex flex-wrap items-center justify-between gap-4 p-6 pb-4">
@@ -241,7 +247,13 @@ export default function PromptsPage() {
             <DialogHeader>
               <DialogTitle>Criar Prompt</DialogTitle>
             </DialogHeader>
-            <PromptForm isCreate />
+            <PromptForm
+              isCreate
+              form={form}
+              setForm={setForm}
+              onSubmit={() => createMutation.mutate()}
+              isPending={createMutation.isPending}
+            />
           </DialogContent>
         </Dialog>
       </div>
@@ -301,7 +313,13 @@ export default function PromptsPage() {
                         <X className="h-4 w-4" />
                       </Button>
                     </div>
-                    <PromptForm isCreate={false} />
+                    <PromptForm
+                      isCreate={false}
+                      form={form}
+                      setForm={setForm}
+                      onSubmit={() => updateMutation.mutate()}
+                      isPending={updateMutation.isPending}
+                    />
                   </CardContent>
                 ) : (
                   <>

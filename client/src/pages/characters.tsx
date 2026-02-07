@@ -38,6 +38,90 @@ interface AIResult {
   result: string;
 }
 
+const CharacterForm = ({
+  form,
+  setForm,
+  isCreate,
+  onSubmit,
+  isPending,
+}: {
+  form: any;
+  setForm: (f: any) => void;
+  isCreate: boolean;
+  onSubmit: () => void;
+  isPending: boolean;
+}) => (
+  <div className="space-y-4">
+    <div className="space-y-2">
+      <Label>Nome</Label>
+      <Input
+        value={form.name}
+        onChange={(e) => setForm({ ...form, name: e.target.value })}
+        placeholder="Nome do personagem..."
+        data-testid="input-char-name"
+      />
+    </div>
+    <div className="space-y-2">
+      <Label>Descrição Física</Label>
+      <Textarea
+        value={form.description}
+        onChange={(e) => setForm({ ...form, description: e.target.value })}
+        placeholder="Aparência, porte físico, características marcantes..."
+        rows={2}
+        className="resize-none"
+        data-testid="input-char-description"
+      />
+    </div>
+    <div className="space-y-2">
+      <Label>Personalidade</Label>
+      <Textarea
+        value={form.personality}
+        onChange={(e) => setForm({ ...form, personality: e.target.value })}
+        placeholder="Traços, temperamento, peculiaridades..."
+        rows={2}
+        className="resize-none"
+        data-testid="input-char-personality"
+      />
+    </div>
+    <div className="space-y-2">
+      <Label>Histórico (Background)</Label>
+      <Textarea
+        value={form.background}
+        onChange={(e) => setForm({ ...form, background: e.target.value })}
+        placeholder="História de vida, motivações, segredos..."
+        rows={2}
+        className="resize-none"
+        data-testid="input-char-background"
+      />
+    </div>
+    <div className="space-y-2">
+      <Label>Notas</Label>
+      <Textarea
+        value={form.notes}
+        onChange={(e) => setForm({ ...form, notes: e.target.value })}
+        placeholder="Notas adicionais..."
+        rows={2}
+        className="resize-none"
+        data-testid="input-char-notes"
+      />
+    </div>
+    <Button
+      className="w-full"
+      onClick={onSubmit}
+      disabled={!form.name.trim() || isPending}
+      data-testid="button-submit-character"
+    >
+      {isCreate
+        ? isPending
+          ? "Criando..."
+          : "Criar Personagem"
+        : isPending
+          ? "Salvando..."
+          : "Salvar Alterações"}
+    </Button>
+  </div>
+);
+
 export default function CharactersPage() {
   const [search, setSearch] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
@@ -142,83 +226,6 @@ export default function CharactersPage() {
       c.description?.toLowerCase().includes(search.toLowerCase())
   );
 
-  const CharacterForm = ({ isCreate }: { isCreate: boolean }) => (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <Label>Nome</Label>
-        <Input
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-          placeholder="Nome do personagem..."
-          data-testid="input-char-name"
-        />
-      </div>
-      <div className="space-y-2">
-        <Label>Descrição Física</Label>
-        <Textarea
-          value={form.description}
-          onChange={(e) => setForm({ ...form, description: e.target.value })}
-          placeholder="Aparência, porte físico, características marcantes..."
-          rows={2}
-          className="resize-none"
-          data-testid="input-char-description"
-        />
-      </div>
-      <div className="space-y-2">
-        <Label>Personalidade</Label>
-        <Textarea
-          value={form.personality}
-          onChange={(e) => setForm({ ...form, personality: e.target.value })}
-          placeholder="Traços, temperamento, peculiaridades..."
-          rows={2}
-          className="resize-none"
-          data-testid="input-char-personality"
-        />
-      </div>
-      <div className="space-y-2">
-        <Label>Histórico (Background)</Label>
-        <Textarea
-          value={form.background}
-          onChange={(e) => setForm({ ...form, background: e.target.value })}
-          placeholder="História de vida, motivações, segredos..."
-          rows={2}
-          className="resize-none"
-          data-testid="input-char-background"
-        />
-      </div>
-      <div className="space-y-2">
-        <Label>Notas</Label>
-        <Textarea
-          value={form.notes}
-          onChange={(e) => setForm({ ...form, notes: e.target.value })}
-          placeholder="Notas adicionais..."
-          rows={2}
-          className="resize-none"
-          data-testid="input-char-notes"
-        />
-      </div>
-      <Button
-        className="w-full"
-        onClick={() =>
-          isCreate ? createMutation.mutate() : updateMutation.mutate()
-        }
-        disabled={
-          !form.name.trim() ||
-          (isCreate ? createMutation.isPending : updateMutation.isPending)
-        }
-        data-testid="button-submit-character"
-      >
-        {isCreate
-          ? createMutation.isPending
-            ? "Criando..."
-            : "Criar Personagem"
-          : updateMutation.isPending
-            ? "Salvando..."
-            : "Salvar Alterações"}
-      </Button>
-    </div>
-  );
-
   return (
     <div className="flex h-full flex-col">
       <div className="flex flex-wrap items-center justify-between gap-4 p-6 pb-4">
@@ -253,7 +260,13 @@ export default function CharactersPage() {
                 Preencha os dados do novo personagem.
               </DialogDescription>
             </DialogHeader>
-            <CharacterForm isCreate />
+            <CharacterForm
+              isCreate
+              form={form}
+              setForm={setForm}
+              onSubmit={() => createMutation.mutate()}
+              isPending={createMutation.isPending}
+            />
           </DialogContent>
         </Dialog>
       </div>
@@ -305,7 +318,13 @@ export default function CharactersPage() {
                         <X className="h-4 w-4" />
                       </Button>
                     </div>
-                    <CharacterForm isCreate={false} />
+                    <CharacterForm
+                      isCreate={false}
+                      form={form}
+                      setForm={setForm}
+                      onSubmit={() => updateMutation.mutate()}
+                      isPending={updateMutation.isPending}
+                    />
                   </CardContent>
                 ) : (
                   <>

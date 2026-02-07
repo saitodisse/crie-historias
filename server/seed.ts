@@ -1,4 +1,10 @@
 import { storage } from "./storage";
+import {
+  STORY_TONES,
+  THEME_PRESETS,
+  STYLE_PRESETS,
+  getSystemInstruction,
+} from "../shared/creative-constants";
 
 const DEFAULT_USER_ID = 1;
 
@@ -28,96 +34,40 @@ export async function seedDatabase(userId: number = DEFAULT_USER_ID) {
     return;
   }
 
-  // Personagens
+  // Personagens (Arquétipos de HQ)
   const char1 = await storage.createCharacter({
     userId: effectiveUserId,
-    name: "Elena Voss",
+    name: "Sombra da Noite",
     description:
-      "Alta, traços angulares, cabelos escuros com mechas prateadas presos em um coque severo. Olhos azul-claros que parecem ver através das pessoas. Uma cicatriz fina traça sua mandíbula esquerda.",
+      "Veste um traje tático preto fosco com detalhes em roxo escuro. Uma capa esfarrapada que parece se fundir com as sombras. Máscara que cobre apenas os olhos, revelando um olhar determinado.",
     personality:
-      "Brilhante e metódica, Elena aborda problemas com precisão cirúrgica. Demora a confiar, mas é ferozmente leal uma vez que se conquista seu respeito. Tem um humor seco que pega as pessoas desprevenidas.",
+      "Estóico, observador e implacável contra o crime. Evita violência letal, mas usa o medo como sua principal ferramenta. Fala pouco, agindo com precisão milimétrica.",
     background:
-      "Ex-analista de inteligência que deixou a agência após uma missão terminar de forma catastrófica. Agora dirige uma firma de investigação privada, mas ainda carrega o peso das vidas que não pôde salvar.",
-    notes:
-      "Fala três idiomas. Tem um pesadelo recorrente sobre Praga. Bebe café preto exclusivamente.",
+      "Um ex-detetive que se cansou da corrupção no sistema e decidiu agir por conta própria. Sua base é um bunker escondido sob uma antiga fábrica de brinquedos.",
+    notes: "Especialista em artes marciais e gadgets tecnológicos.",
     active: true,
   });
 
   const char2 = await storage.createCharacter({
     userId: effectiveUserId,
-    name: "Marcus Reeve",
+    name: "Nova Lux",
     description:
-      "Físico atarracado, pele marrom quente, cabelo curto com mechas grisalhas nas têmporas. Olhos escuros expressivos, muitas vezes franzidos de diversão. Veste-se impecavelmente mesmo em situações casuais.",
+      "Cabelos loiros platinados que brilham levemente. Olhos dourados. Traje tecnológico branco e dourado com circuitos visíveis que emitem luz quando ela usa seus poderes.",
     personality:
-      "Carismático e desarmantemente honesto, Marcus tem o dom de deixar as pessoas à vontade. Por trás do charme esconde-se uma mente estratégica afiada como uma navalha. Ele é do tipo que ri do perigo e depois o neutraliza.",
+      "Otimista, corajosa e por vezes um pouco ingênua sobre a maldade do mundo. Acredita no potencial de redenção de todos.",
     background:
-      "Ex-militar que se tornou jornalista e depois articulador político. Ele viu os conflitos mais feios do mundo de perto e emergiu com sua humanidade intacta, embora não ilesa.",
-    notes:
-      "Toca piano quando precisa pensar. Tem uma rede de contatos abrangendo cinco continentes.",
+      "Uma cientista que sofreu um acidente com um acelerador de partículas e ganhou a habilidade de manipular fótons e luz sólida.",
+    notes: "Pode voar e criar escudos de luz.",
     active: true,
   });
 
-  const char3 = await storage.createCharacter({
-    userId: effectiveUserId,
-    name: "Lian Zhou",
-    description:
-      "Baixa, constituição atlética. Cabelo preto liso geralmente meio escondido sob um boné. Olhos escuros com uma qualidade intensa e vigilante. Várias pequenas tatuagens nos antebraços, cada uma com uma história.",
-    personality:
-      "Quieta e observadora, Lian fala raramente, mas com precisão devastadora. Ela é profundamente empática apesar de seu exterior guardado. Quando pressionada, revela uma coragem feroz, quase imprudente.",
-    background:
-      "Cresceu nas margens de uma megacidade, autodidata em eletrônica e hacking. Encontrou propósito em expor a corrupção corporativa através do jornalismo investigativo.",
-    notes:
-      "Vegetariana. Tem um gato de resgate chamado Byte. Insone que faz seu melhor trabalho às 3 da manhã.",
-    active: true,
-  });
-
-  const char4 = await storage.createCharacter({
-    userId: effectiveUserId,
-    name: "Beatriz Silva",
-    description:
-      "Mulher na casa dos 40 anos, olhos expressivos e cabelos cacheados. Sempre carrega um caderno de couro gasto.",
-    personality:
-      "Intuitiva, resiliente e extremamente observadora. Possui uma calma contagiante, mesmo em situações de crise.",
-    background:
-      "Ex-professora de história que se tornou especialista em restauração de documentos antigos após encontrar um segredo de família.",
-    notes: "Fala fluentemente latim e francês. Adora chá de camomila.",
-    active: true,
-  });
-
-  // Histórias
+  // Histórias Exemplo
   const story1 = await storage.createStory({
     userId: effectiveUserId,
-    title: "O Protocolo de Praga",
+    title: "O Crepúsculo de Neon",
     premise:
-      "Quando uma operação classificada da Guerra Fria ressurge na Praga moderna, a ex-analista de inteligência Elena Voss deve confrontar os fantasmas de seu passado enquanto corre para evitar um incidente internacional que poderia remodelar o equilíbrio de poder global.",
-    tone: "Thriller Político, Espionagem",
-    status: "in-development",
-  });
-
-  const story2 = await storage.createStory({
-    userId: effectiveUserId,
-    title: "Sombras de Neon",
-    premise:
-      "Em uma metrópole cyberpunk em expansão, a jornalista investigativa Lian Zhou descobre uma conspiração ligando uma poderosa corporação a uma série de desaparecimentos misteriosos na classe baixa da cidade. Quanto mais ela investiga, mais percebe que a conspiração alcança a infraestrutura digital que controla todos os aspectos da vida urbana.",
-    tone: "Cyberpunk Noir, Ficção Científica",
-    status: "draft",
-  });
-
-  const story3 = await storage.createStory({
-    userId: effectiveUserId,
-    title: "O Gambito do Diplomata",
-    premise:
-      "O articulador político Marcus Reeve é contratado para mediar a paz em uma nação africana volátil, mas descobre que o conflito está sendo deliberadamente arquitetado por potências externas. Ele deve navegar por uma teia de traição onde cada aliado pode ser um inimigo.",
-    tone: "Drama Político, Thriller Internacional",
-    status: "draft",
-  });
-
-  const story4 = await storage.createStory({
-    userId: effectiveUserId,
-    title: "O Segredo do Arquivo Nacional",
-    premise:
-      "Beatriz Silva descobre um mapa oculto em um documento do século XVIII que aponta para um tesouro esquecido no coração da Amazônia.",
-    tone: "Aventura, Mistério",
+      "Em uma cidade onde o sol nunca brilha através da poluição, Sombra da Noite deve impedir que uma nova droga digital escravize a população, enquanto Nova Lux tenta provar que há esperança mesmo nas sombras mais profundas.",
+    tone: "Mistério Noir, Ação Frenética",
     status: "in-development",
   });
 
@@ -130,59 +80,72 @@ export async function seedDatabase(userId: number = DEFAULT_USER_ID) {
     storyId: story1.id,
     characterId: char2.id,
   });
-  await storage.addStoryCharacter({
-    storyId: story2.id,
-    characterId: char3.id,
-  });
-  await storage.addStoryCharacter({
-    storyId: story3.id,
-    characterId: char2.id,
-  });
-  await storage.addStoryCharacter({
-    storyId: story4.id,
-    characterId: char4.id,
-  });
 
-  // Roteiros
+  // Roteiros (Exemplo de Página 1)
   await storage.createScript({
     storyId: story1.id,
-    title: "Protocolo Praga - Sinopse",
-    type: "synopsis",
-    content: `ATO UM: O DESPERTAR\n\nElena Voss construiu uma vida tranquila administrando sua firma de investigação privada em Berlim. Sua paz cuidadosamente construída estilhaça quando um pacote misterioso chega contendo um documento classificado da Operação Nightfall — uma missão que lhe disseram ter sido permanentemente enterrada.`,
+    title: "Página 1 - A Chegada",
+    type: "detailed",
+    content: `[PÁGINA 1]\n\nPAINEL 1: Plano geral da cidade sob chuva de neon. Sombra da Noite observa do topo de um gárgula.\n\nPAINEL 2: Close no rosto de Sombra da Noite. Ele detecta um movimento suspeito.\n\nPAINEL 3: Ele salta para o abismo, a capa se abrindo como asas de morcego.`,
     origin: "manual",
   });
 
-  await storage.createScript({
-    storyId: story4.id,
-    title: "Sinopse - O Segredo do Arquivo Nacional",
-    type: "synopsis",
-    content:
-      "A história começa quando Beatriz, ao restaurar um diário de um explorador português, encontra coordenadas geográficas escondidas sob uma camada de tinta invisível. Ela parte em uma jornada perigosa para validar sua descoberta.",
-    origin: "manual",
-  });
+  // Biblioteca de Prompts (Baseado nos Presets)
+  for (const preset of THEME_PRESETS) {
+    await storage.createPrompt({
+      userId: effectiveUserId,
+      name: `Template: ${preset.label}`,
+      category: "story",
+      type: "task",
+      content: preset.prompt,
+      active: true,
+    });
+  }
 
-  // Prompts
+  // Prompt Mestre de Quadrinhos
   await storage.createPrompt({
     userId: effectiveUserId,
-    name: "Gerador Criativo de Sinopses",
-    category: "story",
+    name: "Gerador Profissional de HQ (Padrão)",
+    category: "script",
     type: "system",
-    content:
-      "Você é um roteirista especializado e arquiteto de histórias. Ao ser solicitado a gerar uma sinopse, crie uma estrutura narrativa atraente com atos claros, tensão crescente e resolução satisfatória.",
+    content: getSystemInstruction(4, "Aventura Épica"),
     active: true,
   });
 
-  // Perfis
+  // Perfis Criativos (Baseado nos Style Presets)
+  // Criaremos 3 perfis principais para não poluir demais, mas representativos
   await storage.createProfile({
     userId: effectiveUserId,
-    name: "Explorador Criativo",
-    model: "gpt-5-mini",
+    name: "Estilo Marvel/DC (Moderno)",
+    model: "gpt-4o",
+    temperature: "0.8",
+    maxTokens: 4096,
+    narrativeStyle:
+      "HQ Moderna da Marvel, colorido digital, estilo Jim Lee/Todd McFarlane",
+    active: true,
+  });
+
+  await storage.createProfile({
+    userId: effectiveUserId,
+    name: "Mangá Shonen (Dinâmico)",
+    model: "gpt-4o-mini",
     temperature: "0.9",
     maxTokens: 4096,
     narrativeStyle:
-      "Prosa literária rica com atenção aos detalhes sensoriais. Prefira mostrar a contar.",
-    active: true,
+      "Mangá Shonen moderno, traço detalhado, efeitos cinematográficos",
+    active: false,
   });
 
-  console.log("Seed data created successfully");
+  await storage.createProfile({
+    userId: effectiveUserId,
+    name: "Noir Clássico (Sombrio)",
+    model: "gpt-4-turbo",
+    temperature: "0.7",
+    maxTokens: 2048,
+    narrativeStyle:
+      "HQ Noir, alto contraste, sombras profundas, estilo Frank Miller",
+    active: false,
+  });
+
+  console.log("Seed data updated with Comic Book presets successfully");
 }
