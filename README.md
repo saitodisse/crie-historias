@@ -1,352 +1,530 @@
-https://chatgpt.com/c/6986b1c4-f7b4-8329-8317-0d90b0d92233
+# StoryForge - Estudio de Escrita Criativa
 
-Tudo foi baseado no prompt abaixo.
-
----
-
-Maravilha. Suas respostas deixaram o **produto cristalino** — agora dá pra transformar isso numa **V1 enxuta, sólida e extensível**, sem “feature creep”.
-
-Vou organizar em 4 partes:
-
-1. 🎯 **Definição clara do produto (V1)**
-2. 🧹 **O que entra / o que fica explicitamente fora**
-3. 📐 **Especificação Funcional V1 (reescrita e enxugada)**
-4. 🗂️ **Modelo conceitual de dados (entidades e relações – sem schema SQL)**
-
-Sem stack, sem imagens, sem firula.
+Plataforma de escrita criativa assistida por inteligencia artificial para gerenciamento de historias, personagens e roteiros, com observabilidade completa das chamadas de IA. Interface em portugues brasileiro (PT-BR).
 
 ---
 
-# 🎯 1. O QUE É ESSE PRODUTO (V1)
+## Indice
 
-> **Um banco de dados relacional, server-first, para criação e gerenciamento de histórias, roteiros e personagens, orientado por IA, com rastreabilidade total de prompts, modelos e resultados.**
-
-Ele é:
-
-* 🧠 **Criativo**
-* 🗃️ **Auditável**
-* 🔁 **Reexecutável**
-* 👤 **Single-user agora, multi-user-ready**
-
-Não é:
-
-* Um gerador visual
-* Um editor de HQ
-* Um playground descartável de IA
-
----
-
-# 🧹 2. ESCOPO: ENTRA vs FICA FORA
-
-## ✅ ENTRA NA V1
-
-* Histórias
-* Roteiros
-* Personagens
-* Prompts configuráveis
-* Execuções de IA com histórico completo
-* Preferências de modelo por usuário
-* Base pronta para SaaS (auth depois)
-
-## ❌ FICA FORA DA V1 (explicitamente)
-
-* Geração de imagens
-* Character sheets visuais
-* Grounding com Google Search
-* Wizard complexo
-* Versionamento com merge/diff
-* Compartilhamento público
-* Templates visuais / UX avançado
-
-👉 Isso evita ambiguidade no futuro.
+- [Visao Geral](#visao-geral)
+- [Funcionalidades](#funcionalidades)
+- [Arquitetura](#arquitetura)
+- [Stack Tecnologico](#stack-tecnologico)
+- [Estrutura do Projeto](#estrutura-do-projeto)
+- [Modelo de Dados](#modelo-de-dados)
+- [Autenticacao](#autenticacao)
+- [Integracao com IA](#integracao-com-ia)
+- [Perfis Criativos](#perfis-criativos)
+- [Gerenciamento de Chaves de API](#gerenciamento-de-chaves-de-api)
+- [Auditabilidade de Prompts](#auditabilidade-de-prompts)
+- [Rotas da API](#rotas-da-api)
+- [Tema e Design](#tema-e-design)
+- [Como Executar](#como-executar)
+- [Variaveis de Ambiente](#variaveis-de-ambiente)
 
 ---
 
-# 📐 3. ESPECIFICAÇÃO FUNCIONAL — V1
+## Visao Geral
 
-## 3.1. Conceito Central
+O StoryForge e uma plataforma completa para escritores criativos que combina gerenciamento de projetos literarios com geracao de conteudo por IA. Cada historia pode ter personagens reutilizaveis, roteiros em diferentes niveis de detalhe e prompts salvos para interacao com multiplos provedores de IA.
 
-Tudo no sistema gira em torno de **três eixos principais**:
-
-1. **Entidades Criativas** (histórias, personagens, roteiros)
-2. **Prompts** (configuráveis, versionáveis)
-3. **Execuções de IA** (inputs + outputs + contexto)
+A plataforma registra cada interacao com IA de forma auditavel, armazenando o prompt de sistema, o prompt do usuario, o prompt final montado, os parametros do modelo e o resultado obtido.
 
 ---
 
-## 3.2. Gestão de Histórias
+## Funcionalidades
 
-### História
+### Gerenciamento de Historias
+- Criar, editar e excluir historias com titulo, premissa, tom e status
+- Status de progresso: rascunho, em desenvolvimento, completo
+- Vincular personagens existentes a uma historia (relacao muitos-para-muitos)
+- Visualizar roteiros e personagens associados na pagina de detalhe
 
-Uma **História** é um contêiner criativo.
+### Gerenciamento de Personagens
+- Criar personagens independentes reutilizaveis entre historias
+- Campos: nome, descricao, personalidade, background, notas
+- Ativar/desativar personagens
+- Gerar descricoes de personagens com IA
 
-Ela possui:
+### Roteiros (Scripts)
+- Criar roteiros vinculados a historias
+- Tipos: sinopse, outline, detalhado
+- Origem: manual ou gerado por IA
+- Editor de conteudo integrado com geracao assistida por IA
 
-* Título
-* Premissa
-* Tom / gênero (campo livre ou enum)
-* Status (rascunho, em desenvolvimento, finalizada)
-* Relação com personagens
-* Relação com roteiros
+### Biblioteca de Prompts
+- Salvar e versionar prompts para reutilizacao
+- Categorias e tipos configuravais (tarefa, sistema, contexto)
+- Versionamento automatico: incrementa versao quando o conteudo muda
+- Ativar/desativar prompts
 
-Funcionalidades:
+### Geracao de Conteudo com IA
+- Suporte a tres provedores: OpenAI, Google Gemini e OpenRouter
+- Dialogo de geracao inline com observabilidade completa
+- Visualizacao do prompt enviado, prompt de sistema, parametros e resultado
+- Botoes de copiar para prompt e resultado
+- Aviso visual quando o resultado retorna vazio
+- Botao "Novo Prompt" para iterar rapidamente
+- Badges mostrando modelo, temperatura e tokens maximos usados
 
-* Criar / editar / arquivar
-* Associar personagens existentes
-* Gerar roteiros a partir dela
-* Histórico de execuções de IA relacionadas
+### Perfis Criativos
+- Configurar preferencias de modelo de IA por perfil
+- Campos: modelo, temperatura, tokens maximos, estilo narrativo
+- Seletor de perfil ativo na barra lateral
+- Visualizacao do modelo e temperatura do perfil ativo
+- Um perfil ativo por usuario
 
----
+### Historico de Execucoes
+- Registro completo de cada chamada a IA
+- Armazena: prompt de sistema, prompt do usuario, prompt final, modelo, parametros (temperatura, tokens, modelo) e resultado
+- Visualizacao cronologica de todas as execucoes
+- Rastreabilidade completa para auditoria
 
-## 3.3. Estúdio de Personagens (V1 textual)
-
-### Personagem
-
-Personagens são **entidades independentes**, reutilizáveis.
-
-Campos típicos:
-
-* Nome
-* Descrição física (texto)
-* Personalidade
-* Background
-* Observações livres
-
-Funcionalidades:
-
-* CRUD completo
-* Importar personagem para uma ou mais histórias
-* Personagem **não pertence** a uma história específica
-
-⚠️ Nenhuma imagem nesta versão.
-
----
-
-## 3.4. Roteiros
-
-### Roteiro
-
-Um **Roteiro** é sempre derivado de uma história.
-
-Ele pode representar:
-
-* Sinopse expandida
-* Outline
-* Roteiro detalhado
-* Estrutura por atos/cenas (texto estruturado ou markdown)
-
-Funcionalidades:
-
-* Criar manualmente ou via IA
-* Regerar a partir de prompts diferentes
-* Associar execuções de IA específicas
+### Perfil do Usuario
+- Configuracao de chaves de API (OpenAI, Gemini, OpenRouter)
+- Chaves criptografadas com AES-256-CBC
+- Gerenciamento de perfis criativos
 
 ---
 
-## 3.5. Prompts (peça-chave do sistema)
+## Arquitetura
 
-### Prompt
+```
+Cliente (React + Vite)
+    |
+    |-- TanStack Query (cache e fetching)
+    |-- wouter (roteamento SPA)
+    |-- shadcn/ui + Tailwind CSS (componentes e estilo)
+    |
+    v
+Servidor (Express.js + TypeScript)
+    |
+    |-- Rotas REST API
+    |-- Replit Auth (OIDC + Passport)
+    |-- Drizzle ORM
+    |-- Integracao IA (OpenAI / Gemini / OpenRouter)
+    |
+    v
+PostgreSQL (Neon)
+```
 
-Prompts são **entidades de primeira classe**.
-
-Tipos:
-
-* Prompt de sistema
-* Prompt de tarefa (ex: “gerar sinopse”)
-* Prompt auxiliar (ex: “refinar tom”)
-
-Características:
-
-* Texto totalmente editável
-* Categoria (personagem, história, roteiro, refinamento)
-* Ativo / inativo
-* Versionável (leve)
-
-👉 Prompts **não são hardcoded**.
-
----
-
-## 3.6. Execuções de IA (núcleo técnico)
-
-### Execução
-
-Cada chamada de IA gera um **registro imutável**.
-
-Ela armazena:
-
-* Prompt do sistema (snapshot)
-* Prompt do usuário
-* Prompt final montado
-* Modelo usado (exato)
-* Parâmetros (temperature, etc.)
-* Resultado textual
-* Timestamp
-* Relação com:
-
-  * história
-  * roteiro
-  * personagem (opcional)
-  * prompt base
-
-Funcionalidades:
-
-* Visualizar histórico
-* Reexecutar com o mesmo contexto
-* Comparar outputs manualmente (fora do sistema)
-
-👉 Isso é o que transforma o produto num **banco de conhecimento criativo**.
+O frontend e o backend rodam no mesmo servidor Express na porta 5000. Em desenvolvimento, o Vite serve o frontend com HMR. Em producao, os assets sao pre-compilados e servidos como arquivos estaticos.
 
 ---
 
-## 3.7. Preferências de IA / Perfis Criativos
+## Stack Tecnologico
 
-### Perfil Criativo
+### Frontend
+| Tecnologia | Uso |
+|---|---|
+| React 18 | Biblioteca de UI |
+| Vite 7 | Build tool e dev server |
+| TypeScript | Tipagem estatica |
+| TanStack Query v5 | Gerenciamento de estado do servidor |
+| wouter | Roteamento client-side |
+| shadcn/ui | Componentes de UI |
+| Radix UI | Primitivos de acessibilidade |
+| Tailwind CSS 3 | Estilizacao utilitaria |
+| Lucide React | Icones |
+| React Hook Form | Gerenciamento de formularios |
+| Zod | Validacao de schemas |
+| Framer Motion | Animacoes |
+| Recharts | Graficos |
 
-Um perfil define:
+### Backend
+| Tecnologia | Uso |
+|---|---|
+| Express 5 | Framework HTTP |
+| TypeScript | Tipagem estatica |
+| Drizzle ORM | ORM para PostgreSQL |
+| drizzle-zod | Validacao de schemas do banco |
+| Passport.js | Autenticacao |
+| openid-client | OIDC para Replit Auth |
+| connect-pg-simple | Sessoes em PostgreSQL |
+| OpenAI SDK | Cliente para OpenAI e OpenRouter |
+| @google/generative-ai | Cliente para Google Gemini |
+| Node.js crypto | Criptografia AES-256-CBC |
 
-* Modelo preferido
-* Parâmetros padrão
-* Estilo narrativo desejado (texto)
-* Uso padrão de prompts
-
-Funcionalidades:
-
-* Definir perfil padrão
-* Sobrescrever por execução
-* Persistir última escolha do usuário
-
----
-
-## 3.8. Usuário (V1 simplificado)
-
-Na V1:
-
-* Um único usuário “local”
-* Estrutura já preparada para:
-
-  * autenticação
-  * múltiplos usuários
-  * chaves próprias de LLM
-
----
-
-# 🗂️ 4. MODELO CONCEITUAL DE DADOS (ENTIDADES)
-
-Sem SQL, só o **mapa mental**.
-
----
-
-## Entidades Principais
-
-### User
-
-* id
-* nome
-* email (futuro)
-* preferências globais
+### Banco de Dados
+| Tecnologia | Uso |
+|---|---|
+| PostgreSQL (Neon) | Banco de dados relacional |
+| Drizzle Kit | Migracao e sincronizacao de schema |
 
 ---
 
-### CreativeProfile
+## Estrutura do Projeto
 
-* id
-* user_id
-* nome
-* modelo padrão
-* parâmetros
-* ativo
-
----
-
-### Story
-
-* id
-* user_id
-* título
-* premissa
-* tom
-* status
-* timestamps
-
----
-
-### Character
-
-* id
-* user_id
-* nome
-* descrição
-* personalidade
-* background
-* ativo
-
----
-
-### StoryCharacter (N:N)
-
-* story_id
-* character_id
-
----
-
-### Script
-
-* id
-* story_id
-* tipo (sinopse, outline, roteiro)
-* conteúdo
-* origem (manual | IA)
-* timestamps
-
----
-
-### Prompt
-
-* id
-* user_id
-* nome
-* categoria
-* texto
-* versão
-* ativo
+```
+storyforge/
+├── client/
+│   ├── index.html                    # HTML raiz
+│   └── src/
+│       ├── App.tsx                    # Componente raiz com roteamento e auth
+│       ├── main.tsx                   # Entry point
+│       ├── index.css                  # Estilos globais e variaveis CSS
+│       ├── components/
+│       │   ├── app-sidebar.tsx        # Sidebar com navegacao + seletor de perfil
+│       │   ├── theme-toggle.tsx       # Alternador dark/light mode
+│       │   └── ui/                    # Componentes shadcn/ui
+│       ├── hooks/
+│       │   ├── use-auth.ts            # Hook de autenticacao
+│       │   ├── use-mobile.ts          # Deteccao de mobile
+│       │   └── use-toast.ts           # Hook de notificacoes
+│       ├── lib/
+│       │   ├── queryClient.ts         # Configuracao do TanStack Query
+│       │   └── utils.ts              # Utilitarios (cn, etc.)
+│       └── pages/
+│           ├── landing.tsx            # Pagina inicial (nao autenticado)
+│           ├── stories.tsx            # Lista de historias
+│           ├── story-detail.tsx       # Detalhe da historia + IA
+│           ├── characters.tsx         # Gerenciamento de personagens + IA
+│           ├── scripts.tsx            # Lista de roteiros
+│           ├── script-detail.tsx      # Detalhe do roteiro + IA
+│           ├── prompts.tsx            # Biblioteca de prompts
+│           ├── executions.tsx         # Historico de execucoes IA
+│           ├── profile.tsx            # Perfil e chaves de API
+│           └── not-found.tsx          # Pagina 404
+├── server/
+│   ├── index.ts                       # Entry point do servidor
+│   ├── routes.ts                      # Todas as rotas REST + logica IA
+│   ├── storage.ts                     # Interface IStorage + DatabaseStorage
+│   ├── crypto.ts                      # Encrypt/decrypt AES-256-CBC
+│   ├── seed.ts                        # Dados iniciais realistas
+│   ├── vite.ts                        # Configuracao Vite para dev/prod
+│   └── replit_integrations/
+│       └── auth/
+│           ├── replitAuth.ts          # Estrategia OIDC do Passport
+│           ├── storage.ts             # Storage para auth_users
+│           └── routes.ts              # Rotas de login/logout/callback
+├── shared/
+│   ├── schema.ts                      # Schema Drizzle + Zod + tipos
+│   └── models/
+│       ├── auth.ts                    # Schema da tabela auth_users
+│       └── chat.ts                    # Schema de conversas/mensagens
+├── package.json
+├── tsconfig.json
+├── tailwind.config.ts
+├── drizzle.config.ts
+└── vite.config.ts
+```
 
 ---
 
-### AIExecution
+## Modelo de Dados
 
-* id
-* user_id
-* prompt_id (opcional)
-* story_id (opcional)
-* script_id (opcional)
-* character_id (opcional)
-* system_prompt_snapshot
-* user_prompt
-* final_prompt
-* model
-* parâmetros
-* resultado
-* timestamp
+### Tabelas Principais
+
+```
+users                    stories                  characters
+├── id (PK, serial)      ├── id (PK, serial)      ├── id (PK, serial)
+├── username             ├── userId (FK → users)   ├── userId (FK → users)
+├── password             ├── title                 ├── name
+├── displayName          ├── premise               ├── description
+├── replitId (unique)    ├── tone                  ├── personality
+├── openaiKey (enc.)     ├── status                ├── background
+├── geminiKey (enc.)     ├── createdAt             ├── notes
+└── openrouterKey (enc.) └── updatedAt             ├── active
+                                                    ├── createdAt
+                                                    └── updatedAt
+```
+
+```
+scripts                  prompts                  creative_profiles
+├── id (PK, serial)      ├── id (PK, serial)      ├── id (PK, serial)
+├── storyId (FK)         ├── userId (FK)           ├── userId (FK)
+├── title                ├── name                  ├── name
+├── type                 ├── category              ├── model
+├── content              ├── content               ├── temperature
+├── origin               ├── type                  ├── maxTokens
+├── createdAt            ├── version               ├── narrativeStyle
+└── updatedAt            ├── active                ├── active
+                         ├── createdAt             └── createdAt
+                         └── updatedAt
+```
+
+```
+ai_executions                   story_characters (junction)
+├── id (PK, serial)             ├── id (PK, serial)
+├── userId (FK)                 ├── storyId (FK → stories)
+├── promptId (FK, opcional)     └── characterId (FK → characters)
+├── storyId (FK, opcional)
+├── scriptId (FK, opcional)
+├── characterId (FK, opcional)
+├── systemPromptSnapshot
+├── userPrompt
+├── finalPrompt
+├── model
+├── parameters (JSONB)
+├── result
+└── createdAt
+```
+
+```
+auth_users                      sessions
+├── id (PK, varchar UUID)       ├── sid (PK)
+├── email                       ├── sess (JSON)
+├── firstName                   └── expire
+├── lastName
+├── profileImageUrl
+├── createdAt
+└── updatedAt
+```
+
+### Relacionamentos
+- **users** 1:N stories, characters, prompts, creative_profiles, ai_executions
+- **stories** N:M characters (via story_characters)
+- **stories** 1:N scripts
+- **ai_executions** referencia opcional: prompt, story, script, character
 
 ---
 
-## Relações-chave
+## Autenticacao
 
-* User → tudo
-* Story ↔ Character (N:N)
-* Story → Script (1:N)
-* Prompt → AIExecution (1:N)
-* Script → AIExecution (1:N)
+O StoryForge utiliza **Replit Auth** via protocolo OIDC (OpenID Connect):
+
+1. O usuario clica em "Entrar com Replit" na landing page
+2. Redirecionamento para o provedor OIDC do Replit
+3. Apos autenticacao, o callback cria/atualiza o registro em `auth_users`
+4. A funcao `getOrCreateUserByReplitId()` vincula ao usuario na tabela `users`
+5. Sessao armazenada em PostgreSQL via `connect-pg-simple`
+6. Todas as rotas da API protegidas com middleware `isAuthenticated`
 
 ---
 
-# 🧭 Próximo passo (sugestão objetiva)
+## Integracao com IA
 
-Se você topar, o próximo passo ideal é **um destes**:
+### Provedores Suportados
 
-1. 📄 Transformar isso num **README de produto**
-2. 🗄️ Desenhar o **schema relacional (Postgres)**
-3. 🧠 Definir **tipos de prompts padrão iniciais**
-4. 🔄 Definir **fluxos principais de uso (happy path)**
+| Provedor | Configuracao | Modelos |
+|---|---|---|
+| **OpenAI** (Replit AI) | Automatica via Replit AI Integrations | gpt-5-mini, gpt-5-nano, etc. |
+| **OpenAI** (chave propria) | Chave informada pelo usuario | Todos os modelos OpenAI |
+| **Google Gemini** | Chave informada pelo usuario | gemini-2.5-flash, gemini-2.5-pro, etc. |
+| **OpenRouter** | Chave informada pelo usuario | 100+ modelos de diversos provedores |
 
-Me diz qual você quer atacar primeiro — e a gente aprofunda sem inflar o escopo.
+### Fluxo de Geracao
+
+1. Usuario abre o dialogo "Gerar com IA" em uma historia, roteiro ou personagem
+2. Escreve um prompt descrevendo o que deseja
+3. O sistema monta o prompt final com contexto (historia, personagens vinculados, etc.)
+4. Envia para o provedor de IA configurado no perfil criativo ativo
+5. Resultado e exibido inline no dialogo com:
+   - Badge do modelo e temperatura usados
+   - Prompt final enviado (com botao copiar)
+   - Prompt de sistema
+   - Resultado recebido (com botao copiar)
+   - Aviso se o resultado retornou vazio
+6. Toda a execucao e salva em `ai_executions` para auditoria
+
+### Parametros de Geracao
+
+Os parametros sao definidos pelo perfil criativo ativo:
+- **Modelo**: qual modelo de IA usar
+- **Temperatura**: controle de criatividade (0.0 = conservador, 2.0 = criativo) com fallback para 0.8
+- **Tokens Maximos**: limite de tokens na resposta (padrao: 2048)
+- **Estilo Narrativo**: instrucoes adicionais para o prompt de sistema
+
+---
+
+## Perfis Criativos
+
+Perfis criativos permitem alternar rapidamente entre configuracoes de IA:
+
+- Cada perfil define modelo, temperatura, tokens maximos e estilo narrativo
+- Apenas um perfil pode estar ativo por vez
+- O seletor de perfil na sidebar mostra o perfil ativo e permite trocar
+- O modelo e temperatura ativos sao exibidos abaixo do seletor
+- Ao gerar conteudo, os parametros do perfil ativo sao usados automaticamente
+
+**Exemplo de perfis:**
+- "Explorador Criativo" - modelo criativo, temperatura alta (0.9), prosa literaria
+- "Redator Tecnico" - modelo preciso, temperatura baixa (0.3), linguagem objetiva
+- "Brainstorm Rapido" - modelo rapido, temperatura media (0.7), ideias concisas
+
+---
+
+## Gerenciamento de Chaves de API
+
+As chaves de API dos usuarios sao gerenciadas com seguranca:
+
+- **Criptografia**: AES-256-CBC usando a variavel de ambiente `ENCRYPTION_KEY`
+- **Armazenamento**: chaves criptografadas nas colunas `openaiKey`, `geminiKey`, `openrouterKey` da tabela `users`
+- **Descriptografia**: apenas no momento do uso (chamada a IA), nunca expostas ao frontend
+- **Interface**: pagina de perfil permite adicionar/atualizar/remover chaves
+- **Prioridade**: chave do usuario > Replit AI Integrations (para OpenAI)
+
+---
+
+## Auditabilidade de Prompts
+
+Cada execucao de IA registra:
+
+| Campo | Descricao |
+|---|---|
+| `systemPromptSnapshot` | Copia do prompt de sistema no momento da execucao |
+| `userPrompt` | Prompt original escrito pelo usuario |
+| `finalPrompt` | Prompt final montado com contexto |
+| `model` | Modelo de IA utilizado |
+| `parameters` | JSONB com temperatura, maxTokens, modelo |
+| `result` | Texto gerado pela IA |
+| `storyId` / `scriptId` / `characterId` | Entidade associada (opcional) |
+| `promptId` | Prompt da biblioteca usado (opcional) |
+| `createdAt` | Data/hora da execucao |
+
+A pagina de "Execucoes" permite navegar por todo o historico de interacoes com IA.
+
+---
+
+## Rotas da API
+
+### Autenticacao
+| Metodo | Rota | Descricao |
+|---|---|---|
+| GET | `/api/auth/user` | Retorna usuario autenticado |
+| GET | `/api/login` | Inicia fluxo OIDC |
+| GET | `/api/callback` | Callback OIDC |
+| GET | `/api/logout` | Encerra sessao |
+
+### Historias
+| Metodo | Rota | Descricao |
+|---|---|---|
+| GET | `/api/stories` | Lista historias do usuario |
+| GET | `/api/stories/:id` | Detalhe com personagens e roteiros |
+| POST | `/api/stories` | Cria historia |
+| PATCH | `/api/stories/:id` | Atualiza historia |
+| DELETE | `/api/stories/:id` | Remove historia |
+| POST | `/api/stories/:id/characters` | Vincula personagem |
+| DELETE | `/api/stories/:storyId/characters/:characterId` | Desvincula personagem |
+
+### Personagens
+| Metodo | Rota | Descricao |
+|---|---|---|
+| GET | `/api/characters` | Lista personagens do usuario |
+| POST | `/api/characters` | Cria personagem |
+| PATCH | `/api/characters/:id` | Atualiza personagem |
+| DELETE | `/api/characters/:id` | Remove personagem |
+
+### Roteiros
+| Metodo | Rota | Descricao |
+|---|---|---|
+| GET | `/api/scripts` | Lista roteiros do usuario |
+| GET | `/api/scripts/:id` | Detalhe do roteiro |
+| POST | `/api/scripts` | Cria roteiro |
+| PATCH | `/api/scripts/:id` | Atualiza roteiro |
+| DELETE | `/api/scripts/:id` | Remove roteiro |
+
+### Prompts
+| Metodo | Rota | Descricao |
+|---|---|---|
+| GET | `/api/prompts` | Lista prompts do usuario |
+| POST | `/api/prompts` | Cria prompt (versionamento automatico) |
+| PATCH | `/api/prompts/:id` | Atualiza prompt |
+| DELETE | `/api/prompts/:id` | Remove prompt |
+
+### Perfis Criativos
+| Metodo | Rota | Descricao |
+|---|---|---|
+| GET | `/api/profiles` | Lista perfis do usuario |
+| POST | `/api/profiles` | Cria perfil |
+| PATCH | `/api/profiles/:id` | Atualiza perfil |
+| DELETE | `/api/profiles/:id` | Remove perfil |
+| POST | `/api/profiles/:id/activate` | Ativa perfil |
+
+### Inteligencia Artificial
+| Metodo | Rota | Descricao |
+|---|---|---|
+| POST | `/api/ai/generate` | Gera conteudo com IA |
+| POST | `/api/ai/rerun` | Re-executa geracao anterior |
+| GET | `/api/executions` | Historico de execucoes |
+| GET | `/api/models/:provider` | Lista modelos disponiveis |
+
+### Usuario
+| Metodo | Rota | Descricao |
+|---|---|---|
+| POST | `/api/user/keys` | Salva chaves de API (criptografadas) |
+
+---
+
+## Tema e Design
+
+### Cores
+- **Primaria**: Roxo (HSL 262, 83%, 58%)
+- Suporte completo a **dark mode** via classe CSS
+
+### Tipografia
+| Familia | Uso |
+|---|---|
+| Plus Jakarta Sans | Texto geral (sans-serif) |
+| Libre Baskerville | Texto literario (serif) |
+| JetBrains Mono | Codigo e prompts (monospace) |
+
+### Componentes
+- Baseado em **shadcn/ui** com primitivos Radix UI
+- Sidebar colapsavel com navegacao e seletor de perfil
+- Icones via **Lucide React**
+- Notificacoes via toast
+- Dialogos modais para geracao de IA
+
+### Idioma
+- Toda a interface em **portugues brasileiro (PT-BR)**
+
+---
+
+## Como Executar
+
+### Pre-requisitos
+- Node.js 20+
+- PostgreSQL (ou Neon)
+
+### Desenvolvimento
+
+```bash
+# Instalar dependencias
+npm install
+
+# Sincronizar schema do banco
+npm run db:push
+
+# Iniciar servidor de desenvolvimento (porta 5000)
+npm run dev
+```
+
+### Producao
+
+```bash
+# Build dos assets
+npm run build
+
+# Iniciar servidor de producao
+npm start
+```
+
+### Verificacao de tipos
+
+```bash
+npm run check
+```
+
+---
+
+## Variaveis de Ambiente
+
+| Variavel | Obrigatoria | Descricao |
+|---|---|---|
+| `DATABASE_URL` | Sim | URL de conexao PostgreSQL |
+| `SESSION_SECRET` | Sim | Segredo para assinatura de sessoes |
+| `ENCRYPTION_KEY` | Sim | Chave para criptografia AES-256-CBC das chaves de API |
+| `AI_INTEGRATIONS_OPENAI_API_KEY` | Nao | Chave OpenAI via Replit AI Integrations (automatica) |
+| `AI_INTEGRATIONS_OPENAI_BASE_URL` | Nao | Base URL da integracao OpenAI (automatica) |
+| `PGHOST` | Auto | Host do PostgreSQL |
+| `PGPORT` | Auto | Porta do PostgreSQL |
+| `PGUSER` | Auto | Usuario do PostgreSQL |
+| `PGPASSWORD` | Auto | Senha do PostgreSQL |
+| `PGDATABASE` | Auto | Nome do banco PostgreSQL |
+
+---
+
+## Licenca
+
+MIT
