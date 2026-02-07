@@ -12,29 +12,15 @@ import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Settings, Plus, Save, Trash2, Check, Pencil, Key } from "lucide-react";
+import { Settings, Plus, Save, Trash2, Check, Pencil, Key, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { CreativeProfile } from "@shared/schema";
 
-const modelsByProvider: Record<string, { value: string; label: string }[]> = {
-  openai: [
-    { value: "gpt-5.2", label: "GPT-5.2 (Mais Capaz)" },
-    { value: "gpt-5.1", label: "GPT-5.1" },
-    { value: "gpt-5", label: "GPT-5" },
-    { value: "gpt-5-mini", label: "GPT-5 Mini (Custo-Benefício)" },
-    { value: "gpt-5-nano", label: "GPT-5 Nano (Mais Rápido)" },
-  ],
-  gemini: [
-    { value: "gemini-pro", label: "Gemini Pro" },
-    { value: "gemini-1.5-flash", label: "Gemini 1.5 Flash" },
-  ],
-  openrouter: [
-    { value: "openrouter/auto", label: "OpenRouter (Auto)" },
-    { value: "anthropic/claude-3-opus", label: "Claude 3 Opus (via OpenRouter)" },
-    { value: "anthropic/claude-3-sonnet", label: "Claude 3 Sonnet (via OpenRouter)" },
-    { value: "meta-llama/llama-3-70b", label: "Llama 3 70B (via OpenRouter)" },
-  ],
-};
+function detectProvider(modelId: string): string {
+  if (modelId.startsWith("gemini")) return "gemini";
+  if (modelId.includes("/")) return "openrouter";
+  return "openai";
+}
 
 export default function ProfilePage() {
   const [createOpen, setCreateOpen] = useState(false);
@@ -42,7 +28,7 @@ export default function ProfilePage() {
   const [provider, setProvider] = useState("openai");
   const [form, setForm] = useState({
     name: "",
-    model: "gpt-5-mini",
+    model: "",
     temperature: "0.8",
     maxTokens: 2048,
     narrativeStyle: "",
@@ -56,6 +42,17 @@ export default function ProfilePage() {
 
   const { data: keysData, isLoading: isLoadingKeys } = useQuery<{ hasOpenai: boolean; hasGemini: boolean; hasOpenrouter: boolean }>({
     queryKey: ["/api/user/keys"],
+  });
+
+  const { data: dynamicModels, isLoading: isLoadingModels, isError: isModelsError } = useQuery<{ id: string; name: string }[]>({
+    queryKey: ["/api/models", provider],
+    queryFn: async () => {
+      const resp = await fetch(`/api/models/${provider}`);
+      if (!resp.ok) throw new Error("Falha ao carregar modelos");
+      return resp.json();
+    },
+    retry: 1,
+    staleTime: 5 * 60 * 1000,
   });
 
   const saveKeysMutation = useMutation({
@@ -121,15 +118,12 @@ export default function ProfilePage() {
 
   const resetForm = () => {
     setProvider("openai");
-    setForm({ name: "", model: "gpt-5-mini", temperature: "0.8", maxTokens: 2048, narrativeStyle: "", active: true });
+    setForm({ name: "", model: "", temperature: "0.8", maxTokens: 2048, narrativeStyle: "", active: true });
   };
 
   const startEditing = (p: CreativeProfile) => {
     setEditId(p.id);
-    const initialProvider = Object.keys(modelsByProvider).find(prov => 
-      modelsByProvider[prov].some(m => m.value === p.model)
-    ) || "openai";
-    setProvider(initialProvider);
+    setProvider(detectProvider(p.model));
     setForm({
       name: p.name,
       model: p.model,
@@ -151,39 +145,52 @@ export default function ProfilePage() {
           data-testid="input-profile-name"
         />
       </div>
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label>Provedor</Label>
-          <Select 
-            value={provider} 
-            onValueChange={(v) => {
-              setProvider(v);
-              setForm({ ...form, model: modelsByProvider[v][0].value });
-            }}
-          >
-            <SelectTrigger data-testid="select-profile-provider">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="openai">OpenAI</SelectItem>
-              <SelectItem value="gemini">Gemini</SelectItem>
-              <SelectItem value="openrouter">OpenRouter</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-          <Label>Modelo de IA</Label>
+      <div className="space-y-2">
+        <Label>Provedor</Label>
+        <Select 
+          value={provider} 
+          onValueChange={(v) => {
+            setProvider(v);
+            setForm({ ...form, model: "" });
+          }}
+        >
+          <SelectTrigger data-testid="select-profile-provider">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="openai">OpenAI</SelectItem>
+            <SelectItem value="gemini">Gemini</SelectItem>
+            <SelectItem value="openrouter">OpenRouter</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="space-y-2">
+        <Label>Modelo de IA</Label>
+        {isLoadingModels ? (
+          <div className="flex items-center gap-2 h-9 px-3 border rounded-md text-sm text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Carregando modelos...
+          </div>
+        ) : isModelsError ? (
+          <div className="flex items-center gap-2 h-9 px-3 border border-destructive rounded-md text-sm text-destructive">
+            Falha ao carregar modelos. Verifique sua chave de API.
+          </div>
+        ) : dynamicModels && dynamicModels.length === 0 ? (
+          <div className="flex items-center gap-2 h-9 px-3 border rounded-md text-sm text-muted-foreground">
+            Nenhum modelo disponível para este provedor.
+          </div>
+        ) : (
           <Select value={form.model} onValueChange={(v) => setForm({ ...form, model: v })}>
             <SelectTrigger data-testid="select-profile-model">
-              <SelectValue />
+              <SelectValue placeholder="Selecione um modelo" />
             </SelectTrigger>
             <SelectContent>
-              {modelsByProvider[provider].map((m) => (
-                <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>
+              {(dynamicModels || []).map((m) => (
+                <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
               ))}
             </SelectContent>
           </Select>
-        </div>
+        )}
       </div>
       <div className="space-y-2">
         <Label>Temperatura: {form.temperature}</Label>
@@ -224,7 +231,7 @@ export default function ProfilePage() {
       <Button
         className="w-full"
         onClick={() => (isCreate ? createMutation.mutate() : updateMutation.mutate())}
-        disabled={!form.name.trim() || (isCreate ? createMutation.isPending : updateMutation.isPending)}
+        disabled={!form.name.trim() || !form.model || (isCreate ? createMutation.isPending : updateMutation.isPending)}
         data-testid="button-submit-profile"
       >
         {isCreate

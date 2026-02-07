@@ -328,6 +328,65 @@ export async function registerRoutes(
     }
   });
 
+  app.get("/api/models/:provider", async (req, res) => {
+    try {
+      const { provider } = req.params;
+      const user = await storage.getUser(DEFAULT_USER_ID);
+
+      if (provider === "openai") {
+        const apiKey = user?.openaiKey ? decrypt(user.openaiKey) : process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
+        const baseURL = user?.openaiKey ? "https://api.openai.com/v1" : process.env.AI_INTEGRATIONS_OPENAI_BASE_URL;
+        const client = new OpenAI({ apiKey, baseURL });
+        const list = await client.models.list();
+        const models = [];
+        for await (const m of list) {
+          if (m.id.startsWith("gpt-") || m.id.startsWith("o") || m.id.includes("chatgpt")) {
+            models.push({ id: m.id, name: m.id });
+          }
+        }
+        models.sort((a, b) => a.name.localeCompare(b.name));
+        res.json(models);
+      } else if (provider === "gemini") {
+        const apiKey = user?.geminiKey ? decrypt(user.geminiKey) : null;
+        if (!apiKey) {
+          return res.json([
+            { id: "gemini-2.0-flash", name: "Gemini 2.0 Flash" },
+            { id: "gemini-2.0-flash-lite", name: "Gemini 2.0 Flash Lite" },
+            { id: "gemini-1.5-flash", name: "Gemini 1.5 Flash" },
+            { id: "gemini-1.5-pro", name: "Gemini 1.5 Pro" },
+            { id: "gemini-pro", name: "Gemini Pro" },
+          ]);
+        }
+        const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+        if (!resp.ok) throw new Error("Falha ao buscar modelos do Gemini");
+        const data = await resp.json();
+        const models = (data.models || [])
+          .filter((m: any) => m.supportedGenerationMethods?.includes("generateContent"))
+          .map((m: any) => ({
+            id: m.name.replace("models/", ""),
+            name: m.displayName || m.name.replace("models/", ""),
+          }));
+        res.json(models);
+      } else if (provider === "openrouter") {
+        const resp = await fetch("https://openrouter.ai/api/v1/models");
+        if (!resp.ok) throw new Error("Falha ao buscar modelos do OpenRouter");
+        const data = await resp.json();
+        const models = (data.data || [])
+          .slice(0, 100)
+          .map((m: any) => ({
+            id: m.id,
+            name: m.name || m.id,
+          }));
+        res.json(models);
+      } else {
+        res.status(400).json({ error: "Provedor inválido" });
+      }
+    } catch (error: any) {
+      console.error("Error fetching models:", error.message);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   app.post("/api/ai/generate", async (req, res) => {
     try {
       await ensureDefaultUser();
@@ -390,22 +449,38 @@ export async function registerRoutes(
         : userPrompt;
 
       let result = "";
+      const isGemini = model.startsWith("gemini");
+      const isOpenRouter = model.includes("/");
       
-      if (model.includes("gemini") && user?.geminiKey) {
+      if (isGemini) {
+        if (!user?.geminiKey) throw new Error("Chave de API do Gemini não configurada. Configure nas preferências do perfil.");
         const genAI = new GoogleGenerativeAI(decrypt(user.geminiKey));
-        const geminiModel = genAI.getGenerativeModel({ model: "gemini-pro" });
+        const geminiModel = genAI.getGenerativeModel({ model });
         const geminiResult = await geminiModel.generateContent({
           contents: [{ role: "user", parts: [{ text: `${systemPrompt}\n\n${finalPrompt}` }] }],
           generationConfig: { maxOutputTokens: maxTokens },
         });
         result = geminiResult.response.text();
-      } else {
-        const clientKey = model.includes("openrouter") ? user?.openrouterKey : user?.openaiKey;
+      } else if (isOpenRouter) {
+        const apiKey = user?.openrouterKey ? decrypt(user.openrouterKey) : null;
+        if (!apiKey) throw new Error("Chave de API do OpenRouter não configurada");
         const aiClient = new OpenAI({
-          apiKey: clientKey ? decrypt(clientKey) : process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
-          baseURL: model.includes("openrouter") ? "https://openrouter.ai/api/v1" : process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
+          apiKey,
+          baseURL: "https://openrouter.ai/api/v1",
         });
-
+        const completion = await aiClient.chat.completions.create({
+          model,
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: finalPrompt },
+          ],
+          max_completion_tokens: maxTokens,
+        });
+        result = completion.choices[0]?.message?.content || "";
+      } else {
+        const apiKey = user?.openaiKey ? decrypt(user.openaiKey) : process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
+        const baseURL = user?.openaiKey ? "https://api.openai.com/v1" : process.env.AI_INTEGRATIONS_OPENAI_BASE_URL;
+        const aiClient = new OpenAI({ apiKey, baseURL });
         const completion = await aiClient.chat.completions.create({
           model,
           messages: [
