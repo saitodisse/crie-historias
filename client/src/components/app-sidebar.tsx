@@ -1,5 +1,16 @@
 import { useLocation, Link } from "wouter";
-import { BookOpen, Users, FileText, Sparkles, History, Settings, PenTool, RefreshCw, LogOut, Cpu } from "lucide-react";
+import {
+  BookOpen,
+  Users,
+  FileText,
+  Sparkles,
+  History,
+  Settings,
+  PenTool,
+  RefreshCw,
+  LogOut,
+  Cpu,
+} from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -12,7 +23,13 @@ import {
   SidebarHeader,
   SidebarFooter,
 } from "@/components/ui/sidebar";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
@@ -74,10 +91,17 @@ export function AppSidebar() {
       setIsResetting(true);
       await apiRequest("POST", "/api/admin/reset");
       queryClient.invalidateQueries();
-      toast({ title: "Reset de fábrica concluído", description: "O banco de dados foi limpo e a semente foi reiniciada." });
+      toast({
+        title: "Reset de fábrica concluído",
+        description: "O banco de dados foi limpo e a semente foi reiniciada.",
+      });
       setOpen(false);
     } catch (error: any) {
-      toast({ title: "Erro ao resetar", description: error.message, variant: "destructive" });
+      toast({
+        title: "Erro ao resetar",
+        description: error.message,
+        variant: "destructive",
+      });
     } finally {
       setIsResetting(false);
     }
@@ -89,7 +113,11 @@ export function AppSidebar() {
   };
 
   const userInitials = user
-    ? [user.firstName, user.lastName].filter(Boolean).map((n) => n?.[0]).join("").toUpperCase() || "U"
+    ? [user.firstName, user.lastName]
+        .filter(Boolean)
+        .map((n) => n?.[0])
+        .join("")
+        .toUpperCase() || "U"
     : "U";
   const userName = user
     ? [user.firstName, user.lastName].filter(Boolean).join(" ") || "Usuário"
@@ -105,7 +133,9 @@ export function AppSidebar() {
             </div>
             <div>
               <h1 className="text-sm font-bold tracking-tight">StoryForge</h1>
-              <p className="text-[11px] text-muted-foreground">Estúdio de Escrita Criativa</p>
+              <p className="text-[11px] text-muted-foreground">
+                Estúdio de Escrita Criativa
+              </p>
             </div>
           </div>
         </Link>
@@ -118,7 +148,10 @@ export function AppSidebar() {
               {creativeItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild data-active={isActive(item.url)}>
-                    <Link href={item.url} data-testid={`link-nav-${item.title.toLowerCase()}`}>
+                    <Link
+                      href={item.url}
+                      data-testid={`link-nav-${item.title.toLowerCase()}`}
+                    >
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>
                     </Link>
@@ -135,7 +168,10 @@ export function AppSidebar() {
               {aiItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild data-active={isActive(item.url)}>
-                    <Link href={item.url} data-testid={`link-nav-${item.title.toLowerCase().replace(" ", "-")}`}>
+                    <Link
+                      href={item.url}
+                      data-testid={`link-nav-${item.title.toLowerCase().replace(" ", "-")}`}
+                    >
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>
                     </Link>
@@ -150,28 +186,39 @@ export function AppSidebar() {
           <SidebarGroup>
             <SidebarGroupLabel>Perfil Ativo</SidebarGroupLabel>
             <SidebarGroupContent>
-              <div className="px-2 space-y-2">
+              <div className="space-y-2 px-2">
                 <Select
                   value={activeProfile?.id?.toString() || ""}
-                  onValueChange={(val) => activateProfileMutation.mutate(parseInt(val))}
+                  onValueChange={(val) =>
+                    activateProfileMutation.mutate(parseInt(val))
+                  }
                   data-testid="select-active-profile"
                 >
-                  <SelectTrigger className="text-xs" data-testid="select-active-profile-trigger">
+                  <SelectTrigger
+                    className="text-xs"
+                    data-testid="select-active-profile-trigger"
+                  >
                     <SelectValue placeholder="Selecione um perfil" />
                   </SelectTrigger>
                   <SelectContent>
                     {profiles.map((p) => (
-                      <SelectItem key={p.id} value={p.id.toString()} data-testid={`select-profile-${p.id}`}>
+                      <SelectItem
+                        key={p.id}
+                        value={p.id.toString()}
+                        data-testid={`select-profile-${p.id}`}
+                      >
                         {p.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
                 {activeProfile && (
-                  <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground px-1">
+                  <div className="flex items-center gap-1.5 px-1 text-[10px] text-muted-foreground">
                     <Cpu className="h-3 w-3 shrink-0" />
                     <span className="truncate">{activeProfile.model}</span>
-                    <span className="shrink-0">T:{activeProfile.temperature}</span>
+                    <span className="shrink-0">
+                      T:{activeProfile.temperature}
+                    </span>
                   </div>
                 )}
               </div>
@@ -186,7 +233,10 @@ export function AppSidebar() {
               {settingsItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild data-active={isActive(item.url)}>
-                    <Link href={item.url} data-testid={`link-nav-${item.title.toLowerCase().replace(" ", "-")}`}>
+                    <Link
+                      href={item.url}
+                      data-testid={`link-nav-${item.title.toLowerCase().replace(" ", "-")}`}
+                    >
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>
                     </Link>
@@ -197,14 +247,21 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="p-4 space-y-3">
+      <SidebarFooter className="space-y-3 p-4">
         <div className="flex items-center gap-2">
           <Avatar className="h-7 w-7">
-            {user?.profileImageUrl && <AvatarImage src={user.profileImageUrl} alt={userName} />}
+            {user?.profileImageUrl && (
+              <AvatarImage src={user.profileImageUrl} alt={userName} />
+            )}
             <AvatarFallback className="text-xs">{userInitials}</AvatarFallback>
           </Avatar>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium truncate" data-testid="text-user-name">{userName}</p>
+          <div className="min-w-0 flex-1">
+            <p
+              className="truncate text-xs font-medium"
+              data-testid="text-user-name"
+            >
+              {userName}
+            </p>
           </div>
           <Button
             variant="ghost"
@@ -218,7 +275,12 @@ export function AppSidebar() {
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button variant="outline" size="sm" className="w-full text-[11px] gap-2" data-testid="button-admin-reset">
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full gap-2 text-[11px]"
+              data-testid="button-admin-reset"
+            >
               <RefreshCw className="h-3 w-3" />
               Reset de Fábrica
             </Button>
@@ -227,14 +289,24 @@ export function AppSidebar() {
             <DialogHeader>
               <DialogTitle>Reset de Fábrica</DialogTitle>
               <DialogDescription>
-                Isso apagará permanentemente todos os dados personalizados e restaurará as histórias e personagens padrão. Esta ação não pode ser desfeita.
+                Isso apagará permanentemente todos os dados personalizados e
+                restaurará as histórias e personagens padrão. Esta ação não pode
+                ser desfeita.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
-              <Button variant="ghost" onClick={() => setOpen(false)} disabled={isResetting}>
+              <Button
+                variant="ghost"
+                onClick={() => setOpen(false)}
+                disabled={isResetting}
+              >
                 Cancelar
               </Button>
-              <Button variant="destructive" onClick={handleReset} disabled={isResetting}>
+              <Button
+                variant="destructive"
+                onClick={handleReset}
+                disabled={isResetting}
+              >
                 {isResetting ? "Resetando..." : "Confirmar Reset"}
               </Button>
             </DialogFooter>

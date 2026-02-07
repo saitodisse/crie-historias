@@ -33,4 +33,3 @@ export async function createAudioPlaybackContext(
   worklet.connect(ctx.destination);
   return { ctx, worklet };
 }
-

@@ -147,22 +147,19 @@ export async function batchProcessWithSSE<T, R>(
     sendEvent({ type: "processing", index, item });
 
     try {
-      const result = await pRetry(
-        () => processor(item, index),
-        {
-          retries,
-          minTimeout,
-          maxTimeout,
-          factor: 2,
-          onFailedAttempt: (error) => {
-            if (!isRateLimitError(error)) {
-              throw new AbortError(
-                error instanceof Error ? error : new Error(String(error))
-              );
-            }
-          },
-        }
-      );
+      const result = await pRetry(() => processor(item, index), {
+        retries,
+        minTimeout,
+        maxTimeout,
+        factor: 2,
+        onFailedAttempt: (error) => {
+          if (!isRateLimitError(error)) {
+            throw new AbortError(
+              error instanceof Error ? error : new Error(String(error))
+            );
+          }
+        },
+      });
       results.push(result);
       sendEvent({ type: "progress", index, result });
     } catch (error) {
@@ -179,4 +176,3 @@ export async function batchProcessWithSSE<T, R>(
   sendEvent({ type: "complete", processed: items.length, errors });
   return results;
 }
-

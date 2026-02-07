@@ -7,9 +7,21 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
@@ -36,7 +48,11 @@ export default function PromptsPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState({
-    name: "", category: "story", type: "task", content: "", active: true,
+    name: "",
+    category: "story",
+    type: "task",
+    content: "",
+    active: true,
   });
   const { toast } = useToast();
 
@@ -78,7 +94,14 @@ export default function PromptsPage() {
     },
   });
 
-  const resetForm = () => setForm({ name: "", category: "story", type: "task", content: "", active: true });
+  const resetForm = () =>
+    setForm({
+      name: "",
+      category: "story",
+      type: "task",
+      content: "",
+      active: true,
+    });
 
   const startEditing = (p: Prompt) => {
     setEditingId(p.id);
@@ -113,8 +136,13 @@ export default function PromptsPage() {
       <div className="flex gap-4">
         <div className="flex-1 space-y-2">
           <Label>Categoria</Label>
-          <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
-            <SelectTrigger data-testid="select-prompt-category"><SelectValue /></SelectTrigger>
+          <Select
+            value={form.category}
+            onValueChange={(v) => setForm({ ...form, category: v })}
+          >
+            <SelectTrigger data-testid="select-prompt-category">
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="character">Personagem</SelectItem>
               <SelectItem value="story">História</SelectItem>
@@ -125,8 +153,13 @@ export default function PromptsPage() {
         </div>
         <div className="flex-1 space-y-2">
           <Label>Tipo</Label>
-          <Select value={form.type} onValueChange={(v) => setForm({ ...form, type: v })}>
-            <SelectTrigger data-testid="select-prompt-type"><SelectValue /></SelectTrigger>
+          <Select
+            value={form.type}
+            onValueChange={(v) => setForm({ ...form, type: v })}
+          >
+            <SelectTrigger data-testid="select-prompt-type">
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="system">Sistema</SelectItem>
               <SelectItem value="task">Tarefa</SelectItem>
@@ -156,30 +189,51 @@ export default function PromptsPage() {
       </div>
       <Button
         className="w-full"
-        onClick={() => (isCreate ? createMutation.mutate() : updateMutation.mutate())}
-        disabled={!form.name.trim() || !form.content.trim() || (isCreate ? createMutation.isPending : updateMutation.isPending)}
+        onClick={() =>
+          isCreate ? createMutation.mutate() : updateMutation.mutate()
+        }
+        disabled={
+          !form.name.trim() ||
+          !form.content.trim() ||
+          (isCreate ? createMutation.isPending : updateMutation.isPending)
+        }
         data-testid="button-submit-prompt"
       >
         {isCreate
-          ? createMutation.isPending ? "Criando..." : "Criar Prompt"
-          : updateMutation.isPending ? "Salvando..." : "Salvar Alterações"}
+          ? createMutation.isPending
+            ? "Criando..."
+            : "Criar Prompt"
+          : updateMutation.isPending
+            ? "Salvando..."
+            : "Salvar Alterações"}
       </Button>
     </div>
   );
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between gap-4 flex-wrap p-6 pb-4">
+    <div className="flex h-full flex-col">
+      <div className="flex flex-wrap items-center justify-between gap-4 p-6 pb-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight" data-testid="text-prompts-title">Prompts</h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          <h1
+            className="text-2xl font-bold tracking-tight"
+            data-testid="text-prompts-title"
+          >
+            Prompts
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Modelos de prompt configuráveis para geração por IA
           </p>
         </div>
-        <Dialog open={createOpen} onOpenChange={(o) => { setCreateOpen(o); if (!o) resetForm(); }}>
+        <Dialog
+          open={createOpen}
+          onOpenChange={(o) => {
+            setCreateOpen(o);
+            if (!o) resetForm();
+          }}
+        >
           <DialogTrigger asChild>
             <Button data-testid="button-create-prompt">
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="mr-2 h-4 w-4" />
               Novo Prompt
             </Button>
           </DialogTrigger>
@@ -192,9 +246,9 @@ export default function PromptsPage() {
         </Dialog>
       </div>
 
-      <div className="px-6 pb-4 flex gap-3 flex-wrap">
-        <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      <div className="flex flex-wrap gap-3 px-6 pb-4">
+        <div className="relative min-w-[200px] flex-1">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -220,7 +274,7 @@ export default function PromptsPage() {
             {[1, 2, 3].map((i) => (
               <Card key={i}>
                 <CardContent className="pt-4">
-                  <Skeleton className="h-5 w-32 mb-2" />
+                  <Skeleton className="mb-2 h-5 w-32" />
                   <Skeleton className="h-16 w-full" />
                 </CardContent>
               </Card>
@@ -231,10 +285,19 @@ export default function PromptsPage() {
             {filtered.map((prompt) => (
               <Card key={prompt.id} data-testid={`card-prompt-${prompt.id}`}>
                 {editingId === prompt.id ? (
-                  <CardContent className="pt-4 space-y-3">
+                  <CardContent className="space-y-3 pt-4">
                     <div className="flex items-center justify-between gap-2">
-                      <h3 className="font-semibold text-sm">Editando: {prompt.name}</h3>
-                      <Button size="icon" variant="ghost" onClick={() => { setEditingId(null); resetForm(); }}>
+                      <h3 className="text-sm font-semibold">
+                        Editando: {prompt.name}
+                      </h3>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => {
+                          setEditingId(null);
+                          resetForm();
+                        }}
+                      >
                         <X className="h-4 w-4" />
                       </Button>
                     </div>
@@ -243,15 +306,30 @@ export default function PromptsPage() {
                 ) : (
                   <>
                     <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 pb-2">
-                      <div className="flex items-center gap-2 min-w-0 flex-wrap">
-                        <Sparkles className="h-4 w-4 text-primary shrink-0" />
-                        <h3 className="font-semibold text-sm">{prompt.name}</h3>
-                        <Badge variant="secondary" className={categoryColors[prompt.category] || ""}>
+                      <div className="flex min-w-0 flex-wrap items-center gap-2">
+                        <Sparkles className="h-4 w-4 shrink-0 text-primary" />
+                        <h3 className="text-sm font-semibold">{prompt.name}</h3>
+                        <Badge
+                          variant="secondary"
+                          className={categoryColors[prompt.category] || ""}
+                        >
                           {categoryLabels[prompt.category] || prompt.category}
                         </Badge>
-                        <Badge variant="secondary">{prompt.type === 'system' ? 'Sistema' : prompt.type === 'task' ? 'Tarefa' : 'Auxiliar'}</Badge>
-                        {!prompt.active && <Badge variant="secondary" className="opacity-50">Inativo</Badge>}
-                        <span className="text-xs text-muted-foreground">v{prompt.version}</span>
+                        <Badge variant="secondary">
+                          {prompt.type === "system"
+                            ? "Sistema"
+                            : prompt.type === "task"
+                              ? "Tarefa"
+                              : "Auxiliar"}
+                        </Badge>
+                        {!prompt.active && (
+                          <Badge variant="secondary" className="opacity-50">
+                            Inativo
+                          </Badge>
+                        )}
+                        <span className="text-xs text-muted-foreground">
+                          v{prompt.version}
+                        </span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Button
@@ -259,19 +337,29 @@ export default function PromptsPage() {
                           variant="ghost"
                           onClick={() => {
                             navigator.clipboard.writeText(prompt.content);
-                            toast({ title: "Copiado para a área de transferência" });
+                            toast({
+                              title: "Copiado para a área de transferência",
+                            });
                           }}
                           data-testid={`button-copy-prompt-${prompt.id}`}
                         >
                           <Copy className="h-4 w-4" />
                         </Button>
-                        <Button size="icon" variant="ghost" onClick={() => startEditing(prompt)} data-testid={`button-edit-prompt-${prompt.id}`}>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => startEditing(prompt)}
+                          data-testid={`button-edit-prompt-${prompt.id}`}
+                        >
                           <Pencil className="h-4 w-4" />
                         </Button>
                         <Button
                           size="icon"
                           variant="ghost"
-                          onClick={() => { if (window.confirm(`Remover "${prompt.name}"?`)) deleteMutation.mutate(prompt.id); }}
+                          onClick={() => {
+                            if (window.confirm(`Remover "${prompt.name}"?`))
+                              deleteMutation.mutate(prompt.id);
+                          }}
                           data-testid={`button-delete-prompt-${prompt.id}`}
                         >
                           <Trash2 className="h-4 w-4 text-destructive" />
@@ -279,7 +367,7 @@ export default function PromptsPage() {
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <pre className="text-xs text-muted-foreground bg-muted rounded-md p-3 whitespace-pre-wrap font-mono max-h-32 overflow-auto">
+                      <pre className="max-h-32 overflow-auto whitespace-pre-wrap rounded-md bg-muted p-3 font-mono text-xs text-muted-foreground">
                         {prompt.content}
                       </pre>
                     </CardContent>
@@ -290,12 +378,13 @@ export default function PromptsPage() {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-4">
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
               <Sparkles className="h-8 w-8 text-muted-foreground" />
             </div>
             <h3 className="text-lg font-semibold">Nenhum prompt encontrado</h3>
-            <p className="text-sm text-muted-foreground mt-1 max-w-sm">
-              Crie modelos de prompt configuráveis para geração de conteúdo por IA.
+            <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+              Crie modelos de prompt configuráveis para geração de conteúdo por
+              IA.
             </p>
           </div>
         )}

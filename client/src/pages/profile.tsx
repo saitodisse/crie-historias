@@ -68,8 +68,24 @@ function ProfileFormFields({
   onSubmit,
   isPending,
 }: {
-  form: { name: string; model: string; temperature: string; maxTokens: number; narrativeStyle: string; active: boolean };
-  setForm: React.Dispatch<React.SetStateAction<{ name: string; model: string; temperature: string; maxTokens: number; narrativeStyle: string; active: boolean }>>;
+  form: {
+    name: string;
+    model: string;
+    temperature: string;
+    maxTokens: number;
+    narrativeStyle: string;
+    active: boolean;
+  };
+  setForm: React.Dispatch<
+    React.SetStateAction<{
+      name: string;
+      model: string;
+      temperature: string;
+      maxTokens: number;
+      narrativeStyle: string;
+      active: boolean;
+    }>
+  >;
   provider: string;
   setProvider: (v: string) => void;
   dynamicModels: ModelOption[] | undefined;
@@ -92,7 +108,9 @@ function ProfileFormFields({
         <Label>Nome do Perfil</Label>
         <Input
           value={form.name}
-          onChange={(e) => setForm(prev => ({ ...prev, name: e.target.value }))}
+          onChange={(e) =>
+            setForm((prev) => ({ ...prev, name: e.target.value }))
+          }
           placeholder="ex: Escrita Criativa, Técnico, Conciso"
           data-testid="input-profile-name"
         />
@@ -103,7 +121,7 @@ function ProfileFormFields({
           value={provider}
           onValueChange={(v) => {
             setProvider(v);
-            setForm(prev => ({ ...prev, model: "" }));
+            setForm((prev) => ({ ...prev, model: "" }));
           }}
         >
           <SelectTrigger data-testid="select-profile-provider">
@@ -119,29 +137,35 @@ function ProfileFormFields({
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <Label>Modelo de IA</Label>
-          <Dialog open={searchOpen} onOpenChange={(open) => {
-            setSearchOpen(open);
-            if (!open) setSearchTerm("");
-          }}>
+          <Dialog
+            open={searchOpen}
+            onOpenChange={(open) => {
+              setSearchOpen(open);
+              if (!open) setSearchTerm("");
+            }}
+          >
             <DialogTrigger asChild>
               <Button
                 variant="ghost"
                 size="sm"
                 type="button"
-                className="h-7 px-2 gap-1"
+                className="h-7 gap-1 px-2"
                 disabled={!dynamicModels?.length}
               >
                 <Search className="h-3.5 w-3.5" />
                 Explorar Modelos
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col" onOpenAutoFocus={(e) => e.preventDefault()}>
+            <DialogContent
+              className="flex max-h-[80vh] max-w-2xl flex-col"
+              onOpenAutoFocus={(e) => e.preventDefault()}
+            >
               <DialogHeader>
                 <DialogTitle>
                   Explorar Modelos - {provider.toUpperCase()}
                 </DialogTitle>
               </DialogHeader>
-              <div className="flex gap-2 items-center py-4">
+              <div className="flex items-center gap-2 py-4">
                 <div className="relative flex-1">
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -161,20 +185,22 @@ function ProfileFormFields({
                   variant="outline"
                   size="icon"
                   type="button"
-                  onClick={() => setSortOrder(prev => prev === "asc" ? "desc" : "asc")}
+                  onClick={() =>
+                    setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"))
+                  }
                   title="Ordenar por preço"
                 >
                   <ArrowUpDown className="h-4 w-4" />
                 </Button>
               </div>
-              <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+              <div className="flex-1 space-y-2 overflow-y-auto pr-1">
                 {filteredModels.map((m) => (
                   <Button
                     key={m.id}
                     variant="outline"
-                    className="w-full justify-between h-auto py-3 px-4 text-left"
+                    className="h-auto w-full justify-between px-4 py-3 text-left"
                     onClick={() => {
-                      setForm(prev => ({ ...prev, model: m.id }));
+                      setForm((prev) => ({ ...prev, model: m.id }));
                       setSearchOpen(false);
                     }}
                   >
@@ -182,7 +208,7 @@ function ProfileFormFields({
                       <span className="font-medium">
                         {m.displayName.split(" (")[0]}
                       </span>
-                      <span className="text-xs text-muted-foreground font-mono">
+                      <span className="font-mono text-xs text-muted-foreground">
                         {m.id}
                       </span>
                     </div>
@@ -197,7 +223,7 @@ function ProfileFormFields({
                   </Button>
                 ))}
                 {filteredModels.length === 0 && (
-                  <p className="text-center py-8 text-muted-foreground">
+                  <p className="py-8 text-center text-muted-foreground">
                     Nenhum modelo encontrado.
                   </p>
                 )}
@@ -206,22 +232,22 @@ function ProfileFormFields({
           </Dialog>
         </div>
         {isLoadingModels ? (
-          <div className="flex items-center gap-2 h-9 px-3 border rounded-md text-sm text-muted-foreground">
+          <div className="flex h-9 items-center gap-2 rounded-md border px-3 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
             Carregando modelos...
           </div>
         ) : isModelsError ? (
-          <div className="flex items-center gap-2 h-9 px-3 border border-destructive rounded-md text-sm text-destructive">
+          <div className="flex h-9 items-center gap-2 rounded-md border border-destructive px-3 text-sm text-destructive">
             Falha ao carregar modelos. Verifique sua chave de API.
           </div>
         ) : dynamicModels && dynamicModels.length === 0 ? (
-          <div className="flex items-center gap-2 h-9 px-3 border rounded-md text-sm text-muted-foreground">
+          <div className="flex h-9 items-center gap-2 rounded-md border px-3 text-sm text-muted-foreground">
             Nenhum modelo disponível para este provedor.
           </div>
         ) : (
           <Select
             value={form.model}
-            onValueChange={(v) => setForm(prev => ({ ...prev, model: v }))}
+            onValueChange={(v) => setForm((prev) => ({ ...prev, model: v }))}
           >
             <SelectTrigger data-testid="select-profile-model">
               <SelectValue placeholder="Selecione um modelo" />
@@ -241,7 +267,7 @@ function ProfileFormFields({
         <Slider
           value={[parseFloat(form.temperature)]}
           onValueChange={([v]) =>
-            setForm(prev => ({ ...prev, temperature: v.toFixed(1) }))
+            setForm((prev) => ({ ...prev, temperature: v.toFixed(1) }))
           }
           min={0}
           max={2}
@@ -258,7 +284,10 @@ function ProfileFormFields({
           type="number"
           value={form.maxTokens}
           onChange={(e) =>
-            setForm(prev => ({ ...prev, maxTokens: parseInt(e.target.value) || 2048 }))
+            setForm((prev) => ({
+              ...prev,
+              maxTokens: parseInt(e.target.value) || 2048,
+            }))
           }
           min={256}
           max={8192}
@@ -269,7 +298,9 @@ function ProfileFormFields({
         <Label>Estilo Narrativo</Label>
         <Textarea
           value={form.narrativeStyle}
-          onChange={(e) => setForm(prev => ({ ...prev, narrativeStyle: e.target.value }))}
+          onChange={(e) =>
+            setForm((prev) => ({ ...prev, narrativeStyle: e.target.value }))
+          }
           placeholder="Descreva o estilo de escrita desejado, tom, voz..."
           rows={3}
           className="resize-none"
@@ -283,8 +314,12 @@ function ProfileFormFields({
         data-testid="button-submit-profile"
       >
         {isCreate
-          ? isPending ? "Criando..." : "Criar Perfil"
-          : isPending ? "Salvando..." : "Salvar Alterações"}
+          ? isPending
+            ? "Criando..."
+            : "Criar Perfil"
+          : isPending
+            ? "Salvando..."
+            : "Salvar Alterações"}
       </Button>
     </div>
   );
@@ -345,7 +380,7 @@ export default function ProfilePage() {
 
   const filteredModels = (dynamicModels || [])
     .filter((m) =>
-      m.displayName.toLowerCase().includes(searchTerm.toLowerCase()),
+      m.displayName.toLowerCase().includes(searchTerm.toLowerCase())
     )
     .sort((a, b) => {
       if (!sortOrder) return 0;
@@ -458,15 +493,15 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="flex flex-col h-full p-6 space-y-8 overflow-auto">
+    <div className="flex h-full flex-col space-y-8 overflow-auto p-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">
           Configurações de API
         </h1>
-        <p className="text-sm text-muted-foreground mt-1">
+        <p className="mt-1 text-sm text-muted-foreground">
           Suas chaves são criptografadas e armazenadas com segurança.
         </p>
-        <div className="grid gap-4 mt-4 sm:grid-cols-3">
+        <div className="mt-4 grid gap-4 sm:grid-cols-3">
           <Card>
             <CardHeader className="py-3">
               <div className="flex items-center justify-between">
@@ -489,7 +524,7 @@ export default function ProfilePage() {
               />
               <Button
                 size="sm"
-                className="w-full h-8"
+                className="h-8 w-full"
                 onClick={() => saveKeysMutation.mutate({ openaiKey })}
                 disabled={!openaiKey}
                 data-testid="button-save-openai-key"
@@ -520,7 +555,7 @@ export default function ProfilePage() {
               />
               <Button
                 size="sm"
-                className="w-full h-8"
+                className="h-8 w-full"
                 onClick={() => saveKeysMutation.mutate({ geminiKey })}
                 disabled={!geminiKey}
                 data-testid="button-save-gemini-key"
@@ -551,7 +586,7 @@ export default function ProfilePage() {
               />
               <Button
                 size="sm"
-                className="w-full h-8"
+                className="h-8 w-full"
                 onClick={() => saveKeysMutation.mutate({ openrouterKey })}
                 disabled={!openrouterKey}
                 data-testid="button-save-openrouter-key"
@@ -563,8 +598,8 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      <div className="flex flex-col h-full">
-        <div className="flex items-center justify-between gap-4 flex-wrap pb-4">
+      <div className="flex h-full flex-col">
+        <div className="flex flex-wrap items-center justify-between gap-4 pb-4">
           <div>
             <h1
               className="text-2xl font-bold tracking-tight"
@@ -572,7 +607,7 @@ export default function ProfilePage() {
             >
               Perfis Criativos
             </h1>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="mt-1 text-sm text-muted-foreground">
               Gerencie preferências de modelo de IA e estilos narrativos
             </p>
           </div>
@@ -585,7 +620,7 @@ export default function ProfilePage() {
           >
             <DialogTrigger asChild>
               <Button data-testid="button-create-profile">
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="mr-2 h-4 w-4" />
                 Novo Perfil
               </Button>
             </DialogTrigger>
@@ -609,7 +644,7 @@ export default function ProfilePage() {
               {[1, 2].map((i) => (
                 <Card key={i}>
                   <CardContent className="pt-4">
-                    <Skeleton className="h-5 w-32 mb-2" />
+                    <Skeleton className="mb-2 h-5 w-32" />
                     <Skeleton className="h-4 w-full" />
                   </CardContent>
                 </Card>
@@ -633,7 +668,7 @@ export default function ProfilePage() {
                       />
                       <Button
                         variant="ghost"
-                        className="w-full mt-2"
+                        className="mt-2 w-full"
                         onClick={() => {
                           setEditId(null);
                           resetForm();
@@ -645,13 +680,13 @@ export default function ProfilePage() {
                   ) : (
                     <>
                       <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 pb-2">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <Settings className="h-4 w-4 text-primary shrink-0" />
-                          <h3 className="font-semibold text-sm truncate">
+                        <div className="flex min-w-0 items-center gap-2">
+                          <Settings className="h-4 w-4 shrink-0 text-primary" />
+                          <h3 className="truncate text-sm font-semibold">
                             {profile.name}
                           </h3>
                           {profile.active && (
-                            <div className="flex items-center gap-1 text-primary text-xs">
+                            <div className="flex items-center gap-1 text-xs text-primary">
                               <Check className="h-3 w-3" />
                               Ativo
                             </div>
@@ -713,10 +748,10 @@ export default function ProfilePage() {
                           </div>
                           {profile.narrativeStyle && (
                             <div>
-                              <span className="text-muted-foreground text-xs">
+                              <span className="text-xs text-muted-foreground">
                                 Estilo Narrativo
                               </span>
-                              <p className="text-xs mt-0.5">
+                              <p className="mt-0.5 text-xs">
                                 {profile.narrativeStyle}
                               </p>
                             </div>
@@ -730,13 +765,13 @@ export default function ProfilePage() {
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-20 text-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-4">
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
                 <Settings className="h-8 w-8 text-muted-foreground" />
               </div>
               <h3 className="text-lg font-semibold">
                 Nenhum perfil criativo encontrado
               </h3>
-              <p className="text-sm text-muted-foreground mt-1 max-w-sm">
+              <p className="mt-1 max-w-sm text-sm text-muted-foreground">
                 Crie um perfil para salvar suas configurações de modelo de IA e
                 estilo narrativo.
               </p>

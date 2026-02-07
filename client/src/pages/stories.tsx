@@ -7,8 +7,20 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
@@ -43,7 +55,12 @@ export default function StoriesPage() {
 
   const createMutation = useMutation({
     mutationFn: async () => {
-      const res = await apiRequest("POST", "/api/stories", { title, premise, tone, status });
+      const res = await apiRequest("POST", "/api/stories", {
+        title,
+        premise,
+        tone,
+        status,
+      });
       return res.json();
     },
     onSuccess: () => {
@@ -56,7 +73,11 @@ export default function StoriesPage() {
       toast({ title: "História criada com sucesso" });
     },
     onError: (err: Error) => {
-      toast({ title: "Erro ao criar história", description: err.message, variant: "destructive" });
+      toast({
+        title: "Erro ao criar história",
+        description: err.message,
+        variant: "destructive",
+      });
     },
   });
 
@@ -67,18 +88,23 @@ export default function StoriesPage() {
   );
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between gap-4 flex-wrap p-6 pb-4">
+    <div className="flex h-full flex-col">
+      <div className="flex flex-wrap items-center justify-between gap-4 p-6 pb-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight" data-testid="text-stories-title">Histórias</h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          <h1
+            className="text-2xl font-bold tracking-tight"
+            data-testid="text-stories-title"
+          >
+            Histórias
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Gerencie suas histórias e narrativas criativas
           </p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button data-testid="button-create-story">
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="mr-2 h-4 w-4" />
               Nova História
             </Button>
           </DialogTrigger>
@@ -125,7 +151,9 @@ export default function StoriesPage() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="draft">Rascunho</SelectItem>
-                      <SelectItem value="in-development">Em Desenvolvimento</SelectItem>
+                      <SelectItem value="in-development">
+                        Em Desenvolvimento
+                      </SelectItem>
                       <SelectItem value="finished">Finalizado</SelectItem>
                     </SelectContent>
                   </Select>
@@ -146,7 +174,7 @@ export default function StoriesPage() {
 
       <div className="px-6 pb-4">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -167,7 +195,7 @@ export default function StoriesPage() {
                   <Skeleton className="h-5 w-16" />
                 </CardHeader>
                 <CardContent>
-                  <Skeleton className="h-4 w-full mb-2" />
+                  <Skeleton className="mb-2 h-4 w-full" />
                   <Skeleton className="h-4 w-2/3" />
                 </CardContent>
               </Card>
@@ -178,30 +206,41 @@ export default function StoriesPage() {
             {filtered.map((story) => (
               <Card
                 key={story.id}
-                className="hover-elevate cursor-pointer group"
+                className="hover-elevate group cursor-pointer"
                 onClick={() => navigate(`/stories/${story.id}`)}
                 data-testid={`card-story-${story.id}`}
               >
                 <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 pb-2">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <BookOpen className="h-4 w-4 text-primary shrink-0" />
-                    <h3 className="font-semibold text-sm truncate">{story.title}</h3>
+                  <div className="flex min-w-0 items-center gap-2">
+                    <BookOpen className="h-4 w-4 shrink-0 text-primary" />
+                    <h3 className="truncate text-sm font-semibold">
+                      {story.title}
+                    </h3>
                   </div>
-                  <Badge variant="secondary" className={statusColors[story.status] || ""}>
+                  <Badge
+                    variant="secondary"
+                    className={statusColors[story.status] || ""}
+                  >
                     {statusLabels[story.status] || story.status}
                   </Badge>
                 </CardHeader>
                 <CardContent>
                   {story.premise ? (
-                    <p className="text-sm text-muted-foreground line-clamp-2">{story.premise}</p>
+                    <p className="line-clamp-2 text-sm text-muted-foreground">
+                      {story.premise}
+                    </p>
                   ) : (
-                    <p className="text-sm text-muted-foreground italic">Sem premissa</p>
+                    <p className="text-sm italic text-muted-foreground">
+                      Sem premissa
+                    </p>
                   )}
                   {story.tone && (
-                    <p className="text-xs text-muted-foreground mt-2">{story.tone}</p>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      {story.tone}
+                    </p>
                   )}
-                  <div className="flex items-center justify-end mt-3">
-                    <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="mt-3 flex items-center justify-end">
+                    <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
                   </div>
                 </CardContent>
               </Card>
@@ -209,12 +248,15 @@ export default function StoriesPage() {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-4">
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
               <BookOpen className="h-8 w-8 text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-semibold">Nenhuma história encontrada</h3>
-            <p className="text-sm text-muted-foreground mt-1 max-w-sm">
-              Crie sua primeira história para começar a construir seu universo criativo.
+            <h3 className="text-lg font-semibold">
+              Nenhuma história encontrada
+            </h3>
+            <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+              Crie sua primeira história para começar a construir seu universo
+              criativo.
             </p>
           </div>
         )}

@@ -7,14 +7,35 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Save, Trash2, Sparkles, Copy, Send, MessageSquare } from "lucide-react";
+import {
+  ArrowLeft,
+  Save,
+  Trash2,
+  Sparkles,
+  Copy,
+  Send,
+  MessageSquare,
+} from "lucide-react";
 import type { Script, AIExecution } from "@shared/schema";
 
 interface ScriptDetail extends Script {
@@ -47,7 +68,11 @@ export default function ScriptDetailPage() {
 
   const updateMutation = useMutation({
     mutationFn: async () => {
-      await apiRequest("PATCH", `/api/scripts/${scriptId}`, { title, type, content });
+      await apiRequest("PATCH", `/api/scripts/${scriptId}`, {
+        title,
+        type,
+        content,
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/scripts", scriptId] });
@@ -84,7 +109,11 @@ export default function ScriptDetailPage() {
       setAiResult(data);
     },
     onError: (err: Error) => {
-      toast({ title: "Geração falhou", description: err.message, variant: "destructive" });
+      toast({
+        title: "Geração falhou",
+        description: err.message,
+        variant: "destructive",
+      });
     },
   });
 
@@ -99,7 +128,7 @@ export default function ScriptDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="p-6 space-y-6">
+      <div className="space-y-6 p-6">
         <Skeleton className="h-7 w-48" />
         <Skeleton className="h-96 w-full" />
       </div>
@@ -108,7 +137,7 @@ export default function ScriptDetailPage() {
 
   if (!script) {
     return (
-      <div className="flex items-center justify-center h-full">
+      <div className="flex h-full items-center justify-center">
         <p className="text-muted-foreground">Roteiro não encontrado</p>
       </div>
     );
@@ -121,45 +150,78 @@ export default function ScriptDetailPage() {
   };
 
   return (
-    <div className="flex flex-col h-full overflow-auto">
-      <div className="flex items-center justify-between gap-4 flex-wrap p-6 pb-4">
+    <div className="flex h-full flex-col overflow-auto">
+      <div className="flex flex-wrap items-center justify-between gap-4 p-6 pb-4">
         <div className="flex items-center gap-3">
-          <Button size="icon" variant="ghost" onClick={() => navigate("/scripts")} data-testid="button-back-scripts">
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={() => navigate("/scripts")}
+            data-testid="button-back-scripts"
+          >
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
             {editing ? (
-              <Input value={title} onChange={(e) => setTitle(e.target.value)} className="text-xl font-bold h-auto py-1" />
+              <Input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="h-auto py-1 text-xl font-bold"
+              />
             ) : (
-              <h1 className="text-2xl font-bold tracking-tight" data-testid="text-script-title">{script.title}</h1>
+              <h1
+                className="text-2xl font-bold tracking-tight"
+                data-testid="text-script-title"
+              >
+                {script.title}
+              </h1>
             )}
             {script.storyTitle && (
-              <p className="text-sm text-muted-foreground mt-0.5">História: {script.storyTitle}</p>
+              <p className="mt-0.5 text-sm text-muted-foreground">
+                História: {script.storyTitle}
+              </p>
             )}
           </div>
         </div>
         <div className="flex items-center gap-2">
           {editing ? (
             <>
-              <Button variant="ghost" onClick={() => setEditing(false)}>Cancelar</Button>
-              <Button onClick={() => updateMutation.mutate()} disabled={updateMutation.isPending}>
-                <Save className="h-4 w-4 mr-2" />
+              <Button variant="ghost" onClick={() => setEditing(false)}>
+                Cancelar
+              </Button>
+              <Button
+                onClick={() => updateMutation.mutate()}
+                disabled={updateMutation.isPending}
+              >
+                <Save className="mr-2 h-4 w-4" />
                 Salvar
               </Button>
             </>
           ) : (
             <>
-              <Dialog open={aiOpen} onOpenChange={(o) => { setAiOpen(o); if (!o) { setAiResult(null); setAiPrompt(""); } }}>
+              <Dialog
+                open={aiOpen}
+                onOpenChange={(o) => {
+                  setAiOpen(o);
+                  if (!o) {
+                    setAiResult(null);
+                    setAiPrompt("");
+                  }
+                }}
+              >
                 <DialogTrigger asChild>
                   <Button variant="outline" data-testid="button-ai-script">
-                    <Sparkles className="h-4 w-4 mr-2" />
+                    <Sparkles className="mr-2 h-4 w-4" />
                     Gerar com IA
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-3xl max-h-[85vh]">
+                <DialogContent className="max-h-[85vh] max-w-3xl">
                   <DialogHeader>
                     <DialogTitle>Gerar Conteúdo do Roteiro</DialogTitle>
-                    <DialogDescription>O roteiro e história associada serão enviados como contexto.</DialogDescription>
+                    <DialogDescription>
+                      O roteiro e história associada serão enviados como
+                      contexto.
+                    </DialogDescription>
                   </DialogHeader>
                   <ScrollArea className="max-h-[65vh]">
                     <div className="space-y-4 pr-4">
@@ -175,48 +237,66 @@ export default function ScriptDetailPage() {
                           <Button
                             className="w-full"
                             onClick={() => generateMutation.mutate()}
-                            disabled={!aiPrompt.trim() || generateMutation.isPending}
+                            disabled={
+                              !aiPrompt.trim() || generateMutation.isPending
+                            }
                             data-testid="button-submit-ai-script"
                           >
-                            <Send className="h-4 w-4 mr-2" />
-                            {generateMutation.isPending ? "Gerando..." : "Enviar para IA"}
+                            <Send className="mr-2 h-4 w-4" />
+                            {generateMutation.isPending
+                              ? "Gerando..."
+                              : "Enviar para IA"}
                           </Button>
                         </>
                       ) : (
                         <>
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <Badge variant="secondary">{aiResult.execution.model}</Badge>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <Badge variant="secondary">
+                              {aiResult.execution.model}
+                            </Badge>
                             <Badge variant="outline">
-                              {JSON.stringify((aiResult.execution.parameters as any)?.maxTokens || 0)} tokens máx.
+                              {JSON.stringify(
+                                (aiResult.execution.parameters as any)
+                                  ?.maxTokens || 0
+                              )}{" "}
+                              tokens máx.
                             </Badge>
                           </div>
 
                           <div>
-                            <div className="flex items-center justify-between gap-2 mb-1">
-                              <Label className="text-xs text-muted-foreground flex items-center gap-1">
-                                <Send className="h-3 w-3" /> Enviado (Prompt Final)
+                            <div className="mb-1 flex items-center justify-between gap-2">
+                              <Label className="flex items-center gap-1 text-xs text-muted-foreground">
+                                <Send className="h-3 w-3" /> Enviado (Prompt
+                                Final)
                               </Label>
                               <Button
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => {
-                                  navigator.clipboard.writeText(aiResult.execution.finalPrompt);
+                                  navigator.clipboard.writeText(
+                                    aiResult.execution.finalPrompt
+                                  );
                                   toast({ title: "Prompt copiado" });
                                 }}
                               >
-                                <Copy className="h-3 w-3 mr-1" />
+                                <Copy className="mr-1 h-3 w-3" />
                                 Copiar
                               </Button>
                             </div>
-                            <pre className="mt-1 text-xs bg-muted rounded-md p-3 whitespace-pre-wrap font-mono max-h-32 overflow-auto" data-testid="text-ai-sent">
+                            <pre
+                              className="mt-1 max-h-32 overflow-auto whitespace-pre-wrap rounded-md bg-muted p-3 font-mono text-xs"
+                              data-testid="text-ai-sent"
+                            >
                               {aiResult.execution.finalPrompt}
                             </pre>
                           </div>
 
                           {aiResult.execution.systemPromptSnapshot && (
                             <div>
-                              <Label className="text-xs text-muted-foreground">Prompt de Sistema</Label>
-                              <pre className="mt-1 text-xs bg-muted rounded-md p-3 whitespace-pre-wrap font-mono max-h-24 overflow-auto">
+                              <Label className="text-xs text-muted-foreground">
+                                Prompt de Sistema
+                              </Label>
+                              <pre className="mt-1 max-h-24 overflow-auto whitespace-pre-wrap rounded-md bg-muted p-3 font-mono text-xs">
                                 {aiResult.execution.systemPromptSnapshot}
                               </pre>
                             </div>
@@ -225,40 +305,61 @@ export default function ScriptDetailPage() {
                           <Separator />
 
                           <div>
-                            <div className="flex items-center justify-between gap-2 mb-1">
-                              <Label className="text-xs text-muted-foreground flex items-center gap-1">
-                                <MessageSquare className="h-3 w-3" /> Recebido (Resultado)
+                            <div className="mb-1 flex items-center justify-between gap-2">
+                              <Label className="flex items-center gap-1 text-xs text-muted-foreground">
+                                <MessageSquare className="h-3 w-3" /> Recebido
+                                (Resultado)
                               </Label>
                               <Button
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => {
                                   if (aiResult.result) {
-                                    navigator.clipboard.writeText(aiResult.result);
+                                    navigator.clipboard.writeText(
+                                      aiResult.result
+                                    );
                                     toast({ title: "Resultado copiado" });
                                   }
                                 }}
                               >
-                                <Copy className="h-3 w-3 mr-1" />
+                                <Copy className="mr-1 h-3 w-3" />
                                 Copiar
                               </Button>
                             </div>
                             {aiResult.result ? (
-                              <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap font-serif bg-muted rounded-md p-4" data-testid="text-ai-result">
+                              <div
+                                className="prose prose-sm max-w-none whitespace-pre-wrap rounded-md bg-muted p-4 font-serif dark:prose-invert"
+                                data-testid="text-ai-result"
+                              >
                                 {aiResult.result}
                               </div>
                             ) : (
-                              <div className="bg-destructive/10 text-destructive text-sm rounded-md p-4" data-testid="text-ai-empty">
-                                A IA retornou um resultado vazio. Tente um modelo diferente ou reformule o prompt.
+                              <div
+                                className="rounded-md bg-destructive/10 p-4 text-sm text-destructive"
+                                data-testid="text-ai-empty"
+                              >
+                                A IA retornou um resultado vazio. Tente um
+                                modelo diferente ou reformule o prompt.
                               </div>
                             )}
                           </div>
 
                           <div className="flex gap-2">
-                            <Button variant="outline" onClick={() => setAiResult(null)} data-testid="button-ai-new-prompt">
+                            <Button
+                              variant="outline"
+                              onClick={() => setAiResult(null)}
+                              data-testid="button-ai-new-prompt"
+                            >
                               Novo Prompt
                             </Button>
-                            <Button variant="ghost" onClick={() => { setAiOpen(false); setAiResult(null); setAiPrompt(""); }}>
+                            <Button
+                              variant="ghost"
+                              onClick={() => {
+                                setAiOpen(false);
+                                setAiResult(null);
+                                setAiPrompt("");
+                              }}
+                            >
                               Fechar
                             </Button>
                           </div>
@@ -268,11 +369,16 @@ export default function ScriptDetailPage() {
                   </ScrollArea>
                 </DialogContent>
               </Dialog>
-              <Button variant="outline" onClick={startEditing}>Editar</Button>
+              <Button variant="outline" onClick={startEditing}>
+                Editar
+              </Button>
               <Button
                 size="icon"
                 variant="ghost"
-                onClick={() => { if (window.confirm("Remover este roteiro?")) deleteMutation.mutate(); }}
+                onClick={() => {
+                  if (window.confirm("Remover este roteiro?"))
+                    deleteMutation.mutate();
+                }}
               >
                 <Trash2 className="h-4 w-4 text-destructive" />
               </Button>
@@ -281,10 +387,12 @@ export default function ScriptDetailPage() {
         </div>
       </div>
 
-      <div className="px-6 pb-4 flex items-center gap-2">
+      <div className="flex items-center gap-2 px-6 pb-4">
         {editing ? (
           <Select value={type} onValueChange={setType}>
-            <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="w-32">
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="synopsis">Sinopse</SelectItem>
               <SelectItem value="outline">Esboço</SelectItem>
@@ -293,26 +401,34 @@ export default function ScriptDetailPage() {
           </Select>
         ) : (
           <>
-            <Badge variant="secondary">{typeLabels[script.type] || script.type}</Badge>
-            <Badge variant="secondary">{script.origin === "ai" ? "Gerado por IA" : "Manual"}</Badge>
+            <Badge variant="secondary">
+              {typeLabels[script.type] || script.type}
+            </Badge>
+            <Badge variant="secondary">
+              {script.origin === "ai" ? "Gerado por IA" : "Manual"}
+            </Badge>
           </>
         )}
       </div>
 
       <div className="flex-1 px-6 pb-6">
         <Card className="h-full">
-          <CardContent className="pt-4 h-full">
+          <CardContent className="h-full pt-4">
             {editing ? (
               <Textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                className="font-mono text-sm min-h-[400px] resize-none"
+                className="min-h-[400px] resize-none font-mono text-sm"
                 placeholder="Escreva o conteúdo do roteiro..."
                 data-testid="input-edit-script-content"
               />
             ) : (
-              <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap font-serif" data-testid="text-script-content">
-                {script.content || "Sem conteúdo ainda. Clique em Editar para começar a escrever."}
+              <div
+                className="prose prose-sm max-w-none whitespace-pre-wrap font-serif dark:prose-invert"
+                data-testid="text-script-content"
+              >
+                {script.content ||
+                  "Sem conteúdo ainda. Clique em Editar para começar a escrever."}
               </div>
             )}
           </CardContent>

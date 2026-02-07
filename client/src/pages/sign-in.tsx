@@ -8,14 +8,15 @@ const hasClerkKey = Boolean(import.meta.env.VITE_CLERK_PUBLISHABLE_KEY);
 export default function SignInPage() {
   if (!hasClerkKey) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="flex min-h-screen items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle>Autenticação não configurada</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Defina `VITE_CLERK_PUBLISHABLE_KEY` para habilitar login com Clerk.
+              Defina `VITE_CLERK_PUBLISHABLE_KEY` para habilitar login com
+              Clerk.
             </p>
             <Button asChild className="w-full">
               <Link href="/">Voltar</Link>
@@ -27,9 +28,8 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="flex min-h-screen items-center justify-center p-4">
       <SignIn fallbackRedirectUrl="/" signUpUrl="/sign-up" />
     </div>
   );
 }
-

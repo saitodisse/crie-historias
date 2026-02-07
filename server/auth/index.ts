@@ -120,4 +120,3 @@ export function registerAuthRoutes(app: Express): void {
     return res.redirect("/sign-in");
   });
 }
-

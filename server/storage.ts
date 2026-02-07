@@ -1,14 +1,28 @@
 import {
-  users, stories, characters, storyCharacters, scripts, prompts,
-  creativeProfiles, aiExecutions,
-  type User, type InsertUser,
-  type Story, type InsertStory,
-  type Character, type InsertCharacter,
-  type StoryCharacter, type InsertStoryCharacter,
-  type Script, type InsertScript,
-  type Prompt, type InsertPrompt,
-  type CreativeProfile, type InsertCreativeProfile,
-  type AIExecution, type InsertAIExecution,
+  users,
+  stories,
+  characters,
+  storyCharacters,
+  scripts,
+  prompts,
+  creativeProfiles,
+  aiExecutions,
+  type User,
+  type InsertUser,
+  type Story,
+  type InsertStory,
+  type Character,
+  type InsertCharacter,
+  type StoryCharacter,
+  type InsertStoryCharacter,
+  type Script,
+  type InsertScript,
+  type Prompt,
+  type InsertPrompt,
+  type CreativeProfile,
+  type InsertCreativeProfile,
+  type AIExecution,
+  type InsertAIExecution,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
@@ -20,20 +34,26 @@ export interface IStorage {
   getOrCreateUserByExternalAuthId(
     externalAuthId: string,
     provider: string,
-    displayName?: string,
+    displayName?: string
   ): Promise<User>;
   createUser(user: InsertUser): Promise<User>;
 
   getStories(userId: number): Promise<Story[]>;
   getStory(id: number): Promise<Story | undefined>;
   createStory(data: InsertStory): Promise<Story>;
-  updateStory(id: number, data: Partial<InsertStory>): Promise<Story | undefined>;
+  updateStory(
+    id: number,
+    data: Partial<InsertStory>
+  ): Promise<Story | undefined>;
   deleteStory(id: number): Promise<void>;
 
   getCharacters(userId: number): Promise<Character[]>;
   getCharacter(id: number): Promise<Character | undefined>;
   createCharacter(data: InsertCharacter): Promise<Character>;
-  updateCharacter(id: number, data: Partial<InsertCharacter>): Promise<Character | undefined>;
+  updateCharacter(
+    id: number,
+    data: Partial<InsertCharacter>
+  ): Promise<Character | undefined>;
   deleteCharacter(id: number): Promise<void>;
 
   getStoryCharacters(storyId: number): Promise<Character[]>;
@@ -44,20 +64,32 @@ export interface IStorage {
   getScriptsByStory(storyId: number): Promise<Script[]>;
   getScript(id: number): Promise<Script | undefined>;
   createScript(data: InsertScript): Promise<Script>;
-  updateScript(id: number, data: Partial<InsertScript>): Promise<Script | undefined>;
+  updateScript(
+    id: number,
+    data: Partial<InsertScript>
+  ): Promise<Script | undefined>;
   deleteScript(id: number): Promise<void>;
 
   getPrompts(userId: number): Promise<Prompt[]>;
   getPrompt(id: number): Promise<Prompt | undefined>;
-  getActivePromptsByCategory(userId: number, category: string): Promise<Prompt[]>;
+  getActivePromptsByCategory(
+    userId: number,
+    category: string
+  ): Promise<Prompt[]>;
   createPrompt(data: InsertPrompt): Promise<Prompt>;
-  updatePrompt(id: number, data: Partial<InsertPrompt>): Promise<Prompt | undefined>;
+  updatePrompt(
+    id: number,
+    data: Partial<InsertPrompt>
+  ): Promise<Prompt | undefined>;
   deletePrompt(id: number): Promise<void>;
 
   getProfiles(userId: number): Promise<CreativeProfile[]>;
   getActiveProfile(userId: number): Promise<CreativeProfile | undefined>;
   createProfile(data: InsertCreativeProfile): Promise<CreativeProfile>;
-  updateProfile(id: number, data: Partial<InsertCreativeProfile>): Promise<CreativeProfile | undefined>;
+  updateProfile(
+    id: number,
+    data: Partial<InsertCreativeProfile>
+  ): Promise<CreativeProfile | undefined>;
   deleteProfile(id: number): Promise<void>;
   setActiveProfile(userId: number, profileId: number): Promise<void>;
 
@@ -73,16 +105,25 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateUser(id: number, data: Partial<User>): Promise<User | undefined> {
-    const [user] = await db.update(users).set(data).where(eq(users.id, id)).returning();
+    const [user] = await db
+      .update(users)
+      .set(data)
+      .where(eq(users.id, id))
+      .returning();
     return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.username, username));
     return user || undefined;
   }
 
-  async getUserByExternalAuthId(externalAuthId: string): Promise<User | undefined> {
+  async getUserByExternalAuthId(
+    externalAuthId: string
+  ): Promise<User | undefined> {
     const [user] = await db
       .select()
       .from(users)
@@ -93,7 +134,7 @@ export class DatabaseStorage implements IStorage {
   async getOrCreateUserByExternalAuthId(
     externalAuthId: string,
     provider: string,
-    displayName?: string,
+    displayName?: string
   ): Promise<User> {
     let user = await this.getUserByExternalAuthId(externalAuthId);
     if (!user) {
@@ -101,12 +142,12 @@ export class DatabaseStorage implements IStorage {
       [user] = await db
         .insert(users)
         .values({
-        username,
-        password: `${provider}-auth`,
-        displayName: displayName || username,
-        externalAuthId,
-        authProvider: provider,
-      })
+          username,
+          password: `${provider}-auth`,
+          displayName: displayName || username,
+          externalAuthId,
+          authProvider: provider,
+        })
         .returning();
     }
     return user;
@@ -118,7 +159,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getStories(userId: number): Promise<Story[]> {
-    return db.select().from(stories).where(eq(stories.userId, userId)).orderBy(desc(stories.updatedAt));
+    return db
+      .select()
+      .from(stories)
+      .where(eq(stories.userId, userId))
+      .orderBy(desc(stories.updatedAt));
   }
 
   async getStory(id: number): Promise<Story | undefined> {
@@ -131,8 +176,15 @@ export class DatabaseStorage implements IStorage {
     return story;
   }
 
-  async updateStory(id: number, data: Partial<InsertStory>): Promise<Story | undefined> {
-    const [story] = await db.update(stories).set({ ...data, updatedAt: new Date() }).where(eq(stories.id, id)).returning();
+  async updateStory(
+    id: number,
+    data: Partial<InsertStory>
+  ): Promise<Story | undefined> {
+    const [story] = await db
+      .update(stories)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(stories.id, id))
+      .returning();
     return story || undefined;
   }
 
@@ -141,11 +193,18 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getCharacters(userId: number): Promise<Character[]> {
-    return db.select().from(characters).where(eq(characters.userId, userId)).orderBy(desc(characters.updatedAt));
+    return db
+      .select()
+      .from(characters)
+      .where(eq(characters.userId, userId))
+      .orderBy(desc(characters.updatedAt));
   }
 
   async getCharacter(id: number): Promise<Character | undefined> {
-    const [char] = await db.select().from(characters).where(eq(characters.id, id));
+    const [char] = await db
+      .select()
+      .from(characters)
+      .where(eq(characters.id, id));
     return char || undefined;
   }
 
@@ -154,8 +213,15 @@ export class DatabaseStorage implements IStorage {
     return char;
   }
 
-  async updateCharacter(id: number, data: Partial<InsertCharacter>): Promise<Character | undefined> {
-    const [char] = await db.update(characters).set({ ...data, updatedAt: new Date() }).where(eq(characters.id, id)).returning();
+  async updateCharacter(
+    id: number,
+    data: Partial<InsertCharacter>
+  ): Promise<Character | undefined> {
+    const [char] = await db
+      .update(characters)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(characters.id, id))
+      .returning();
     return char || undefined;
   }
 
@@ -165,12 +231,18 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getStoryCharacters(storyId: number): Promise<Character[]> {
-    const links = await db.select().from(storyCharacters).where(eq(storyCharacters.storyId, storyId));
+    const links = await db
+      .select()
+      .from(storyCharacters)
+      .where(eq(storyCharacters.storyId, storyId));
     if (links.length === 0) return [];
     const charIds = links.map((l) => l.characterId);
     const result: Character[] = [];
     for (const cid of charIds) {
-      const [char] = await db.select().from(characters).where(eq(characters.id, cid));
+      const [char] = await db
+        .select()
+        .from(characters)
+        .where(eq(characters.id, cid));
       if (char) result.push(char);
     }
     return result;
@@ -181,9 +253,18 @@ export class DatabaseStorage implements IStorage {
     return link;
   }
 
-  async removeStoryCharacter(storyId: number, characterId: number): Promise<void> {
-    await db.delete(storyCharacters)
-      .where(and(eq(storyCharacters.storyId, storyId), eq(storyCharacters.characterId, characterId)));
+  async removeStoryCharacter(
+    storyId: number,
+    characterId: number
+  ): Promise<void> {
+    await db
+      .delete(storyCharacters)
+      .where(
+        and(
+          eq(storyCharacters.storyId, storyId),
+          eq(storyCharacters.characterId, characterId)
+        )
+      );
   }
 
   async getScripts(userId?: number): Promise<Script[]> {
@@ -191,7 +272,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getScriptsByStory(storyId: number): Promise<Script[]> {
-    return db.select().from(scripts).where(eq(scripts.storyId, storyId)).orderBy(desc(scripts.updatedAt));
+    return db
+      .select()
+      .from(scripts)
+      .where(eq(scripts.storyId, storyId))
+      .orderBy(desc(scripts.updatedAt));
   }
 
   async getScript(id: number): Promise<Script | undefined> {
@@ -204,8 +289,15 @@ export class DatabaseStorage implements IStorage {
     return script;
   }
 
-  async updateScript(id: number, data: Partial<InsertScript>): Promise<Script | undefined> {
-    const [script] = await db.update(scripts).set({ ...data, updatedAt: new Date() }).where(eq(scripts.id, id)).returning();
+  async updateScript(
+    id: number,
+    data: Partial<InsertScript>
+  ): Promise<Script | undefined> {
+    const [script] = await db
+      .update(scripts)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(scripts.id, id))
+      .returning();
     return script || undefined;
   }
 
@@ -214,7 +306,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getPrompts(userId: number): Promise<Prompt[]> {
-    return db.select().from(prompts).where(eq(prompts.userId, userId)).orderBy(desc(prompts.updatedAt));
+    return db
+      .select()
+      .from(prompts)
+      .where(eq(prompts.userId, userId))
+      .orderBy(desc(prompts.updatedAt));
   }
 
   async getPrompt(id: number): Promise<Prompt | undefined> {
@@ -222,9 +318,20 @@ export class DatabaseStorage implements IStorage {
     return prompt || undefined;
   }
 
-  async getActivePromptsByCategory(userId: number, category: string): Promise<Prompt[]> {
-    return db.select().from(prompts)
-      .where(and(eq(prompts.userId, userId), eq(prompts.category, category), eq(prompts.active, true)));
+  async getActivePromptsByCategory(
+    userId: number,
+    category: string
+  ): Promise<Prompt[]> {
+    return db
+      .select()
+      .from(prompts)
+      .where(
+        and(
+          eq(prompts.userId, userId),
+          eq(prompts.category, category),
+          eq(prompts.active, true)
+        )
+      );
   }
 
   async createPrompt(data: InsertPrompt): Promise<Prompt> {
@@ -232,8 +339,15 @@ export class DatabaseStorage implements IStorage {
     return prompt;
   }
 
-  async updatePrompt(id: number, data: Partial<InsertPrompt>): Promise<Prompt | undefined> {
-    const [prompt] = await db.update(prompts).set({ ...data, updatedAt: new Date() }).where(eq(prompts.id, id)).returning();
+  async updatePrompt(
+    id: number,
+    data: Partial<InsertPrompt>
+  ): Promise<Prompt | undefined> {
+    const [prompt] = await db
+      .update(prompts)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(prompts.id, id))
+      .returning();
     return prompt || undefined;
   }
 
@@ -242,22 +356,43 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getProfiles(userId: number): Promise<CreativeProfile[]> {
-    return db.select().from(creativeProfiles).where(eq(creativeProfiles.userId, userId)).orderBy(desc(creativeProfiles.createdAt));
+    return db
+      .select()
+      .from(creativeProfiles)
+      .where(eq(creativeProfiles.userId, userId))
+      .orderBy(desc(creativeProfiles.createdAt));
   }
 
   async getActiveProfile(userId: number): Promise<CreativeProfile | undefined> {
-    const [profile] = await db.select().from(creativeProfiles)
-      .where(and(eq(creativeProfiles.userId, userId), eq(creativeProfiles.active, true)));
+    const [profile] = await db
+      .select()
+      .from(creativeProfiles)
+      .where(
+        and(
+          eq(creativeProfiles.userId, userId),
+          eq(creativeProfiles.active, true)
+        )
+      );
     return profile || undefined;
   }
 
   async createProfile(data: InsertCreativeProfile): Promise<CreativeProfile> {
-    const [profile] = await db.insert(creativeProfiles).values(data).returning();
+    const [profile] = await db
+      .insert(creativeProfiles)
+      .values(data)
+      .returning();
     return profile;
   }
 
-  async updateProfile(id: number, data: Partial<InsertCreativeProfile>): Promise<CreativeProfile | undefined> {
-    const [profile] = await db.update(creativeProfiles).set(data).where(eq(creativeProfiles.id, id)).returning();
+  async updateProfile(
+    id: number,
+    data: Partial<InsertCreativeProfile>
+  ): Promise<CreativeProfile | undefined> {
+    const [profile] = await db
+      .update(creativeProfiles)
+      .set(data)
+      .where(eq(creativeProfiles.id, id))
+      .returning();
     return profile || undefined;
   }
 
@@ -266,20 +401,29 @@ export class DatabaseStorage implements IStorage {
   }
 
   async setActiveProfile(userId: number, profileId: number): Promise<void> {
-    await db.update(creativeProfiles)
+    await db
+      .update(creativeProfiles)
       .set({ active: false })
       .where(eq(creativeProfiles.userId, userId));
-    await db.update(creativeProfiles)
+    await db
+      .update(creativeProfiles)
       .set({ active: true })
       .where(eq(creativeProfiles.id, profileId));
   }
 
   async getExecutions(userId: number): Promise<AIExecution[]> {
-    return db.select().from(aiExecutions).where(eq(aiExecutions.userId, userId)).orderBy(desc(aiExecutions.createdAt));
+    return db
+      .select()
+      .from(aiExecutions)
+      .where(eq(aiExecutions.userId, userId))
+      .orderBy(desc(aiExecutions.createdAt));
   }
 
   async getExecution(id: number): Promise<AIExecution | undefined> {
-    const [exec] = await db.select().from(aiExecutions).where(eq(aiExecutions.id, id));
+    const [exec] = await db
+      .select()
+      .from(aiExecutions)
+      .where(eq(aiExecutions.id, id));
     return exec || undefined;
   }
 

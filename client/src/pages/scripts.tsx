@@ -44,11 +44,16 @@ export default function ScriptsPage() {
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between gap-4 flex-wrap p-6 pb-4">
+    <div className="flex h-full flex-col">
+      <div className="flex flex-wrap items-center justify-between gap-4 p-6 pb-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight" data-testid="text-scripts-title">Roteiros</h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          <h1
+            className="text-2xl font-bold tracking-tight"
+            data-testid="text-scripts-title"
+          >
+            Roteiros
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Todos os roteiros vinculados às suas histórias
           </p>
         </div>
@@ -76,20 +81,25 @@ export default function ScriptsPage() {
                 data-testid={`card-script-${script.id}`}
               >
                 <CardContent className="flex items-center justify-between gap-4 py-4">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <FileText className="h-5 w-5 text-primary shrink-0" />
+                  <div className="flex min-w-0 items-center gap-3">
+                    <FileText className="h-5 w-5 shrink-0 text-primary" />
                     <div className="min-w-0">
-                      <p className="font-medium text-sm">{script.title}</p>
+                      <p className="text-sm font-medium">{script.title}</p>
                       {script.storyTitle && (
-                        <div className="flex items-center gap-1 mt-0.5">
+                        <div className="mt-0.5 flex items-center gap-1">
                           <BookOpen className="h-3 w-3 text-muted-foreground" />
-                          <p className="text-xs text-muted-foreground">{script.storyTitle}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {script.storyTitle}
+                          </p>
                         </div>
                       )}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant="secondary" className={typeColors[script.type] || ""}>
+                    <Badge
+                      variant="secondary"
+                      className={typeColors[script.type] || ""}
+                    >
                       {typeLabels[script.type] || script.type}
                     </Badge>
                     <Badge variant="secondary">
@@ -100,7 +110,8 @@ export default function ScriptsPage() {
                       variant="ghost"
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (window.confirm("Remover este roteiro?")) deleteMutation.mutate(script.id);
+                        if (window.confirm("Remover este roteiro?"))
+                          deleteMutation.mutate(script.id);
                       }}
                       data-testid={`button-delete-script-${script.id}`}
                     >
@@ -113,12 +124,13 @@ export default function ScriptsPage() {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-4">
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
               <FileText className="h-8 w-8 text-muted-foreground" />
             </div>
             <h3 className="text-lg font-semibold">Nenhum roteiro encontrado</h3>
-            <p className="text-sm text-muted-foreground mt-1 max-w-sm">
-              Os roteiros são criados dentro das histórias. Vá para uma história para criar um.
+            <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+              Os roteiros são criados dentro das histórias. Vá para uma história
+              para criar um.
             </p>
           </div>
         )}

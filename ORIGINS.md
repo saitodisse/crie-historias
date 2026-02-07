@@ -23,16 +23,16 @@ Sem stack, sem imagens, sem firula.
 
 Ele é:
 
-* 🧠 **Criativo**
-* 🗃️ **Auditável**
-* 🔁 **Reexecutável**
-* 👤 **Single-user agora, multi-user-ready**
+- 🧠 **Criativo**
+- 🗃️ **Auditável**
+- 🔁 **Reexecutável**
+- 👤 **Single-user agora, multi-user-ready**
 
 Não é:
 
-* Um gerador visual
-* Um editor de HQ
-* Um playground descartável de IA
+- Um gerador visual
+- Um editor de HQ
+- Um playground descartável de IA
 
 ---
 
@@ -40,23 +40,23 @@ Não é:
 
 ## ✅ ENTRA NA V1
 
-* Histórias
-* Roteiros
-* Personagens
-* Prompts configuráveis
-* Execuções de IA com histórico completo
-* Preferências de modelo por usuário
-* Base pronta para SaaS (auth depois)
+- Histórias
+- Roteiros
+- Personagens
+- Prompts configuráveis
+- Execuções de IA com histórico completo
+- Preferências de modelo por usuário
+- Base pronta para SaaS (auth depois)
 
 ## ❌ FICA FORA DA V1 (explicitamente)
 
-* Geração de imagens
-* Character sheets visuais
-* Grounding com Google Search
-* Wizard complexo
-* Versionamento com merge/diff
-* Compartilhamento público
-* Templates visuais / UX avançado
+- Geração de imagens
+- Character sheets visuais
+- Grounding com Google Search
+- Wizard complexo
+- Versionamento com merge/diff
+- Compartilhamento público
+- Templates visuais / UX avançado
 
 👉 Isso evita ambiguidade no futuro.
 
@@ -82,19 +82,19 @@ Uma **História** é um contêiner criativo.
 
 Ela possui:
 
-* Título
-* Premissa
-* Tom / gênero (campo livre ou enum)
-* Status (rascunho, em desenvolvimento, finalizada)
-* Relação com personagens
-* Relação com roteiros
+- Título
+- Premissa
+- Tom / gênero (campo livre ou enum)
+- Status (rascunho, em desenvolvimento, finalizada)
+- Relação com personagens
+- Relação com roteiros
 
 Funcionalidades:
 
-* Criar / editar / arquivar
-* Associar personagens existentes
-* Gerar roteiros a partir dela
-* Histórico de execuções de IA relacionadas
+- Criar / editar / arquivar
+- Associar personagens existentes
+- Gerar roteiros a partir dela
+- Histórico de execuções de IA relacionadas
 
 ---
 
@@ -106,17 +106,17 @@ Personagens são **entidades independentes**, reutilizáveis.
 
 Campos típicos:
 
-* Nome
-* Descrição física (texto)
-* Personalidade
-* Background
-* Observações livres
+- Nome
+- Descrição física (texto)
+- Personalidade
+- Background
+- Observações livres
 
 Funcionalidades:
 
-* CRUD completo
-* Importar personagem para uma ou mais histórias
-* Personagem **não pertence** a uma história específica
+- CRUD completo
+- Importar personagem para uma ou mais histórias
+- Personagem **não pertence** a uma história específica
 
 ⚠️ Nenhuma imagem nesta versão.
 
@@ -130,16 +130,16 @@ Um **Roteiro** é sempre derivado de uma história.
 
 Ele pode representar:
 
-* Sinopse expandida
-* Outline
-* Roteiro detalhado
-* Estrutura por atos/cenas (texto estruturado ou markdown)
+- Sinopse expandida
+- Outline
+- Roteiro detalhado
+- Estrutura por atos/cenas (texto estruturado ou markdown)
 
 Funcionalidades:
 
-* Criar manualmente ou via IA
-* Regerar a partir de prompts diferentes
-* Associar execuções de IA específicas
+- Criar manualmente ou via IA
+- Regerar a partir de prompts diferentes
+- Associar execuções de IA específicas
 
 ---
 
@@ -151,16 +151,16 @@ Prompts são **entidades de primeira classe**.
 
 Tipos:
 
-* Prompt de sistema
-* Prompt de tarefa (ex: “gerar sinopse”)
-* Prompt auxiliar (ex: “refinar tom”)
+- Prompt de sistema
+- Prompt de tarefa (ex: “gerar sinopse”)
+- Prompt auxiliar (ex: “refinar tom”)
 
 Características:
 
-* Texto totalmente editável
-* Categoria (personagem, história, roteiro, refinamento)
-* Ativo / inativo
-* Versionável (leve)
+- Texto totalmente editável
+- Categoria (personagem, história, roteiro, refinamento)
+- Ativo / inativo
+- Versionável (leve)
 
 👉 Prompts **não são hardcoded**.
 
@@ -174,25 +174,24 @@ Cada chamada de IA gera um **registro imutável**.
 
 Ela armazena:
 
-* Prompt do sistema (snapshot)
-* Prompt do usuário
-* Prompt final montado
-* Modelo usado (exato)
-* Parâmetros (temperature, etc.)
-* Resultado textual
-* Timestamp
-* Relação com:
-
-  * história
-  * roteiro
-  * personagem (opcional)
-  * prompt base
+- Prompt do sistema (snapshot)
+- Prompt do usuário
+- Prompt final montado
+- Modelo usado (exato)
+- Parâmetros (temperature, etc.)
+- Resultado textual
+- Timestamp
+- Relação com:
+  - história
+  - roteiro
+  - personagem (opcional)
+  - prompt base
 
 Funcionalidades:
 
-* Visualizar histórico
-* Reexecutar com o mesmo contexto
-* Comparar outputs manualmente (fora do sistema)
+- Visualizar histórico
+- Reexecutar com o mesmo contexto
+- Comparar outputs manualmente (fora do sistema)
 
 👉 Isso é o que transforma o produto num **banco de conhecimento criativo**.
 
@@ -204,16 +203,16 @@ Funcionalidades:
 
 Um perfil define:
 
-* Modelo preferido
-* Parâmetros padrão
-* Estilo narrativo desejado (texto)
-* Uso padrão de prompts
+- Modelo preferido
+- Parâmetros padrão
+- Estilo narrativo desejado (texto)
+- Uso padrão de prompts
 
 Funcionalidades:
 
-* Definir perfil padrão
-* Sobrescrever por execução
-* Persistir última escolha do usuário
+- Definir perfil padrão
+- Sobrescrever por execução
+- Persistir última escolha do usuário
 
 ---
 
@@ -221,12 +220,11 @@ Funcionalidades:
 
 Na V1:
 
-* Um único usuário “local”
-* Estrutura já preparada para:
-
-  * autenticação
-  * múltiplos usuários
-  * chaves próprias de LLM
+- Um único usuário “local”
+- Estrutura já preparada para:
+  - autenticação
+  - múltiplos usuários
+  - chaves próprias de LLM
 
 ---
 
@@ -240,103 +238,103 @@ Sem SQL, só o **mapa mental**.
 
 ### User
 
-* id
-* nome
-* email (futuro)
-* preferências globais
+- id
+- nome
+- email (futuro)
+- preferências globais
 
 ---
 
 ### CreativeProfile
 
-* id
-* user_id
-* nome
-* modelo padrão
-* parâmetros
-* ativo
+- id
+- user_id
+- nome
+- modelo padrão
+- parâmetros
+- ativo
 
 ---
 
 ### Story
 
-* id
-* user_id
-* título
-* premissa
-* tom
-* status
-* timestamps
+- id
+- user_id
+- título
+- premissa
+- tom
+- status
+- timestamps
 
 ---
 
 ### Character
 
-* id
-* user_id
-* nome
-* descrição
-* personalidade
-* background
-* ativo
+- id
+- user_id
+- nome
+- descrição
+- personalidade
+- background
+- ativo
 
 ---
 
 ### StoryCharacter (N:N)
 
-* story_id
-* character_id
+- story_id
+- character_id
 
 ---
 
 ### Script
 
-* id
-* story_id
-* tipo (sinopse, outline, roteiro)
-* conteúdo
-* origem (manual | IA)
-* timestamps
+- id
+- story_id
+- tipo (sinopse, outline, roteiro)
+- conteúdo
+- origem (manual | IA)
+- timestamps
 
 ---
 
 ### Prompt
 
-* id
-* user_id
-* nome
-* categoria
-* texto
-* versão
-* ativo
+- id
+- user_id
+- nome
+- categoria
+- texto
+- versão
+- ativo
 
 ---
 
 ### AIExecution
 
-* id
-* user_id
-* prompt_id (opcional)
-* story_id (opcional)
-* script_id (opcional)
-* character_id (opcional)
-* system_prompt_snapshot
-* user_prompt
-* final_prompt
-* model
-* parâmetros
-* resultado
-* timestamp
+- id
+- user_id
+- prompt_id (opcional)
+- story_id (opcional)
+- script_id (opcional)
+- character_id (opcional)
+- system_prompt_snapshot
+- user_prompt
+- final_prompt
+- model
+- parâmetros
+- resultado
+- timestamp
 
 ---
 
 ## Relações-chave
 
-* User → tudo
-* Story ↔ Character (N:N)
-* Story → Script (1:N)
-* Prompt → AIExecution (1:N)
-* Script → AIExecution (1:N)
+- User → tudo
+- Story ↔ Character (N:N)
+- Story → Script (1:N)
+- Prompt → AIExecution (1:N)
+- Script → AIExecution (1:N)
 
 ---
 
