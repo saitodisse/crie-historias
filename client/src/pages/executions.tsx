@@ -37,10 +37,10 @@ export default function ExecutionsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/executions"] });
-      toast({ title: "Re-execution complete" });
+      toast({ title: "Re-execução concluída" });
     },
     onError: (err: Error) => {
-      toast({ title: "Re-execution failed", description: err.message, variant: "destructive" });
+      toast({ title: "Re-execução falhou", description: err.message, variant: "destructive" });
     },
   });
 
@@ -56,9 +56,9 @@ export default function ExecutionsPage() {
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between gap-4 flex-wrap p-6 pb-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight" data-testid="text-executions-title">AI History</h1>
+          <h1 className="text-2xl font-bold tracking-tight" data-testid="text-executions-title">Histórico de IA</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Complete audit trail of all AI executions
+            Trilha de auditoria completa de todas as execuções de IA
           </p>
         </div>
       </div>
@@ -69,7 +69,7 @@ export default function ExecutionsPage() {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search executions..."
+            placeholder="Buscar execuções..."
             className="pl-9"
             data-testid="input-search-executions"
           />
@@ -132,7 +132,7 @@ export default function ExecutionsPage() {
                   <div className="flex items-center gap-1 mt-2">
                     <Clock className="h-3 w-3 text-muted-foreground" />
                     <span className="text-xs text-muted-foreground">
-                      {new Date(exec.createdAt).toLocaleString()}
+                      {new Date(exec.createdAt).toLocaleString('pt-BR')}
                     </span>
                   </div>
                 </CardContent>
@@ -144,9 +144,9 @@ export default function ExecutionsPage() {
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-4">
               <History className="h-8 w-8 text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-semibold">No executions yet</h3>
+            <h3 className="text-lg font-semibold">Nenhuma execução encontrada</h3>
             <p className="text-sm text-muted-foreground mt-1 max-w-sm">
-              AI executions will appear here after you generate content.
+              As execuções de IA aparecerão aqui após você gerar conteúdo.
             </p>
           </div>
         )}
@@ -157,7 +157,7 @@ export default function ExecutionsPage() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <History className="h-5 w-5" />
-              Execution #{selectedExec?.id}
+              Execução #{selectedExec?.id}
             </DialogTitle>
           </DialogHeader>
           {selectedExec && (
@@ -169,13 +169,13 @@ export default function ExecutionsPage() {
                   {selectedExec.characterName && <Badge variant="outline">{selectedExec.characterName}</Badge>}
                   {selectedExec.promptName && <Badge variant="outline">{selectedExec.promptName}</Badge>}
                   <span className="text-xs text-muted-foreground ml-auto">
-                    {new Date(selectedExec.createdAt).toLocaleString()}
+                    {new Date(selectedExec.createdAt).toLocaleString('pt-BR')}
                   </span>
                 </div>
 
                 {selectedExec.systemPromptSnapshot && (
                   <div>
-                    <Label className="text-xs text-muted-foreground">System Prompt Snapshot</Label>
+                    <Label className="text-xs text-muted-foreground">Snapshot do Prompt de Sistema</Label>
                     <pre className="mt-1 text-xs bg-muted rounded-md p-3 whitespace-pre-wrap font-mono max-h-32 overflow-auto">
                       {selectedExec.systemPromptSnapshot}
                     </pre>
@@ -183,14 +183,14 @@ export default function ExecutionsPage() {
                 )}
 
                 <div>
-                  <Label className="text-xs text-muted-foreground">User Prompt</Label>
+                  <Label className="text-xs text-muted-foreground">Prompt do Usuário</Label>
                   <pre className="mt-1 text-xs bg-muted rounded-md p-3 whitespace-pre-wrap font-mono">
                     {selectedExec.userPrompt}
                   </pre>
                 </div>
 
                 <div>
-                  <Label className="text-xs text-muted-foreground">Final Assembled Prompt</Label>
+                  <Label className="text-xs text-muted-foreground">Prompt Final Montado</Label>
                   <pre className="mt-1 text-xs bg-muted rounded-md p-3 whitespace-pre-wrap font-mono max-h-40 overflow-auto">
                     {selectedExec.finalPrompt}
                   </pre>
@@ -198,7 +198,7 @@ export default function ExecutionsPage() {
 
                 {selectedExec.parameters && (
                   <div>
-                    <Label className="text-xs text-muted-foreground">Parameters</Label>
+                    <Label className="text-xs text-muted-foreground">Parâmetros</Label>
                     <pre className="mt-1 text-xs bg-muted rounded-md p-3 whitespace-pre-wrap font-mono">
                       {JSON.stringify(selectedExec.parameters, null, 2)}
                     </pre>
@@ -209,23 +209,23 @@ export default function ExecutionsPage() {
 
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-1">
-                    <Label className="text-xs text-muted-foreground">Result</Label>
+                    <Label className="text-xs text-muted-foreground">Resultado</Label>
                     <Button
                       size="sm"
                       variant="ghost"
                       onClick={() => {
                         if (selectedExec.result) {
                           navigator.clipboard.writeText(selectedExec.result);
-                          toast({ title: "Result copied" });
+                          toast({ title: "Resultado copiado" });
                         }
                       }}
                     >
                       <Copy className="h-3 w-3 mr-1" />
-                      Copy
+                      Copiar
                     </Button>
                   </div>
                   <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap font-serif bg-muted rounded-md p-4">
-                    {selectedExec.result || "No result"}
+                    {selectedExec.result || "Sem resultado"}
                   </div>
                 </div>
 
@@ -239,7 +239,7 @@ export default function ExecutionsPage() {
                     disabled={rerunMutation.isPending}
                   >
                     <RefreshCw className="h-4 w-4 mr-2" />
-                    Re-execute
+                    Re-executar
                   </Button>
                 </div>
               </div>

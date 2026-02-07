@@ -23,6 +23,13 @@ const categoryColors: Record<string, string> = {
   refinement: "bg-purple-500/10 text-purple-700 dark:text-purple-400",
 };
 
+const categoryLabels: Record<string, string> = {
+  character: "Personagem",
+  story: "História",
+  script: "Roteiro",
+  refinement: "Refinamento",
+};
+
 export default function PromptsPage() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
@@ -45,7 +52,7 @@ export default function PromptsPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/prompts"] });
       setCreateOpen(false);
       resetForm();
-      toast({ title: "Prompt created" });
+      toast({ title: "Prompt criado" });
     },
   });
 
@@ -57,7 +64,7 @@ export default function PromptsPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/prompts"] });
       setEditingId(null);
       resetForm();
-      toast({ title: "Prompt updated" });
+      toast({ title: "Prompt atualizado" });
     },
   });
 
@@ -67,7 +74,7 @@ export default function PromptsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/prompts"] });
-      toast({ title: "Prompt deleted" });
+      toast({ title: "Prompt removido" });
     },
   });
 
@@ -95,45 +102,45 @@ export default function PromptsPage() {
   const PromptForm = ({ isCreate }: { isCreate: boolean }) => (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label>Name</Label>
+        <Label>Nome</Label>
         <Input
           value={form.name}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
-          placeholder="e.g. Generate Synopsis"
+          placeholder="ex: Gerar Sinopse"
           data-testid="input-prompt-name"
         />
       </div>
       <div className="flex gap-4">
         <div className="flex-1 space-y-2">
-          <Label>Category</Label>
+          <Label>Categoria</Label>
           <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
             <SelectTrigger data-testid="select-prompt-category"><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="character">Character</SelectItem>
-              <SelectItem value="story">Story</SelectItem>
-              <SelectItem value="script">Script</SelectItem>
-              <SelectItem value="refinement">Refinement</SelectItem>
+              <SelectItem value="character">Personagem</SelectItem>
+              <SelectItem value="story">História</SelectItem>
+              <SelectItem value="script">Roteiro</SelectItem>
+              <SelectItem value="refinement">Refinamento</SelectItem>
             </SelectContent>
           </Select>
         </div>
         <div className="flex-1 space-y-2">
-          <Label>Type</Label>
+          <Label>Tipo</Label>
           <Select value={form.type} onValueChange={(v) => setForm({ ...form, type: v })}>
             <SelectTrigger data-testid="select-prompt-type"><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="system">System</SelectItem>
-              <SelectItem value="task">Task</SelectItem>
-              <SelectItem value="auxiliary">Auxiliary</SelectItem>
+              <SelectItem value="system">Sistema</SelectItem>
+              <SelectItem value="task">Tarefa</SelectItem>
+              <SelectItem value="auxiliary">Auxiliar</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </div>
       <div className="space-y-2">
-        <Label>Content</Label>
+        <Label>Conteúdo</Label>
         <Textarea
           value={form.content}
           onChange={(e) => setForm({ ...form, content: e.target.value })}
-          placeholder="Write your prompt template here. Use {{story.title}}, {{character.name}} etc. for variables."
+          placeholder="Escreva seu modelo de prompt aqui. Use {{story.title}}, {{character.name}} etc. para variáveis."
           rows={8}
           className="font-mono text-sm"
           data-testid="input-prompt-content"
@@ -145,7 +152,7 @@ export default function PromptsPage() {
           onCheckedChange={(checked) => setForm({ ...form, active: checked })}
           data-testid="switch-prompt-active"
         />
-        <Label>Active</Label>
+        <Label>Ativo</Label>
       </div>
       <Button
         className="w-full"
@@ -154,8 +161,8 @@ export default function PromptsPage() {
         data-testid="button-submit-prompt"
       >
         {isCreate
-          ? createMutation.isPending ? "Creating..." : "Create Prompt"
-          : updateMutation.isPending ? "Saving..." : "Save Changes"}
+          ? createMutation.isPending ? "Criando..." : "Criar Prompt"
+          : updateMutation.isPending ? "Salvando..." : "Salvar Alterações"}
       </Button>
     </div>
   );
@@ -166,19 +173,19 @@ export default function PromptsPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight" data-testid="text-prompts-title">Prompts</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Configurable prompt templates for AI generation
+            Modelos de prompt configuráveis para geração por IA
           </p>
         </div>
         <Dialog open={createOpen} onOpenChange={(o) => { setCreateOpen(o); if (!o) resetForm(); }}>
           <DialogTrigger asChild>
             <Button data-testid="button-create-prompt">
               <Plus className="h-4 w-4 mr-2" />
-              New Prompt
+              Novo Prompt
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Create Prompt</DialogTitle>
+              <DialogTitle>Criar Prompt</DialogTitle>
             </DialogHeader>
             <PromptForm isCreate />
           </DialogContent>
@@ -191,18 +198,18 @@ export default function PromptsPage() {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search prompts..."
+            placeholder="Buscar prompts..."
             className="pl-9"
             data-testid="input-search-prompts"
           />
         </div>
         <Tabs value={category} onValueChange={setCategory}>
           <TabsList>
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="story">Story</TabsTrigger>
-            <TabsTrigger value="character">Character</TabsTrigger>
-            <TabsTrigger value="script">Script</TabsTrigger>
-            <TabsTrigger value="refinement">Refinement</TabsTrigger>
+            <TabsTrigger value="all">Todos</TabsTrigger>
+            <TabsTrigger value="story">História</TabsTrigger>
+            <TabsTrigger value="character">Personagem</TabsTrigger>
+            <TabsTrigger value="script">Roteiro</TabsTrigger>
+            <TabsTrigger value="refinement">Refinamento</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
@@ -226,7 +233,7 @@ export default function PromptsPage() {
                 {editingId === prompt.id ? (
                   <CardContent className="pt-4 space-y-3">
                     <div className="flex items-center justify-between gap-2">
-                      <h3 className="font-semibold text-sm">Editing: {prompt.name}</h3>
+                      <h3 className="font-semibold text-sm">Editando: {prompt.name}</h3>
                       <Button size="icon" variant="ghost" onClick={() => { setEditingId(null); resetForm(); }}>
                         <X className="h-4 w-4" />
                       </Button>
@@ -240,10 +247,10 @@ export default function PromptsPage() {
                         <Sparkles className="h-4 w-4 text-primary shrink-0" />
                         <h3 className="font-semibold text-sm">{prompt.name}</h3>
                         <Badge variant="secondary" className={categoryColors[prompt.category] || ""}>
-                          {prompt.category}
+                          {categoryLabels[prompt.category] || prompt.category}
                         </Badge>
-                        <Badge variant="secondary">{prompt.type}</Badge>
-                        {!prompt.active && <Badge variant="secondary" className="opacity-50">Inactive</Badge>}
+                        <Badge variant="secondary">{prompt.type === 'system' ? 'Sistema' : prompt.type === 'task' ? 'Tarefa' : 'Auxiliar'}</Badge>
+                        {!prompt.active && <Badge variant="secondary" className="opacity-50">Inativo</Badge>}
                         <span className="text-xs text-muted-foreground">v{prompt.version}</span>
                       </div>
                       <div className="flex items-center gap-1">
@@ -252,7 +259,7 @@ export default function PromptsPage() {
                           variant="ghost"
                           onClick={() => {
                             navigator.clipboard.writeText(prompt.content);
-                            toast({ title: "Copied to clipboard" });
+                            toast({ title: "Copiado para a área de transferência" });
                           }}
                           data-testid={`button-copy-prompt-${prompt.id}`}
                         >
@@ -264,7 +271,7 @@ export default function PromptsPage() {
                         <Button
                           size="icon"
                           variant="ghost"
-                          onClick={() => { if (window.confirm(`Delete "${prompt.name}"?`)) deleteMutation.mutate(prompt.id); }}
+                          onClick={() => { if (window.confirm(`Remover "${prompt.name}"?`)) deleteMutation.mutate(prompt.id); }}
                           data-testid={`button-delete-prompt-${prompt.id}`}
                         >
                           <Trash2 className="h-4 w-4 text-destructive" />
@@ -286,9 +293,9 @@ export default function PromptsPage() {
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-4">
               <Sparkles className="h-8 w-8 text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-semibold">No prompts yet</h3>
+            <h3 className="text-lg font-semibold">Nenhum prompt encontrado</h3>
             <p className="text-sm text-muted-foreground mt-1 max-w-sm">
-              Create configurable prompt templates for AI content generation.
+              Crie modelos de prompt configuráveis para geração de conteúdo por IA.
             </p>
           </div>
         )}

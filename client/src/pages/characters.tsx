@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Users, Search, Pencil, Trash2, Save, X, Sparkles } from "lucide-react";
+import { Plus, Users, Search, Pencil, Trash2, X, Sparkles } from "lucide-react";
 import type { Character } from "@shared/schema";
 
 export default function CharactersPage() {
@@ -35,7 +35,7 @@ export default function CharactersPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/characters"] });
       setCreateOpen(false);
       resetForm();
-      toast({ title: "Character created" });
+      toast({ title: "Personagem criado" });
     },
   });
 
@@ -47,7 +47,7 @@ export default function CharactersPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/characters"] });
       setEditingId(null);
       resetForm();
-      toast({ title: "Character updated" });
+      toast({ title: "Personagem atualizado" });
     },
   });
 
@@ -57,7 +57,7 @@ export default function CharactersPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/characters"] });
-      toast({ title: "Character deleted" });
+      toast({ title: "Personagem removido" });
     },
   });
 
@@ -75,10 +75,10 @@ export default function CharactersPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/executions"] });
       setAiDialogOpen(false);
       setAiPrompt("");
-      toast({ title: "AI generation complete" });
+      toast({ title: "Geração por IA concluída" });
     },
     onError: (err: Error) => {
-      toast({ title: "Generation failed", description: err.message, variant: "destructive" });
+      toast({ title: "Geração falhou", description: err.message, variant: "destructive" });
     },
   });
 
@@ -104,53 +104,53 @@ export default function CharactersPage() {
   const CharacterForm = ({ isCreate }: { isCreate: boolean }) => (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label>Name</Label>
+        <Label>Nome</Label>
         <Input
           value={form.name}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
-          placeholder="Character name..."
+          placeholder="Nome do personagem..."
           data-testid="input-char-name"
         />
       </div>
       <div className="space-y-2">
-        <Label>Physical Description</Label>
+        <Label>Descrição Física</Label>
         <Textarea
           value={form.description}
           onChange={(e) => setForm({ ...form, description: e.target.value })}
-          placeholder="Appearance, build, distinguishing features..."
+          placeholder="Aparência, porte físico, características marcantes..."
           rows={2}
           className="resize-none"
           data-testid="input-char-description"
         />
       </div>
       <div className="space-y-2">
-        <Label>Personality</Label>
+        <Label>Personalidade</Label>
         <Textarea
           value={form.personality}
           onChange={(e) => setForm({ ...form, personality: e.target.value })}
-          placeholder="Traits, temperament, quirks..."
+          placeholder="Traços, temperamento, peculiaridades..."
           rows={2}
           className="resize-none"
           data-testid="input-char-personality"
         />
       </div>
       <div className="space-y-2">
-        <Label>Background</Label>
+        <Label>Histórico (Background)</Label>
         <Textarea
           value={form.background}
           onChange={(e) => setForm({ ...form, background: e.target.value })}
-          placeholder="History, motivations, secrets..."
+          placeholder="História de vida, motivações, segredos..."
           rows={2}
           className="resize-none"
           data-testid="input-char-background"
         />
       </div>
       <div className="space-y-2">
-        <Label>Notes</Label>
+        <Label>Notas</Label>
         <Textarea
           value={form.notes}
           onChange={(e) => setForm({ ...form, notes: e.target.value })}
-          placeholder="Additional notes..."
+          placeholder="Notas adicionais..."
           rows={2}
           className="resize-none"
           data-testid="input-char-notes"
@@ -163,8 +163,8 @@ export default function CharactersPage() {
         data-testid="button-submit-character"
       >
         {isCreate
-          ? createMutation.isPending ? "Creating..." : "Create Character"
-          : updateMutation.isPending ? "Saving..." : "Save Changes"}
+          ? createMutation.isPending ? "Criando..." : "Criar Personagem"
+          : updateMutation.isPending ? "Salvando..." : "Salvar Alterações"}
       </Button>
     </div>
   );
@@ -173,21 +173,21 @@ export default function CharactersPage() {
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between gap-4 flex-wrap p-6 pb-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight" data-testid="text-characters-title">Characters</h1>
+          <h1 className="text-2xl font-bold tracking-tight" data-testid="text-characters-title">Personagens</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Reusable characters that can be linked to any story
+            Personagens que podem ser vinculados a qualquer história
           </p>
         </div>
         <Dialog open={createOpen} onOpenChange={(o) => { setCreateOpen(o); if (!o) resetForm(); }}>
           <DialogTrigger asChild>
             <Button data-testid="button-create-character">
               <Plus className="h-4 w-4 mr-2" />
-              New Character
+              Novo Personagem
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Create Character</DialogTitle>
+              <DialogTitle>Criar Personagem</DialogTitle>
             </DialogHeader>
             <CharacterForm isCreate />
           </DialogContent>
@@ -200,7 +200,7 @@ export default function CharactersPage() {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search characters..."
+            placeholder="Buscar personagens..."
             className="pl-9"
             data-testid="input-search-characters"
           />
@@ -227,7 +227,7 @@ export default function CharactersPage() {
                 {editingId === char.id ? (
                   <CardContent className="pt-4 space-y-3">
                     <div className="flex items-center justify-between gap-2">
-                      <h3 className="font-semibold text-sm">Editing: {char.name}</h3>
+                      <h3 className="font-semibold text-sm">Editando: {char.name}</h3>
                       <Button size="icon" variant="ghost" onClick={() => { setEditingId(null); resetForm(); }}>
                         <X className="h-4 w-4" />
                       </Button>
@@ -243,7 +243,7 @@ export default function CharactersPage() {
                         </div>
                         <div className="min-w-0">
                           <h3 className="font-semibold text-sm truncate">{char.name}</h3>
-                          {!char.active && <Badge variant="secondary" className="text-xs">Inactive</Badge>}
+                          {!char.active && <Badge variant="secondary" className="text-xs">Inativo</Badge>}
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
@@ -264,7 +264,7 @@ export default function CharactersPage() {
                         <Button
                           size="icon"
                           variant="ghost"
-                          onClick={() => { if (window.confirm(`Delete "${char.name}"?`)) deleteMutation.mutate(char.id); }}
+                          onClick={() => { if (window.confirm(`Remover "${char.name}"?`)) deleteMutation.mutate(char.id); }}
                           data-testid={`button-delete-char-${char.id}`}
                         >
                           <Trash2 className="h-4 w-4 text-destructive" />
@@ -275,12 +275,12 @@ export default function CharactersPage() {
                       {char.description && <p className="text-sm text-muted-foreground line-clamp-2 mb-1">{char.description}</p>}
                       {char.personality && (
                         <p className="text-xs text-muted-foreground">
-                          <span className="font-medium">Personality:</span> {char.personality}
+                          <span className="font-medium">Personalidade:</span> {char.personality}
                         </p>
                       )}
                       {char.background && (
                         <p className="text-xs text-muted-foreground mt-1">
-                          <span className="font-medium">Background:</span> {char.background}
+                          <span className="font-medium">Histórico:</span> {char.background}
                         </p>
                       )}
                     </CardContent>
@@ -294,9 +294,9 @@ export default function CharactersPage() {
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-4">
               <Users className="h-8 w-8 text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-semibold">No characters yet</h3>
+            <h3 className="text-lg font-semibold">Nenhum personagem encontrado</h3>
             <p className="text-sm text-muted-foreground mt-1 max-w-sm">
-              Create reusable characters that can be shared across multiple stories.
+              Crie personagens reutilizáveis que podem ser compartilhados entre múltiplas histórias.
             </p>
           </div>
         )}
@@ -305,15 +305,15 @@ export default function CharactersPage() {
       <Dialog open={aiDialogOpen} onOpenChange={setAiDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Generate with AI</DialogTitle>
+            <DialogTitle>Gerar com IA</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 pt-2">
             <div className="space-y-2">
-              <Label>What would you like to generate for this character?</Label>
+              <Label>O que você gostaria de gerar para este personagem?</Label>
               <Textarea
                 value={aiPrompt}
                 onChange={(e) => setAiPrompt(e.target.value)}
-                placeholder="e.g. Expand this character's backstory, develop their motivations..."
+                placeholder="ex: Expanda o histórico deste personagem, desenvolva suas motivações..."
                 rows={4}
                 data-testid="input-ai-char-prompt"
               />
@@ -325,7 +325,7 @@ export default function CharactersPage() {
               data-testid="button-submit-ai-char"
             >
               <Sparkles className="h-4 w-4 mr-2" />
-              {generateMutation.isPending ? "Generating..." : "Generate"}
+              {generateMutation.isPending ? "Gerando..." : "Gerar"}
             </Button>
           </div>
         </DialogContent>

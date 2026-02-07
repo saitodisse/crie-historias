@@ -16,11 +16,11 @@ import { Settings, Plus, Save, Trash2, Check } from "lucide-react";
 import type { CreativeProfile } from "@shared/schema";
 
 const availableModels = [
-  { value: "gpt-5.2", label: "GPT-5.2 (Most Capable)" },
+  { value: "gpt-5.2", label: "GPT-5.2 (Mais Capaz)" },
   { value: "gpt-5.1", label: "GPT-5.1" },
   { value: "gpt-5", label: "GPT-5" },
-  { value: "gpt-5-mini", label: "GPT-5 Mini (Cost Effective)" },
-  { value: "gpt-5-nano", label: "GPT-5 Nano (Fastest)" },
+  { value: "gpt-5-mini", label: "GPT-5 Mini (Custo-Benefício)" },
+  { value: "gpt-5-nano", label: "GPT-5 Nano (Mais Rápido)" },
 ];
 
 export default function ProfilePage() {
@@ -48,7 +48,7 @@ export default function ProfilePage() {
       queryClient.invalidateQueries({ queryKey: ["/api/profiles"] });
       setCreateOpen(false);
       resetForm();
-      toast({ title: "Profile created" });
+      toast({ title: "Perfil criado" });
     },
   });
 
@@ -60,7 +60,7 @@ export default function ProfilePage() {
       queryClient.invalidateQueries({ queryKey: ["/api/profiles"] });
       setEditId(null);
       resetForm();
-      toast({ title: "Profile updated" });
+      toast({ title: "Perfil atualizado" });
     },
   });
 
@@ -70,7 +70,7 @@ export default function ProfilePage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/profiles"] });
-      toast({ title: "Profile deleted" });
+      toast({ title: "Perfil removido" });
     },
   });
 
@@ -80,7 +80,7 @@ export default function ProfilePage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/profiles"] });
-      toast({ title: "Active profile updated" });
+      toast({ title: "Perfil ativo atualizado" });
     },
   });
 
@@ -102,16 +102,16 @@ export default function ProfilePage() {
   const ProfileForm = ({ isCreate }: { isCreate: boolean }) => (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label>Profile Name</Label>
+        <Label>Nome do Perfil</Label>
         <Input
           value={form.name}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
-          placeholder="e.g. Creative Writing, Technical, Concise"
+          placeholder="ex: Escrita Criativa, Técnico, Conciso"
           data-testid="input-profile-name"
         />
       </div>
       <div className="space-y-2">
-        <Label>AI Model</Label>
+        <Label>Modelo de IA</Label>
         <Select value={form.model} onValueChange={(v) => setForm({ ...form, model: v })}>
           <SelectTrigger data-testid="select-profile-model">
             <SelectValue />
@@ -124,7 +124,7 @@ export default function ProfilePage() {
         </Select>
       </div>
       <div className="space-y-2">
-        <Label>Temperature: {form.temperature}</Label>
+        <Label>Temperatura: {form.temperature}</Label>
         <Slider
           value={[parseFloat(form.temperature)]}
           onValueChange={([v]) => setForm({ ...form, temperature: v.toFixed(1) })}
@@ -134,11 +134,11 @@ export default function ProfilePage() {
           data-testid="slider-temperature"
         />
         <p className="text-xs text-muted-foreground">
-          Lower = more focused, Higher = more creative
+          Menor = mais focado, Maior = mais criativo
         </p>
       </div>
       <div className="space-y-2">
-        <Label>Max Tokens</Label>
+        <Label>Máximo de Tokens</Label>
         <Input
           type="number"
           value={form.maxTokens}
@@ -149,11 +149,11 @@ export default function ProfilePage() {
         />
       </div>
       <div className="space-y-2">
-        <Label>Narrative Style</Label>
+        <Label>Estilo Narrativo</Label>
         <Textarea
           value={form.narrativeStyle}
           onChange={(e) => setForm({ ...form, narrativeStyle: e.target.value })}
-          placeholder="Describe desired writing style, tone, voice..."
+          placeholder="Descreva o estilo de escrita desejado, tom, voz..."
           rows={3}
           className="resize-none"
           data-testid="input-narrative-style"
@@ -166,8 +166,8 @@ export default function ProfilePage() {
         data-testid="button-submit-profile"
       >
         {isCreate
-          ? createMutation.isPending ? "Creating..." : "Create Profile"
-          : updateMutation.isPending ? "Saving..." : "Save Changes"}
+          ? createMutation.isPending ? "Criando..." : "Criar Perfil"
+          : updateMutation.isPending ? "Salvando..." : "Salvar Alterações"}
       </Button>
     </div>
   );
@@ -176,21 +176,21 @@ export default function ProfilePage() {
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between gap-4 flex-wrap p-6 pb-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight" data-testid="text-profile-title">Creative Profiles</h1>
+          <h1 className="text-2xl font-bold tracking-tight" data-testid="text-profile-title">Perfis Criativos</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Manage AI model preferences and narrative styles
+            Gerencie preferências de modelo de IA e estilos narrativos
           </p>
         </div>
         <Dialog open={createOpen} onOpenChange={(o) => { setCreateOpen(o); if (!o) resetForm(); }}>
           <DialogTrigger asChild>
             <Button data-testid="button-create-profile">
               <Plus className="h-4 w-4 mr-2" />
-              New Profile
+              Novo Perfil
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Create Creative Profile</DialogTitle>
+              <DialogTitle>Criar Perfil Criativo</DialogTitle>
             </DialogHeader>
             <ProfileForm isCreate />
           </DialogContent>
@@ -221,7 +221,7 @@ export default function ProfilePage() {
                   <CardContent className="pt-4">
                     <ProfileForm isCreate={false} />
                     <Button variant="ghost" className="w-full mt-2" onClick={() => { setEditId(null); resetForm(); }}>
-                      Cancel
+                      Cancelar
                     </Button>
                   </CardContent>
                 ) : (
@@ -233,7 +233,7 @@ export default function ProfilePage() {
                         {profile.active && (
                           <div className="flex items-center gap-1 text-primary text-xs">
                             <Check className="h-3 w-3" />
-                            Active
+                            Ativo
                           </div>
                         )}
                       </div>
@@ -245,16 +245,16 @@ export default function ProfilePage() {
                             onClick={() => setActiveMutation.mutate(profile.id)}
                             data-testid={`button-activate-profile-${profile.id}`}
                           >
-                            Set Active
+                            Ativar
                           </Button>
                         )}
                         <Button size="icon" variant="ghost" onClick={() => startEditing(profile)}>
-                          <Save className="h-4 w-4" />
+                          <Pencil className="h-4 w-4" />
                         </Button>
                         <Button
                           size="icon"
                           variant="ghost"
-                          onClick={() => { if (window.confirm("Delete this profile?")) deleteMutation.mutate(profile.id); }}
+                          onClick={() => { if (window.confirm("Remover este perfil?")) deleteMutation.mutate(profile.id); }}
                         >
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
@@ -263,20 +263,20 @@ export default function ProfilePage() {
                     <CardContent>
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between gap-2">
-                          <span className="text-muted-foreground">Model</span>
+                          <span className="text-muted-foreground">Modelo</span>
                           <span className="font-mono text-xs">{profile.model}</span>
                         </div>
                         <div className="flex justify-between gap-2">
-                          <span className="text-muted-foreground">Temperature</span>
+                          <span className="text-muted-foreground">Temperatura</span>
                           <span>{profile.temperature}</span>
                         </div>
                         <div className="flex justify-between gap-2">
-                          <span className="text-muted-foreground">Max Tokens</span>
+                          <span className="text-muted-foreground">Tokens Máximos</span>
                           <span>{profile.maxTokens}</span>
                         </div>
                         {profile.narrativeStyle && (
                           <div>
-                            <span className="text-muted-foreground text-xs">Narrative Style</span>
+                            <span className="text-muted-foreground text-xs">Estilo Narrativo</span>
                             <p className="text-xs mt-0.5">{profile.narrativeStyle}</p>
                           </div>
                         )}
@@ -292,9 +292,9 @@ export default function ProfilePage() {
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-4">
               <Settings className="h-8 w-8 text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-semibold">No creative profiles yet</h3>
+            <h3 className="text-lg font-semibold">Nenhum perfil criativo encontrado</h3>
             <p className="text-sm text-muted-foreground mt-1 max-w-sm">
-              Create a profile to save your preferred AI model settings and narrative style.
+              Crie um perfil para salvar suas configurações de modelo de IA e estilo narrativo.
             </p>
           </div>
         )}

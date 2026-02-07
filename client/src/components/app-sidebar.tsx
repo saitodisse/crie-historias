@@ -14,18 +14,18 @@ import {
 } from "@/components/ui/sidebar";
 
 const creativeItems = [
-  { title: "Stories", url: "/", icon: BookOpen },
-  { title: "Characters", url: "/characters", icon: Users },
-  { title: "Scripts", url: "/scripts", icon: FileText },
+  { title: "Histórias", url: "/", icon: BookOpen },
+  { title: "Personagens", url: "/characters", icon: Users },
+  { title: "Roteiros", url: "/scripts", icon: FileText },
 ];
 
 const aiItems = [
   { title: "Prompts", url: "/prompts", icon: Sparkles },
-  { title: "AI History", url: "/executions", icon: History },
+  { title: "Histórico de IA", url: "/executions", icon: History },
 ];
 
 const settingsItems = [
-  { title: "Creative Profile", url: "/profile", icon: Settings },
+  { title: "Perfil Criativo", url: "/profile", icon: Settings },
 ];
 
 export function AppSidebar() {
@@ -46,14 +46,14 @@ export function AppSidebar() {
             </div>
             <div>
               <h1 className="text-sm font-bold tracking-tight">StoryForge</h1>
-              <p className="text-[11px] text-muted-foreground">Creative Writing Studio</p>
+              <p className="text-[11px] text-muted-foreground">Estúdio de Escrita Criativa</p>
             </div>
           </div>
         </Link>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Creative</SidebarGroupLabel>
+          <SidebarGroupLabel>Criativo</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {creativeItems.map((item) => (
@@ -70,7 +70,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarGroupLabel>AI Engine</SidebarGroupLabel>
+          <SidebarGroupLabel>Motor de IA</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {aiItems.map((item) => (
@@ -87,7 +87,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarGroupLabel>Settings</SidebarGroupLabel>
+          <SidebarGroupLabel>Configurações</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {settingsItems.map((item) => (
@@ -105,7 +105,7 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="p-4">
-        <p className="text-[11px] text-muted-foreground">v1.0 - Single User</p>
+        <p className="text-[11px] text-muted-foreground">v1.0 - Usuário Único</p>
       </SidebarFooter>
     </Sidebar>
   );

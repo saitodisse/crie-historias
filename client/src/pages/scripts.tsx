@@ -27,7 +27,7 @@ export default function ScriptsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/scripts"] });
-      toast({ title: "Script deleted" });
+      toast({ title: "Roteiro removido" });
     },
   });
 
@@ -37,13 +37,19 @@ export default function ScriptsPage() {
     detailed: "bg-green-500/10 text-green-700 dark:text-green-400",
   };
 
+  const typeLabels: Record<string, string> = {
+    synopsis: "Sinopse",
+    outline: "Esboço",
+    detailed: "Detalhado",
+  };
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between gap-4 flex-wrap p-6 pb-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight" data-testid="text-scripts-title">Scripts</h1>
+          <h1 className="text-2xl font-bold tracking-tight" data-testid="text-scripts-title">Roteiros</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            All scripts across your stories
+            Todos os roteiros vinculados às suas histórias
           </p>
         </div>
       </div>
@@ -84,17 +90,17 @@ export default function ScriptsPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge variant="secondary" className={typeColors[script.type] || ""}>
-                      {script.type}
+                      {typeLabels[script.type] || script.type}
                     </Badge>
                     <Badge variant="secondary">
-                      {script.origin === "ai" ? "AI" : "Manual"}
+                      {script.origin === "ai" ? "IA" : "Manual"}
                     </Badge>
                     <Button
                       size="icon"
                       variant="ghost"
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (window.confirm("Delete this script?")) deleteMutation.mutate(script.id);
+                        if (window.confirm("Remover este roteiro?")) deleteMutation.mutate(script.id);
                       }}
                       data-testid={`button-delete-script-${script.id}`}
                     >
@@ -110,9 +116,9 @@ export default function ScriptsPage() {
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-4">
               <FileText className="h-8 w-8 text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-semibold">No scripts yet</h3>
+            <h3 className="text-lg font-semibold">Nenhum roteiro encontrado</h3>
             <p className="text-sm text-muted-foreground mt-1 max-w-sm">
-              Scripts are created within stories. Go to a story to create one.
+              Os roteiros são criados dentro das histórias. Vá para uma história para criar um.
             </p>
           </div>
         )}

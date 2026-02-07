@@ -22,9 +22,9 @@ const statusColors: Record<string, string> = {
 };
 
 const statusLabels: Record<string, string> = {
-  draft: "Draft",
-  "in-development": "In Development",
-  finished: "Finished",
+  draft: "Rascunho",
+  "in-development": "Em Desenvolvimento",
+  finished: "Finalizado",
 };
 
 export default function StoriesPage() {
@@ -53,10 +53,10 @@ export default function StoriesPage() {
       setPremise("");
       setTone("");
       setStatus("draft");
-      toast({ title: "Story created successfully" });
+      toast({ title: "História criada com sucesso" });
     },
     onError: (err: Error) => {
-      toast({ title: "Failed to create story", description: err.message, variant: "destructive" });
+      toast({ title: "Erro ao criar história", description: err.message, variant: "destructive" });
     },
   });
 
@@ -70,38 +70,38 @@ export default function StoriesPage() {
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between gap-4 flex-wrap p-6 pb-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight" data-testid="text-stories-title">Stories</h1>
+          <h1 className="text-2xl font-bold tracking-tight" data-testid="text-stories-title">Histórias</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Manage your creative stories and narratives
+            Gerencie suas histórias e narrativas criativas
           </p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button data-testid="button-create-story">
               <Plus className="h-4 w-4 mr-2" />
-              New Story
+              Nova História
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Create New Story</DialogTitle>
+              <DialogTitle>Criar Nova História</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 pt-2">
               <div className="space-y-2">
-                <Label>Title</Label>
+                <Label>Título</Label>
                 <Input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Enter story title..."
+                  placeholder="Título da história..."
                   data-testid="input-story-title"
                 />
               </div>
               <div className="space-y-2">
-                <Label>Premise</Label>
+                <Label>Premissa</Label>
                 <Textarea
                   value={premise}
                   onChange={(e) => setPremise(e.target.value)}
-                  placeholder="What is this story about?"
+                  placeholder="Sobre o que é esta história?"
                   className="resize-none"
                   rows={3}
                   data-testid="input-story-premise"
@@ -109,11 +109,11 @@ export default function StoriesPage() {
               </div>
               <div className="flex gap-4">
                 <div className="flex-1 space-y-2">
-                  <Label>Tone / Genre</Label>
+                  <Label>Tom / Gênero</Label>
                   <Input
                     value={tone}
                     onChange={(e) => setTone(e.target.value)}
-                    placeholder="e.g. Dark Fantasy, Sci-Fi Comedy"
+                    placeholder="ex: Fantasia Épica, Ficção Científica"
                     data-testid="input-story-tone"
                   />
                 </div>
@@ -124,9 +124,9 @@ export default function StoriesPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="draft">Draft</SelectItem>
-                      <SelectItem value="in-development">In Development</SelectItem>
-                      <SelectItem value="finished">Finished</SelectItem>
+                      <SelectItem value="draft">Rascunho</SelectItem>
+                      <SelectItem value="in-development">Em Desenvolvimento</SelectItem>
+                      <SelectItem value="finished">Finalizado</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -137,7 +137,7 @@ export default function StoriesPage() {
                 disabled={!title.trim() || createMutation.isPending}
                 data-testid="button-submit-story"
               >
-                {createMutation.isPending ? "Creating..." : "Create Story"}
+                {createMutation.isPending ? "Criando..." : "Criar História"}
               </Button>
             </div>
           </DialogContent>
@@ -150,7 +150,7 @@ export default function StoriesPage() {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search stories..."
+            placeholder="Buscar histórias..."
             className="pl-9"
             data-testid="input-search-stories"
           />
@@ -195,7 +195,7 @@ export default function StoriesPage() {
                   {story.premise ? (
                     <p className="text-sm text-muted-foreground line-clamp-2">{story.premise}</p>
                   ) : (
-                    <p className="text-sm text-muted-foreground italic">No premise yet</p>
+                    <p className="text-sm text-muted-foreground italic">Sem premissa</p>
                   )}
                   {story.tone && (
                     <p className="text-xs text-muted-foreground mt-2">{story.tone}</p>
@@ -212,9 +212,9 @@ export default function StoriesPage() {
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-4">
               <BookOpen className="h-8 w-8 text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-semibold">No stories yet</h3>
+            <h3 className="text-lg font-semibold">Nenhuma história encontrada</h3>
             <p className="text-sm text-muted-foreground mt-1 max-w-sm">
-              Create your first story to start building your creative universe.
+              Crie sua primeira história para começar a construir seu universo criativo.
             </p>
           </div>
         )}
