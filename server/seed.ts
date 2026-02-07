@@ -172,5 +172,34 @@ Chapter 5: Breaking Through
     active: false,
   });
 
+  // Novos dados em PT-BR
+  const charPT1 = await storage.createCharacter({
+    userId,
+    name: "Beatriz Silva",
+    description: "Mulher na casa dos 40 anos, olhos expressivos e cabelos cacheados. Sempre carrega um caderno de couro gasto.",
+    personality: "Intuitiva, resiliente e extremamente observadora. Possui uma calma contagiante, mesmo em situações de crise.",
+    background: "Ex-professora de história que se tornou especialista em restauração de documentos antigos após encontrar um segredo de família.",
+    notes: "Fala fluentemente latim e francês. Adora chá de camomila.",
+    active: true,
+  });
+
+  const storyPT1 = await storage.createStory({
+    userId,
+    title: "O Segredo do Arquivo Nacional",
+    premise: "Beatriz Silva descobre um mapa oculto em um documento do século XVIII que aponta para um tesouro esquecido no coração da Amazônia.",
+    tone: "Aventura, Mistério",
+    status: "in-development",
+  });
+
+  await storage.addStoryCharacter({ storyId: storyPT1.id, characterId: charPT1.id });
+
+  await storage.createScript({
+    storyId: storyPT1.id,
+    title: "Sinopse - O Segredo do Arquivo Nacional",
+    type: "synopsis",
+    content: "A história começa quando Beatriz, ao restaurar um diário de um explorador português, encontra coordenadas geográficas escondidas sob uma camada de tinta invisível. Ela parte em uma jornada perigosa para validar sua descoberta.",
+    origin: "manual",
+  });
+
   console.log("Seed data created successfully");
 }
