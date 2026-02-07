@@ -213,7 +213,10 @@ export default function ProfilePage() {
                     placeholder="Pesquisar modelos..."
                     className="pl-9"
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      setSearchTerm(e.target.value);
+                    }}
                   />
                 </div>
                 <Button
