@@ -24,7 +24,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, BookOpen, Search, ChevronRight } from "lucide-react";
+import { Plus, BookOpen, Search, ChevronRight, Sparkles } from "lucide-react";
 import type { Story } from "@shared/schema";
 
 const statusColors: Record<string, string> = {
@@ -101,75 +101,86 @@ export default function StoriesPage() {
             Gerencie suas histórias e narrativas criativas
           </p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button data-testid="button-create-story">
-              <Plus className="mr-2 h-4 w-4" />
-              Nova História
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Criar Nova História</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 pt-2">
-              <div className="space-y-2">
-                <Label>Título</Label>
-                <Input
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Título da história..."
-                  data-testid="input-story-title"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Premissa</Label>
-                <Textarea
-                  value={premise}
-                  onChange={(e) => setPremise(e.target.value)}
-                  placeholder="Sobre o que é esta história?"
-                  className="resize-none"
-                  rows={3}
-                  data-testid="input-story-premise"
-                />
-              </div>
-              <div className="flex gap-4">
-                <div className="flex-1 space-y-2">
-                  <Label>Tom / Gênero</Label>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            className="border-primary/50 text-primary hover:bg-primary/5"
+            onClick={() => navigate("/wizard/idea")}
+            data-testid="button-wizard"
+          >
+            <Sparkles className="mr-2 h-4 w-4" />
+            Wizard de História
+          </Button>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button data-testid="button-create-story">
+                <Plus className="mr-2 h-4 w-4" />
+                Nova História
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Criar Nova História</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 pt-2">
+                <div className="space-y-2">
+                  <Label>Título</Label>
                   <Input
-                    value={tone}
-                    onChange={(e) => setTone(e.target.value)}
-                    placeholder="ex: Fantasia Épica, Ficção Científica"
-                    data-testid="input-story-tone"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="Título da história..."
+                    data-testid="input-story-title"
                   />
                 </div>
-                <div className="flex-1 space-y-2">
-                  <Label>Status</Label>
-                  <Select value={status} onValueChange={setStatus}>
-                    <SelectTrigger data-testid="select-story-status">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="draft">Rascunho</SelectItem>
-                      <SelectItem value="in-development">
-                        Em Desenvolvimento
-                      </SelectItem>
-                      <SelectItem value="finished">Finalizado</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div className="space-y-2">
+                  <Label>Premissa</Label>
+                  <Textarea
+                    value={premise}
+                    onChange={(e) => setPremise(e.target.value)}
+                    placeholder="Sobre o que é esta história?"
+                    className="resize-none"
+                    rows={3}
+                    data-testid="input-story-premise"
+                  />
                 </div>
+                <div className="flex gap-4">
+                  <div className="flex-1 space-y-2">
+                    <Label>Tom / Gênero</Label>
+                    <Input
+                      value={tone}
+                      onChange={(e) => setTone(e.target.value)}
+                      placeholder="ex: Fantasia Épica, Ficção Científica"
+                      data-testid="input-story-tone"
+                    />
+                  </div>
+                  <div className="flex-1 space-y-2">
+                    <Label>Status</Label>
+                    <Select value={status} onValueChange={setStatus}>
+                      <SelectTrigger data-testid="select-story-status">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="draft">Rascunho</SelectItem>
+                        <SelectItem value="in-development">
+                          Em Desenvolvimento
+                        </SelectItem>
+                        <SelectItem value="finished">Finalizado</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <Button
+                  className="w-full"
+                  onClick={() => createMutation.mutate()}
+                  disabled={!title.trim() || createMutation.isPending}
+                  data-testid="button-submit-story"
+                >
+                  {createMutation.isPending ? "Criando..." : "Criar História"}
+                </Button>
               </div>
-              <Button
-                className="w-full"
-                onClick={() => createMutation.mutate()}
-                disabled={!title.trim() || createMutation.isPending}
-                data-testid="button-submit-story"
-              >
-                {createMutation.isPending ? "Criando..." : "Criar História"}
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <div className="px-6 pb-4">

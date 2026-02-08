@@ -20,6 +20,9 @@ import ProfilePage from "@/pages/profile";
 import LandingPage from "@/pages/landing";
 import SignInPage from "@/pages/sign-in";
 import SignUpPage from "@/pages/sign-up";
+import WizardIdea from "@/pages/wizard/idea";
+import WizardCast from "@/pages/wizard/cast";
+import WizardScript from "@/pages/wizard/script";
 import { Loader2 } from "lucide-react";
 
 function Router() {
@@ -33,6 +36,9 @@ function Router() {
       <Route path="/prompts" component={PromptsPage} />
       <Route path="/executions" component={ExecutionsPage} />
       <Route path="/profile" component={ProfilePage} />
+      <Route path="/wizard/idea" component={WizardIdea} />
+      <Route path="/wizard/characters" component={WizardCast} />
+      <Route path="/wizard/script" component={WizardScript} />
       <Route component={NotFound} />
     </Switch>
   );

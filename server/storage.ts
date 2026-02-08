@@ -372,11 +372,19 @@ export class DatabaseStorage implements IStorage {
           eq(creativeProfiles.userId, userId),
           eq(creativeProfiles.active, true)
         )
-      );
+      )
+      .orderBy(desc(creativeProfiles.createdAt));
     return profile || undefined;
   }
 
   async createProfile(data: InsertCreativeProfile): Promise<CreativeProfile> {
+    if (data.active) {
+      // Ensure only one profile is active at a time
+      await db
+        .update(creativeProfiles)
+        .set({ active: false })
+        .where(eq(creativeProfiles.userId, data.userId));
+    }
     const [profile] = await db
       .insert(creativeProfiles)
       .values(data)
@@ -388,6 +396,20 @@ export class DatabaseStorage implements IStorage {
     id: number,
     data: Partial<InsertCreativeProfile>
   ): Promise<CreativeProfile | undefined> {
+    if (data.active) {
+      // Get the user ID first to deactivate other profiles
+      const [existing] = await db
+        .select()
+        .from(creativeProfiles)
+        .where(eq(creativeProfiles.id, id));
+
+      if (existing) {
+        await db
+          .update(creativeProfiles)
+          .set({ active: false })
+          .where(eq(creativeProfiles.userId, existing.userId));
+      }
+    }
     const [profile] = await db
       .update(creativeProfiles)
       .set(data)

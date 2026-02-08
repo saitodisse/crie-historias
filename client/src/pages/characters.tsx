@@ -50,77 +50,160 @@ const CharacterForm = ({
   isCreate: boolean;
   onSubmit: () => void;
   isPending: boolean;
-}) => (
-  <div className="space-y-4">
-    <div className="space-y-2">
-      <Label>Nome</Label>
-      <Input
-        value={form.name}
-        onChange={(e) => setForm({ ...form, name: e.target.value })}
-        placeholder="Nome do personagem..."
-        data-testid="input-char-name"
-      />
+}) => {
+  const [genPrompt, setGenPrompt] = useState("");
+  const { toast } = useToast();
+
+  const genMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", "/api/ai/generate", {
+        userPrompt: genPrompt,
+        type: "character-generation",
+      });
+      return res.json() as Promise<AIResult>;
+    },
+    onSuccess: (data) => {
+      try {
+        let jsonStr = data.result.trim();
+
+        // Remove markdown delimiters if strictly wrapping
+        if (jsonStr.startsWith("```json")) {
+          jsonStr = jsonStr.replace(/^```json/, "").replace(/```$/, "");
+        } else {
+          // Try to find JSON object structure
+          const firstBrace = jsonStr.indexOf("{");
+          const lastBrace = jsonStr.lastIndexOf("}");
+
+          if (firstBrace !== -1 && lastBrace !== -1) {
+            jsonStr = jsonStr.substring(firstBrace, lastBrace + 1);
+          }
+        }
+
+        const parsed = JSON.parse(jsonStr);
+        setForm({
+          ...form,
+          name: parsed.name || form.name,
+          description: parsed.description || form.description,
+          personality: parsed.personality || form.personality,
+          background: parsed.background || form.background,
+          notes: parsed.notes || form.notes,
+        });
+        toast({ title: "Personagem preenchido com IA!" });
+      } catch (e) {
+        console.error("JSON Parse Error:", e);
+        toast({
+          title: "Erro ao processar resposta da IA",
+          description: "O formato retornado não é válido. Tente novamente.",
+          variant: "destructive",
+        });
+      }
+    },
+    onError: (err: Error) => {
+      toast({
+        title: "Falha na geração",
+        description: err.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  return (
+    <div className="space-y-4">
+      {isCreate && (
+        <div className="space-y-3 rounded-lg border bg-muted/40 p-4">
+          <div className="flex items-center gap-2 text-sm font-medium text-primary">
+            <Sparkles className="h-4 w-4" />
+            <span>Preencher com IA (Mágica)</span>
+          </div>
+          <Textarea
+            value={genPrompt}
+            onChange={(e) => setGenPrompt(e.target.value)}
+            placeholder="Ex: Mônica da Turma da Mônica, menina forte e dentuça..."
+            className="resize-none bg-background"
+            rows={2}
+          />
+          <Button
+            variant="secondary"
+            size="sm"
+            className="w-full"
+            onClick={() => genMutation.mutate()}
+            disabled={!genPrompt.trim() || genMutation.isPending}
+          >
+            {genMutation.isPending ? "Gerando..." : "Preencher Campos"}
+          </Button>
+        </div>
+      )}
+
+      <div className="space-y-2">
+        <Label>Nome</Label>
+        <Input
+          value={form.name}
+          onChange={(e) => setForm({ ...form, name: e.target.value })}
+          placeholder="Nome do personagem..."
+          data-testid="input-char-name"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label>Descrição Física</Label>
+        <Textarea
+          value={form.description}
+          onChange={(e) => setForm({ ...form, description: e.target.value })}
+          placeholder="Aparência, porte físico, características marcantes..."
+          rows={2}
+          className="resize-none"
+          data-testid="input-char-description"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label>Personalidade</Label>
+        <Textarea
+          value={form.personality}
+          onChange={(e) => setForm({ ...form, personality: e.target.value })}
+          placeholder="Traços, temperamento, peculiaridades..."
+          rows={2}
+          className="resize-none"
+          data-testid="input-char-personality"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label>Histórico (Background)</Label>
+        <Textarea
+          value={form.background}
+          onChange={(e) => setForm({ ...form, background: e.target.value })}
+          placeholder="História de vida, motivações, segredos..."
+          rows={2}
+          className="resize-none"
+          data-testid="input-char-background"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label>Notas</Label>
+        <Textarea
+          value={form.notes}
+          onChange={(e) => setForm({ ...form, notes: e.target.value })}
+          placeholder="Notas adicionais..."
+          rows={2}
+          className="resize-none"
+          data-testid="input-char-notes"
+        />
+      </div>
+      <Button
+        className="w-full"
+        onClick={onSubmit}
+        disabled={!form.name.trim() || isPending}
+        data-testid="button-submit-character"
+      >
+        {isCreate
+          ? isPending
+            ? "Criando..."
+            : "Criar Personagem"
+          : isPending
+            ? "Salvando..."
+            : "Salvar Alterações"}
+      </Button>
     </div>
-    <div className="space-y-2">
-      <Label>Descrição Física</Label>
-      <Textarea
-        value={form.description}
-        onChange={(e) => setForm({ ...form, description: e.target.value })}
-        placeholder="Aparência, porte físico, características marcantes..."
-        rows={2}
-        className="resize-none"
-        data-testid="input-char-description"
-      />
-    </div>
-    <div className="space-y-2">
-      <Label>Personalidade</Label>
-      <Textarea
-        value={form.personality}
-        onChange={(e) => setForm({ ...form, personality: e.target.value })}
-        placeholder="Traços, temperamento, peculiaridades..."
-        rows={2}
-        className="resize-none"
-        data-testid="input-char-personality"
-      />
-    </div>
-    <div className="space-y-2">
-      <Label>Histórico (Background)</Label>
-      <Textarea
-        value={form.background}
-        onChange={(e) => setForm({ ...form, background: e.target.value })}
-        placeholder="História de vida, motivações, segredos..."
-        rows={2}
-        className="resize-none"
-        data-testid="input-char-background"
-      />
-    </div>
-    <div className="space-y-2">
-      <Label>Notas</Label>
-      <Textarea
-        value={form.notes}
-        onChange={(e) => setForm({ ...form, notes: e.target.value })}
-        placeholder="Notas adicionais..."
-        rows={2}
-        className="resize-none"
-        data-testid="input-char-notes"
-      />
-    </div>
-    <Button
-      className="w-full"
-      onClick={onSubmit}
-      disabled={!form.name.trim() || isPending}
-      data-testid="button-submit-character"
-    >
-      {isCreate
-        ? isPending
-          ? "Criando..."
-          : "Criar Personagem"
-        : isPending
-          ? "Salvando..."
-          : "Salvar Alterações"}
-    </Button>
-  </div>
-);
+  );
+};
 
 export default function CharactersPage() {
   const [search, setSearch] = useState("");

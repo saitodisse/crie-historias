@@ -1,4 +1,5 @@
 import type { Express, Request, Response } from "express";
+import { z } from "zod";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import OpenAI from "openai";
@@ -461,11 +462,14 @@ export async function registerRoutes(
   app.post("/api/ai/generate", isAuthenticated, async (req, res) => {
     try {
       const user = await getAppUser(req);
-      const { storyId, characterId, scriptId, promptId, userPrompt, type } =
+      let { storyId, characterId, scriptId, promptId, userPrompt, type } =
         req.body;
 
       const profile = await storage.getActiveProfile(user.id);
-      const model = profile?.model || "gpt-5-mini";
+      console.log(
+        `[AI Generate] Type: ${type}, User: ${user.id}, Profile: ${profile ? `${profile.name} (ID: ${profile.id}, Model: ${profile.model})` : "Default (No active profile)"}`
+      );
+      const model = profile?.model || "gpt-4o-mini";
       const maxTokens = profile?.maxTokens || 2048;
       const parsedTemp = profile?.temperature
         ? parseFloat(profile.temperature)
@@ -475,11 +479,38 @@ export async function registerRoutes(
         : Math.max(0, Math.min(2, parsedTemp));
 
       let contextParts: string[] = [];
-      let systemPrompt =
-        "Você é um assistente de escrita criativa habilidoso. ";
+      let systemPrompt = "";
 
-      if (profile?.narrativeStyle) {
-        systemPrompt += `Escreva neste estilo: ${profile.narrativeStyle}. `;
+      if (type === "wizard-idea") {
+        systemPrompt =
+          "Você é um especialista em estruturação de histórias (Story Architect). Sua tarefa é expandir ideias embrionárias em títulos cativantes e premissas sólidas, mantendo um diálogo construtivo com o autor através de perguntas inteligentes. Sempre peça feedback ou faça perguntas ao final.";
+      } else if (type === "wizard-script") {
+        systemPrompt =
+          "Você é um roteirista profissional. Sua tarefa é produzir roteiros completos e detalhados seguindo o formato e estilo solicitados, respeitando fielmente o contexto dos personagens e da história fornecidos.";
+      } else if (type === "character-generation") {
+        systemPrompt =
+          "ATENÇÃO: GERAÇÃO DE DADOS ESTRUTURADOS.\n" +
+          "Sua tarefa é gerar um perfil de personagem em JSON válido.\n\n" +
+          "SCHEMA ESPERADO (TypeScript):\n" +
+          "{\n" +
+          "  name: string; // Nome do personagem\n" +
+          "  description?: string; // Aparência física\n" +
+          "  personality?: string; // Traços de personalidade\n" +
+          "  background?: string; // História de fundo\n" +
+          "  notes?: string; // Notas adicionais\n" +
+          "}\n\n" +
+          "Retorne APENAS o JSON. Sem blocos de código markdown. Sem conversa.";
+      } else {
+        systemPrompt = "Você é um assistente de escrita criativa habilidoso. ";
+      }
+
+      if (profile?.narrativeStyle && type !== "character-generation") {
+        systemPrompt += ` Escreva neste estilo predominante: ${profile.narrativeStyle}.`;
+      }
+
+      // For character generation, append explicit JSON instruction to user prompt as well to override any model tendencies
+      if (type === "character-generation") {
+        userPrompt = `${userPrompt}\n\nIMPORTANTE: Retorne APENAS um JSON válido.`;
       }
 
       let story, character, script, promptRecord;
@@ -530,7 +561,7 @@ export async function registerRoutes(
         }
       }
 
-      const finalPrompt =
+      let currentPrompt =
         contextParts.length > 0
           ? `Contexto:\n${contextParts.join("\n")}\n\nSolicitação: ${userPrompt}`
           : userPrompt;
@@ -539,59 +570,131 @@ export async function registerRoutes(
       const isGemini = model.startsWith("gemini");
       const isOpenRouter = model.includes("/");
 
-      if (isGemini) {
-        if (!user?.geminiKey)
-          throw new Error(
-            "Chave de API do Gemini não configurada. Configure nas preferências do perfil."
-          );
-        const genAI = new GoogleGenerativeAI(decrypt(user.geminiKey));
-        const geminiModel = genAI.getGenerativeModel({ model });
-        const geminiResult = await geminiModel.generateContent({
-          contents: [
-            {
-              role: "user",
-              parts: [{ text: `${systemPrompt}\n\n${finalPrompt}` }],
-            },
-          ],
-          generationConfig: { maxOutputTokens: maxTokens, temperature },
-        });
-        result = geminiResult.response.text();
-      } else if (isOpenRouter) {
-        const apiKey = user?.openrouterKey ? decrypt(user.openrouterKey) : null;
-        if (!apiKey)
-          throw new Error("Chave de API do OpenRouter não configurada");
-        const aiClient = new OpenAI({
-          apiKey,
-          baseURL: "https://openrouter.ai/api/v1",
-        });
-        const completion = await aiClient.chat.completions.create({
-          model,
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: finalPrompt },
-          ],
-          max_tokens: maxTokens,
-          temperature,
-        });
-        result = completion.choices[0]?.message?.content || "";
-      } else {
-        const apiKey = user?.openaiKey
-          ? decrypt(user.openaiKey)
-          : process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
-        const baseURL = user?.openaiKey
-          ? "https://api.openai.com/v1"
-          : process.env.AI_INTEGRATIONS_OPENAI_BASE_URL;
-        const aiClient = new OpenAI({ apiKey, baseURL });
-        const completion = await aiClient.chat.completions.create({
-          model,
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: finalPrompt },
-          ],
-          max_tokens: maxTokens,
-          temperature,
-        });
-        result = completion.choices[0]?.message?.content || "";
+      const maxRetries = type === "character-generation" ? 3 : 1;
+      let attempts = 0;
+
+      while (attempts < maxRetries) {
+        attempts++;
+        try {
+          if (isGemini) {
+            if (!user?.geminiKey)
+              throw new Error(
+                "Chave de API do Gemini não configurada. Configure nas preferências do perfil."
+              );
+            const genAI = new GoogleGenerativeAI(decrypt(user.geminiKey));
+            const geminiModel = genAI.getGenerativeModel({ model });
+            const geminiResult = await geminiModel.generateContent({
+              contents: [
+                {
+                  role: "user",
+                  parts: [{ text: `${systemPrompt}\n\n${currentPrompt}` }],
+                },
+              ],
+              generationConfig: { maxOutputTokens: maxTokens, temperature },
+            });
+            result = geminiResult.response.text();
+          } else if (isOpenRouter) {
+            const apiKey = user?.openrouterKey
+              ? decrypt(user.openrouterKey)
+              : null;
+            if (!apiKey)
+              throw new Error("Chave de API do OpenRouter não configurada");
+            const aiClient = new OpenAI({
+              apiKey,
+              baseURL: "https://openrouter.ai/api/v1",
+            });
+            const completion = await aiClient.chat.completions.create({
+              model,
+              messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: currentPrompt },
+              ],
+              max_tokens: maxTokens,
+              temperature,
+              response_format:
+                type === "character-generation"
+                  ? { type: "json_object" }
+                  : undefined,
+            });
+            result = completion.choices[0]?.message?.content || "";
+          } else {
+            const apiKey = user?.openaiKey
+              ? decrypt(user.openaiKey)
+              : process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
+            const baseURL = user?.openaiKey
+              ? "https://api.openai.com/v1"
+              : process.env.AI_INTEGRATIONS_OPENAI_BASE_URL;
+            const aiClient = new OpenAI({ apiKey, baseURL });
+            const completion = await aiClient.chat.completions.create({
+              model,
+              messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: currentPrompt },
+              ],
+              max_tokens: maxTokens,
+              temperature,
+              response_format:
+                type === "character-generation"
+                  ? { type: "json_object" }
+                  : undefined,
+            });
+            result = completion.choices[0]?.message?.content || "";
+          }
+
+          if (type === "character-generation") {
+            try {
+              let jsonStr = result
+                .replace(/```json/g, "")
+                .replace(/```/g, "")
+                .trim();
+
+              const firstBrace = jsonStr.indexOf("{");
+              const lastBrace = jsonStr.lastIndexOf("}");
+
+              if (firstBrace !== -1 && lastBrace !== -1) {
+                jsonStr = jsonStr.substring(firstBrace, lastBrace + 1);
+              }
+
+              const parsed = JSON.parse(jsonStr);
+
+              const charSchema = z.object({
+                name: z.string(),
+                description: z.string().nullable().optional(),
+                personality: z.string().nullable().optional(),
+                background: z.string().nullable().optional(),
+                notes: z.string().nullable().optional(),
+              });
+
+              charSchema.parse(parsed);
+
+              // Success!
+              result = JSON.stringify(parsed);
+              break;
+            } catch (e: any) {
+              console.log(
+                `JSON Validation failed (attempt ${attempts}/${maxRetries}):`,
+                e.message
+              );
+              if (attempts >= maxRetries) {
+                // Even if it failed validation, we return the raw result so the user sees something happened,
+                // or we could throw. But returning raw allows the frontend to maybe show the error.
+                // Actually the user wants correct JSON.
+                // If all retries fail, we accept the last result but log it.
+                console.error("All retries failed for JSON generation");
+              } else {
+                currentPrompt += `\n\nERRO: Sua resposta anterior não foi um JSON válido ou não seguiu o schema. Erro: ${e.message}. \nRetorne APENAS o JSON corrigido.`;
+                continue; // Retry
+              }
+            }
+          }
+
+          break; // If not character generation or success
+        } catch (error) {
+          if (attempts >= maxRetries) throw error;
+          // If network error, maybe retry?
+          // For now only retrying on JSON validation logic as requested.
+          throw error;
+        }
       }
 
       const execution = await storage.createExecution({
@@ -602,7 +705,7 @@ export async function registerRoutes(
         characterId: characterId || null,
         systemPromptSnapshot: systemPrompt,
         userPrompt,
-        finalPrompt,
+        finalPrompt: currentPrompt,
         model,
         parameters: { maxTokens, temperature, model },
         result,
@@ -656,6 +759,7 @@ export async function registerRoutes(
         characters,
       } = await import("@shared/schema");
       const { seedDatabase } = await import("./seed");
+      const { seedWizardTemplates } = await import("./seed-wizard");
       const { eq, inArray } = await import("drizzle-orm");
 
       // Delete user-specific data
@@ -690,6 +794,7 @@ export async function registerRoutes(
       await db.delete(characters).where(eq(characters.userId, user.id));
 
       await seedDatabase(user.id);
+      await seedWizardTemplates(user.id);
       res.json({ success: true });
     } catch (error: any) {
       console.error("Factory reset error:", error);
