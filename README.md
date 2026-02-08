@@ -2,30 +2,20 @@
 
 ## Estudio de Escrita Criativa
 
-### StoryForge
-
-Plataforma de escrita criativa assistida por inteligencia artificial para gerenciamento de historias, personagens e roteiros, com observabilidade completa das chamadas de IA. Interface em portugues brasileiro (PT-BR).
-
-```sh
-# para liberar porta (ex: 5000) ocupada
-Get-Process -Id (Get-NetTCPConnection -LocalPort 5000).OwningProcess | Stop-Process -Force
-
-# para criar banco de dados
-$env:PGPASSWORD='xxxxxx'; & "C:\Program Files\PostgreSQL\18\bin\psql.exe" -U postgres -h localhost -c "CREATE DATABASE storyforge;"
-```
+AI-powered creative writing platform for managing stories, characters, and scripts with full prompt auditability. Supports OpenAI, Gemini, and OpenRouter with user-managed API keys (AES-256-CBC encrypted). Interface em português brasileiro (PT-BR).
 
 ---
 
-## Atualizacao: Execucao Local (sem Replit)
+## Execução Local
 
-O projeto foi preparado para rodar localmente com PostgreSQL/Neon e autenticacao via Clerk (com fallback local para desenvolvimento).
+O projeto utiliza PostgreSQL/Neon e autenticação via Clerk (com fallback local para desenvolvimento).
 
 - **Banco**: PostgreSQL via `DATABASE_URL` (Neon recomendado).
 - **Auth**:
   - Com `CLERK_SECRET_KEY` + `VITE_CLERK_PUBLISHABLE_KEY`: usa Clerk.
-  - Sem essas variaveis: usa usuario local de desenvolvimento automaticamente.
+  - Sem essas variáveis: usa usuário local de desenvolvimento automaticamente.
 
-Setup rapido:
+### Setup Rápido
 
 ```bash
 npm install
@@ -142,13 +132,13 @@ Servidor (Express.js + TypeScript)
     |-- Rotas REST API
     |-- Clerk Auth (com fallback local em desenvolvimento)
     |-- Drizzle ORM
-    |-- Integracao IA (OpenAI / Gemini / OpenRouter)
+    |-- Integração IA (OpenAI / Gemini / OpenRouter)
     |
     v
 PostgreSQL (Neon)
 ```
 
-O frontend e o backend rodam no mesmo servidor Express na porta 5000. Em desenvolvimento, o Vite serve o frontend com HMR. Em producao, os assets sao pre-compilados e servidos como arquivos estaticos.
+O frontend e o backend rodam no mesmo servidor Express na porta 5000. Em desenvolvimento, o Vite serve o frontend com HMR. Em produção, os assets são pré-compilados e servidos como arquivos estáticos.
 
 ---
 
@@ -234,14 +224,10 @@ root/
 │   ├── storage.ts                     # Interface IStorage + DatabaseStorage
 │   ├── crypto.ts                      # Encrypt/decrypt AES-256-CBC
 │   ├── seed.ts                        # Dados iniciais realistas
-│   ├── vite.ts                        # Configuracao Vite para dev/prod
 │   └── auth/
 │       └── index.ts                   # Auth Clerk + fallback local + rotas /api/auth/user
 ├── shared/
-│   ├── schema.ts                      # Schema Drizzle + Zod + tipos
-│   └── models/
-│       ├── auth.ts                    # Schema da tabela auth_users
-│       └── chat.ts                    # Schema de conversas/mensagens
+│   └── schema.ts                      # Schema Drizzle + Zod + tipos
 ├── package.json
 ├── tsconfig.json
 ├── tailwind.config.ts
@@ -261,7 +247,7 @@ users                    stories                  characters
 ├── username             ├── userId (FK → users)   ├── userId (FK → users)
 ├── password             ├── title                 ├── name
 ├── displayName          ├── premise               ├── description
-├── replitId (unique)    ├── tone                  ├── personality
+├── externalAuthId       ├── tone                  ├── personality
 ├── openaiKey (enc.)     ├── status                ├── background
 ├── geminiKey (enc.)     ├── createdAt             ├── notes
 └── openrouterKey (enc.) └── updatedAt             ├── active
@@ -323,7 +309,7 @@ auth_users                      sessions
 ## Autenticacao
 
 O StoryForge utiliza **Clerk** quando as variaveis de ambiente do Clerk estao definidas.
-Sem Clerk, entra automaticamente em modo local (usuario de desenvolvimento), o que facilita execucao fora do Replit.
+Sem Clerk, entra automaticamente em modo local (usuario de desenvolvimento), o que facilita a execução local.
 
 1. Em modo Clerk, o usuario acessa `/sign-in` ou `/sign-up`
 2. O backend valida autenticacao e extrai `userId` do Clerk
@@ -336,12 +322,11 @@ Sem Clerk, entra automaticamente em modo local (usuario de desenvolvimento), o q
 
 ### Provedores Suportados
 
-| Provedor                   | Configuracao                          | Modelos                                |
-| -------------------------- | ------------------------------------- | -------------------------------------- |
-| **OpenAI** (Replit AI)     | Automatica via Replit AI Integrations | gpt-5-mini, gpt-5-nano, etc.           |
-| **OpenAI** (chave propria) | Chave informada pelo usuario          | Todos os modelos OpenAI                |
-| **Google Gemini**          | Chave informada pelo usuario          | gemini-2.5-flash, gemini-2.5-pro, etc. |
-| **OpenRouter**             | Chave informada pelo usuario          | 100+ modelos de diversos provedores    |
+| Provedor                   | Configuracao                 | Modelos                             |
+| -------------------------- | ---------------------------- | ----------------------------------- |
+| **OpenAI** (chave própria) | Chave informada pelo usuário | Todos os modelos OpenAI             |
+| **Google Gemini**          | Chave informada pelo usuario | Modelos Gemini 1.5 e 2.0            |
+| **OpenRouter**             | Chave informada pelo usuario | 100+ modelos de diversos provedores |
 
 ### Fluxo de Geracao
 
@@ -564,20 +549,19 @@ npm run check
 
 ## Variaveis de Ambiente
 
-| Variavel                          | Obrigatoria | Descricao                                             |
-| --------------------------------- | ----------- | ----------------------------------------------------- |
-| `DATABASE_URL`                    | Sim         | URL de conexao PostgreSQL                             |
-| `ENCRYPTION_KEY`                  | Sim         | Chave para criptografia AES-256-CBC das chaves de API |
-| `CLERK_SECRET_KEY`                | Nao         | Habilita autenticacao Clerk no backend                |
-| `VITE_CLERK_PUBLISHABLE_KEY`      | Nao         | Habilita telas de sign-in/sign-up no frontend         |
-| `DEV_AUTH_USER_ID`                | Nao         | ID do usuario local (fallback sem Clerk)              |
-| `AI_INTEGRATIONS_OPENAI_API_KEY`  | Nao         | Chave OpenAI via Replit AI Integrations (automatica)  |
-| `AI_INTEGRATIONS_OPENAI_BASE_URL` | Nao         | Base URL da integracao OpenAI (automatica)            |
-| `PGHOST`                          | Auto        | Host do PostgreSQL                                    |
-| `PGPORT`                          | Auto        | Porta do PostgreSQL                                   |
-| `PGUSER`                          | Auto        | Usuario do PostgreSQL                                 |
-| `PGPASSWORD`                      | Auto        | Senha do PostgreSQL                                   |
-| `PGDATABASE`                      | Auto        | Nome do banco PostgreSQL                              |
+| Variavel                     | Obrigatoria | Descricao                                             |
+| ---------------------------- | ----------- | ----------------------------------------------------- |
+| `DATABASE_URL`               | Sim         | URL de conexao PostgreSQL                             |
+| `ENCRYPTION_KEY`             | Sim         | Chave para criptografia AES-256-CBC das chaves de API |
+| `CLERK_SECRET_KEY`           | Nao         | Habilita autenticacao Clerk no backend                |
+| `VITE_CLERK_PUBLISHABLE_KEY` | Nao         | Habilita telas de sign-in/sign-up no frontend         |
+| `DEV_AUTH_USER_ID`           | Nao         | ID do usuario local (fallback sem Clerk)              |
+
+| `PGHOST` | Auto | Host do PostgreSQL |
+| `PGPORT` | Auto | Porta do PostgreSQL |
+| `PGUSER` | Auto | Usuario do PostgreSQL |
+| `PGPASSWORD` | Auto | Senha do PostgreSQL |
+| `PGDATABASE` | Auto | Nome do banco PostgreSQL |
 
 ---
 

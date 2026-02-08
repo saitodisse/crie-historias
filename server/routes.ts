@@ -3,6 +3,7 @@ import { z } from "zod";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import OpenAI from "openai";
+import { GoogleBillingService } from "./services/googleBilling";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { encrypt, decrypt } from "./crypto";
 import { getAuthUser, isAuthenticated } from "./auth";
@@ -14,10 +15,8 @@ import {
   insertCreativeProfileSchema,
 } from "@shared/schema";
 
-const openai = new OpenAI({
-  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
-  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
-});
+// Global OpenAI instance removed to enforce using user-specific keys from DB
+// const openai = new OpenAI({ ... });
 
 function toInt(value: string | string[]): number {
   const raw = Array.isArray(value) ? value[0] : value;
@@ -381,13 +380,20 @@ export async function registerRoutes(
       const user = await getAppUser(req);
 
       if (provider === "openai") {
-        const apiKey = user?.openaiKey
-          ? decrypt(user.openaiKey)
-          : process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
-        const baseURL = user?.openaiKey
-          ? "https://api.openai.com/v1"
-          : process.env.AI_INTEGRATIONS_OPENAI_BASE_URL;
-        const client = new OpenAI({ apiKey, baseURL });
+        const apiKey = user?.openaiKey ? decrypt(user.openaiKey) : null;
+        const baseURL = user?.openaiKey ? "https://api.openai.com/v1" : null;
+
+        if (!apiKey) {
+          return res.status(400).json({
+            error:
+              "Chave da OpenAI não configurada. Por favor, adicione sua chave nas configurações.",
+          });
+        }
+
+        const client = new OpenAI({
+          apiKey,
+          baseURL: baseURL || "https://api.openai.com/v1",
+        });
         const list = await client.models.list();
         const models = [];
         const pricing: Record<string, string> = {
@@ -412,18 +418,34 @@ export async function registerRoutes(
         res.json(models);
       } else if (provider === "gemini") {
         const apiKey = user?.geminiKey ? decrypt(user.geminiKey) : null;
-        const pricingInfo = " (Grátis/Tiered)";
+        // Fetch pricing using User Key (if available) or Server Service Account (fallback)
+        const dynamicPricing = await GoogleBillingService.getGeminiPricing(
+          apiKey || undefined
+        );
+        const defaultPricing = " (Grátis/Tiered)";
+
         if (!apiKey) {
-          return res.json([
-            { id: "gemini-2.0-flash", name: "Gemini 2.0 Flash" + pricingInfo },
-            {
-              id: "gemini-2.0-flash-lite",
-              name: "Gemini 2.0 Flash Lite" + pricingInfo,
-            },
-            { id: "gemini-1.5-flash", name: "Gemini 1.5 Flash" + pricingInfo },
-            { id: "gemini-1.5-pro", name: "Gemini 1.5 Pro" + pricingInfo },
-            { id: "gemini-pro", name: "Gemini Pro" + pricingInfo },
-          ]);
+          // Even without a User API Key, we can show dynamic pricing if the server has a Service Account
+          const fallbackModels = [
+            "gemini-2.0-flash",
+            "gemini-2.0-flash-lite",
+            "gemini-1.5-flash",
+            "gemini-1.5-pro",
+            "gemini-pro",
+          ];
+          return res.json(
+            fallbackModels.map((id) => {
+              // Convert ID to display name (simple logic or use a map if needed)
+              const name = id
+                .split("-")
+                .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                .join(" ");
+              return {
+                id,
+                name: name + (dynamicPricing[id] || defaultPricing),
+              };
+            })
+          );
         }
         const resp = await fetch(
           `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`
@@ -434,11 +456,14 @@ export async function registerRoutes(
           .filter((m: any) =>
             m.supportedGenerationMethods?.includes("generateContent")
           )
-          .map((m: any) => ({
-            id: m.name.replace("models/", ""),
-            name:
-              (m.displayName || m.name.replace("models/", "")) + pricingInfo,
-          }));
+          .map((m: any) => {
+            const id = m.name.replace("models/", "");
+            const pricing = dynamicPricing[id] || defaultPricing;
+            return {
+              id,
+              name: (m.displayName || id) + pricing,
+            };
+          });
         res.json(models);
       } else if (provider === "openrouter") {
         const resp = await fetch("https://openrouter.ai/api/v1/models");
@@ -618,13 +643,21 @@ export async function registerRoutes(
             });
             result = completion.choices[0]?.message?.content || "";
           } else {
-            const apiKey = user?.openaiKey
-              ? decrypt(user.openaiKey)
-              : process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
+            const apiKey = user?.openaiKey ? decrypt(user.openaiKey) : null;
             const baseURL = user?.openaiKey
               ? "https://api.openai.com/v1"
-              : process.env.AI_INTEGRATIONS_OPENAI_BASE_URL;
-            const aiClient = new OpenAI({ apiKey, baseURL });
+              : null;
+
+            if (!apiKey) {
+              throw new Error(
+                "Chave da OpenAI não configurada. Por favor, adicione sua chave nas configurações."
+              );
+            }
+
+            const aiClient = new OpenAI({
+              apiKey,
+              baseURL: baseURL || "https://api.openai.com/v1",
+            });
             const completion = await aiClient.chat.completions.create({
               model,
               messages: [
