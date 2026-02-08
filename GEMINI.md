@@ -19,7 +19,7 @@ This document provides a summary of the "Crie Histórias" project, intended for 
 **Architecture:**
 The application follows a client-server architecture:
 *   **Client (Frontend):** Built with React + Vite, using TanStack Query for data fetching, wouter for routing, and `shadcn/ui` with Tailwind CSS for UI components and styling.
-*   **Server (Backend):** Developed with Express.js + TypeScript, handling REST API routes, Replit Auth (OIDC + Passport), Drizzle ORM for database interactions, and integration with various AI providers (OpenAI, Gemini, OpenRouter).
+*   **Server (Backend):** Developed with Express.js + TypeScript, handling REST API routes, Authentication (Clerk + Local Fallback), Drizzle ORM for database interactions, and integration with various AI providers (OpenAI, Gemini, OpenRouter).
 *   **Database:** PostgreSQL (Neon) is used for data persistence.
 
 The frontend and backend run on the same Express server on port 5000. In development, Vite serves the frontend with HMR; in production, assets are pre-compiled and served statically.
@@ -42,7 +42,7 @@ The frontend and backend run on the same Express server on port 5000. In develop
 *   **Express 5:** HTTP framework
 *   **TypeScript:** Static typing
 *   **Drizzle ORM & drizzle-zod:** ORM for PostgreSQL and schema validation
-*   **Passport.js & openid-client:** Authentication via OIDC (Replit Auth)
+*   **Clerk & Local Auth:** Hybrid authentication (Cloud or Local)
 *   **connect-pg-simple:** PostgreSQL sessions
 *   **OpenAI SDK & @google/generative-ai:** AI provider clients
 *   **Node.js crypto:** AES-256-CBC encryption
@@ -98,6 +98,6 @@ npm run check
 *   **Styling:** Utilizes Tailwind CSS for utility-first styling and `shadcn/ui` components built on Radix UI primitives. Full dark mode support.
 *   **Code Structure:** Follows a clear client/server separation, with shared schemas and models.
 *   **Typing:** Strongly typed using TypeScript across both frontend and backend.
-*   **Authentication:** Leverages Replit Auth via OIDC, with user sessions stored in PostgreSQL.
+*   **Authentication:** Leverages Clerk (Cloud) or Local Fallback (Development), with user sessions stored in PostgreSQL.
 *   **API Keys:** User-provided API keys are encrypted using AES-256-CBC and decrypted only at the point of use.
 *   **Database:** Uses Drizzle ORM for type-safe database interactions and schema management.
