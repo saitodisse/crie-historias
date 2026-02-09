@@ -7,6 +7,7 @@ import {
   prompts,
   creativeProfiles,
   aiExecutions,
+  scriptPrompts,
   type User,
   type InsertUser,
   type Project,
@@ -82,6 +83,10 @@ export interface IStorage {
     data: Partial<InsertPrompt>
   ): Promise<Prompt | undefined>;
   deletePrompt(id: number): Promise<void>;
+  getPromptsByIds(ids: number[]): Promise<Prompt[]>;
+
+  getScriptPrompts(scriptId: number): Promise<number[]>;
+  updateScriptPrompts(scriptId: number, promptIds: number[]): Promise<void>;
 
   getProfiles(userId: number): Promise<CreativeProfile[]>;
   getActiveProfile(userId: number): Promise<CreativeProfile | undefined>;
@@ -309,7 +314,32 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteScript(id: number): Promise<void> {
+    await db.delete(scriptPrompts).where(eq(scriptPrompts.scriptId, id));
     await db.delete(scripts).where(eq(scripts.id, id));
+  }
+
+  async getScriptPrompts(scriptId: number): Promise<number[]> {
+    const results = await db
+      .select()
+      .from(scriptPrompts)
+      .where(eq(scriptPrompts.scriptId, scriptId));
+    return results.map((r) => r.promptId);
+  }
+
+  async updateScriptPrompts(
+    scriptId: number,
+    promptIds: number[]
+  ): Promise<void> {
+    // Basic sync: delete and re-insert
+    await db.delete(scriptPrompts).where(eq(scriptPrompts.scriptId, scriptId));
+    if (promptIds.length > 0) {
+      await db.insert(scriptPrompts).values(
+        promptIds.map((pid) => ({
+          scriptId,
+          promptId: pid,
+        }))
+      );
+    }
   }
 
   async getPrompts(userId: number): Promise<Prompt[]> {
@@ -359,7 +389,19 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deletePrompt(id: number): Promise<void> {
+    await db.delete(scriptPrompts).where(eq(scriptPrompts.promptId, id));
     await db.delete(prompts).where(eq(prompts.id, id));
+  }
+
+  async getPromptsByIds(ids: number[]): Promise<Prompt[]> {
+    if (ids.length === 0) return [];
+    // Using simple loop or inArray if available. Since it's a small list, loop is safe.
+    const results: Prompt[] = [];
+    for (const id of ids) {
+      const p = await this.getPrompt(id);
+      if (p) results.push(p);
+    }
+    return results;
   }
 
   async getProfiles(userId: number): Promise<CreativeProfile[]> {

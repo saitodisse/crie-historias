@@ -12,6 +12,7 @@ import { Send, Sparkles, ChevronRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { Markdown } from "@/components/markdown";
 import type { Project, AIExecution } from "@shared/schema";
 
 interface AIResult {
@@ -138,6 +139,10 @@ export default function WizardIdea() {
   const handleStart = () => {
     if (!initialIdea.trim()) return;
     const initialMsg = { role: "user" as const, content: initialIdea };
+    console.log(
+      "[Wizard Event] Start Idea Generation",
+      JSON.stringify(initialMsg, null, 2)
+    );
     setMessages([initialMsg]);
     // Create Project first
     createProjectMutation.mutate(initialIdea);
@@ -145,7 +150,12 @@ export default function WizardIdea() {
 
   const handleSendChat = () => {
     if (!chatInput.trim() || !projectId) return;
-    setMessages((prev) => [...prev, { role: "user", content: chatInput }]);
+    const userMsg = { role: "user" as const, content: chatInput };
+    console.log(
+      "[Wizard Event] Sending Refinement",
+      JSON.stringify(userMsg, null, 2)
+    );
+    setMessages((prev) => [...prev, userMsg]);
     const prompt = `Minha resposta/refinamento: ${chatInput}\n\nCom base nisso, atualize a Premissa e o Título se necessário, e continue o refinamento com novas perguntas se precisar.`;
     generateMutation.mutate({ prompt, sId: projectId });
     setChatInput("");
@@ -201,8 +211,16 @@ export default function WizardIdea() {
                         : "mr-auto rounded-tl-none bg-muted text-foreground"
                     )}
                   >
-                    <div className="prose prose-sm whitespace-pre-wrap dark:prose-invert">
-                      {m.content}
+                    <div className="max-w-full">
+                      {m.role === "ai" ? (
+                        <Markdown className="prose-sm dark:prose-invert">
+                          {m.content}
+                        </Markdown>
+                      ) : (
+                        <div className="whitespace-pre-wrap font-sans">
+                          {m.content}
+                        </div>
+                      )}
                     </div>
                   </motion.div>
                 ))}

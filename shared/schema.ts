@@ -128,6 +128,7 @@ export const scriptsRelations = relations(scripts, ({ one, many }) => ({
     references: [projects.id],
   }),
   aiExecutions: many(aiExecutions),
+  scriptPrompts: many(scriptPrompts),
 }));
 
 export const prompts = pgTable("prompts", {
@@ -152,6 +153,28 @@ export const prompts = pgTable("prompts", {
 export const promptsRelations = relations(prompts, ({ one, many }) => ({
   user: one(users, { fields: [prompts.userId], references: [users.id] }),
   aiExecutions: many(aiExecutions),
+  scriptPrompts: many(scriptPrompts),
+}));
+
+export const scriptPrompts = pgTable("script_prompts", {
+  id: serial("id").primaryKey(),
+  scriptId: integer("script_id")
+    .notNull()
+    .references(() => scripts.id, { onDelete: "cascade" }),
+  promptId: integer("prompt_id")
+    .notNull()
+    .references(() => prompts.id, { onDelete: "cascade" }),
+});
+
+export const scriptPromptsRelations = relations(scriptPrompts, ({ one }) => ({
+  script: one(scripts, {
+    fields: [scriptPrompts.scriptId],
+    references: [scripts.id],
+  }),
+  prompt: one(prompts, {
+    fields: [scriptPrompts.promptId],
+    references: [prompts.id],
+  }),
 }));
 
 export const creativeProfiles = pgTable("creative_profiles", {
@@ -186,6 +209,7 @@ export const aiExecutions = pgTable("ai_executions", {
     .notNull()
     .references(() => users.id),
   promptId: integer("prompt_id").references(() => prompts.id),
+  promptIds: integer("prompt_ids").array(),
   projectId: integer("project_id").references(() => projects.id),
   scriptId: integer("script_id").references(() => scripts.id),
   characterId: integer("character_id").references(() => characters.id),

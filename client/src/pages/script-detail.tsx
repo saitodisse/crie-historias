@@ -36,10 +36,12 @@ import {
   Send,
   MessageSquare,
 } from "lucide-react";
-import type { Script, AIExecution } from "@shared/schema";
+import { Markdown } from "@/components/markdown";
+import type { Script, AIExecution, Prompt } from "@shared/schema";
 
 interface ScriptDetail extends Script {
   projectTitle?: string;
+  promptIds?: number[];
 }
 
 interface AIResult {
@@ -59,12 +61,35 @@ export default function ScriptDetailPage() {
   const [content, setContent] = useState("");
   const [aiOpen, setAiOpen] = useState(false);
   const [aiPrompt, setAiPrompt] = useState("");
+  const [selectedPromptIds, setSelectedPromptIds] = useState<number[]>([]);
   const [aiResult, setAiResult] = useState<AIResult | null>(null);
+
+  const { data: allPrompts } = useQuery<Prompt[]>({
+    queryKey: ["/api/prompts"],
+  });
+
+  const scriptPrompts = (allPrompts || []).filter(
+    (p) => p.category === "script" && p.active
+  );
 
   const { data: script, isLoading } = useQuery<ScriptDetail>({
     queryKey: ["/api/scripts", scriptId],
     enabled: !!scriptId,
   });
+
+  // Sync selected prompts when script loads
+  useState(() => {
+    if (script?.promptIds) {
+      setSelectedPromptIds(script.promptIds);
+    }
+  });
+
+  // Re-sync if script data changes and not editing
+  const [lastLoadedId, setLastLoadedId] = useState<number | null>(null);
+  if (script && script.id !== lastLoadedId) {
+    if (script.promptIds) setSelectedPromptIds(script.promptIds);
+    setLastLoadedId(script.id);
+  }
 
   const updateMutation = useMutation({
     mutationFn: async () => {
@@ -72,6 +97,7 @@ export default function ScriptDetailPage() {
         title,
         type,
         content,
+        promptIds: selectedPromptIds,
       });
     },
     onSuccess: () => {
@@ -99,6 +125,7 @@ export default function ScriptDetailPage() {
         scriptId,
         projectId: script?.projectId,
         userPrompt: aiPrompt,
+        promptIds: selectedPromptIds,
         type: "script",
       });
       return res.json() as Promise<AIResult>;
@@ -234,6 +261,61 @@ export default function ScriptDetailPage() {
                             rows={4}
                             data-testid="input-ai-script-prompt"
                           />
+
+                          <div className="space-y-2">
+                            <Label className="text-sm font-medium">
+                              Prompts Adicionais (Categoria Roteiro)
+                            </Label>
+                            <div className="flex flex-wrap gap-2">
+                              {scriptPrompts.map((p) => {
+                                const isSelected = selectedPromptIds.includes(
+                                  p.id
+                                );
+                                return (
+                                  <Button
+                                    key={p.id}
+                                    variant={
+                                      isSelected ? "secondary" : "outline"
+                                    }
+                                    size="sm"
+                                    className={`h-auto flex-col items-start px-3 py-2 text-left ${
+                                      isSelected
+                                        ? "border-primary/50 bg-primary/10"
+                                        : ""
+                                    }`}
+                                    onClick={() => {
+                                      setSelectedPromptIds((prev) =>
+                                        prev.includes(p.id)
+                                          ? prev.filter((id) => id !== p.id)
+                                          : [...prev, p.id]
+                                      );
+                                    }}
+                                  >
+                                    <div className="flex w-full items-center justify-between gap-2">
+                                      <span className="text-xs font-semibold leading-tight">
+                                        {p.name}
+                                      </span>
+                                      <Badge
+                                        variant="outline"
+                                        className="h-4 px-1 text-[9px] uppercase leading-none"
+                                      >
+                                        {p.type}
+                                      </Badge>
+                                    </div>
+                                    <span className="mt-1 line-clamp-1 text-[10px] text-muted-foreground">
+                                      {p.content}
+                                    </span>
+                                  </Button>
+                                );
+                              })}
+                            </div>
+                            {scriptPrompts.length === 0 && (
+                              <p className="text-xs italic text-muted-foreground">
+                                Nenhum prompt de roteiro encontrado em
+                                biblioteca.
+                              </p>
+                            )}
+                          </div>
                           <Button
                             className="w-full"
                             onClick={() => generateMutation.mutate()}
@@ -328,10 +410,12 @@ export default function ScriptDetailPage() {
                             </div>
                             {aiResult.result ? (
                               <div
-                                className="prose prose-sm max-w-none whitespace-pre-wrap rounded-md bg-muted p-4 font-serif dark:prose-invert"
+                                className="rounded-md bg-muted p-4"
                                 data-testid="text-ai-result"
                               >
-                                {aiResult.result}
+                                <Markdown className="prose-sm font-serif dark:prose-invert">
+                                  {aiResult.result}
+                                </Markdown>
                               </div>
                             ) : (
                               <div
@@ -423,12 +507,11 @@ export default function ScriptDetailPage() {
                 data-testid="input-edit-script-content"
               />
             ) : (
-              <div
-                className="prose prose-sm max-w-none whitespace-pre-wrap font-serif dark:prose-invert"
-                data-testid="text-script-content"
-              >
-                {script.content ||
-                  "Sem conteúdo ainda. Clique em Editar para começar a escrever."}
+              <div className="font-serif">
+                <Markdown className="prose-sm dark:prose-invert">
+                  {script.content ||
+                    "Sem conteúdo ainda. Clique em Editar para começar a escrever."}
+                </Markdown>
               </div>
             )}
           </CardContent>

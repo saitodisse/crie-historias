@@ -54,7 +54,13 @@ export default function WizardCast() {
       );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/projects/${projectId}`] });
+      console.log(
+        "[Wizard Event] Characters Linked Successfully",
+        JSON.stringify({ selectedIds, projectId }, null, 2)
+      );
+      queryClient.invalidateQueries({
+        queryKey: [`/api/projects/${projectId}`],
+      });
       const charIdsQuery = selectedIds.join(",");
       navigate(`/wizard/script?projectId=${projectId}&charIds=${charIdsQuery}`);
     },
@@ -68,9 +74,16 @@ export default function WizardCast() {
   });
 
   const toggleCharacter = (id: number) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-    );
+    setSelectedIds((prev) => {
+      const next = prev.includes(id)
+        ? prev.filter((i) => i !== id)
+        : [...prev, id];
+      console.log(
+        "[Wizard State] Character Selection Updated",
+        JSON.stringify(next)
+      );
+      return next;
+    });
   };
 
   if (isLoading) {

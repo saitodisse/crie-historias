@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.0.4] - 2026-02-08
+
+### Added
+
+- Implementação de validação JSON e lógica de retentativa para geração de roteiros no Wizard, garantindo saída estruturada.
+- Atualização do frontend para processar o retorno JSON e extrair título e conteúdo automaticamente.
+
+## [1.0.3] - 2026-02-08
+
+### Fixed
+
+- Corrigida filtragem de prompts de roteiro no detalhe do roteiro e no wizard.
+- Padronizadas categorias de prompts para minúsculo para evitar inconsistências.
+
 ## [1.0.2] - 2026-02-08
 
 ### Added

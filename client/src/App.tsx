@@ -12,9 +12,11 @@ import NotFound from "@/pages/not-found";
 import ProjectsPage from "@/pages/projects";
 import ProjectDetailPage from "@/pages/project-detail";
 import CharactersPage from "@/pages/characters";
+import CharacterDetailPage from "@/pages/character-detail";
 import ScriptsPage from "@/pages/scripts";
 import ScriptDetailPage from "@/pages/script-detail";
 import PromptsPage from "@/pages/prompts";
+import PromptDetailPage from "@/pages/prompt-detail";
 import ExecutionsPage from "@/pages/executions";
 import ProfilePage from "@/pages/profile";
 import LandingPage from "@/pages/landing";
@@ -32,9 +34,11 @@ function Router() {
       <Route path="/projects" component={ProjectsPage} />
       <Route path="/projects/:id" component={ProjectDetailPage} />
       <Route path="/characters" component={CharactersPage} />
+      <Route path="/characters/:id" component={CharacterDetailPage} />
       <Route path="/scripts" component={ScriptsPage} />
       <Route path="/scripts/:id" component={ScriptDetailPage} />
       <Route path="/prompts" component={PromptsPage} />
+      <Route path="/prompts/:id" component={PromptDetailPage} />
       <Route path="/executions" component={ExecutionsPage} />
       <Route path="/profile" component={ProfilePage} />
       <Route path="/wizard/idea" component={WizardIdea} />

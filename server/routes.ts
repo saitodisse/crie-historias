@@ -40,6 +40,31 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+  // Observabilidade no servidor
+  app.use((req, res, next) => {
+    const start = Date.now();
+    const path = req.path;
+    if (path.startsWith("/api")) {
+      const body =
+        req.body && Object.keys(req.body).length > 0
+          ? JSON.stringify(req.body, null, 2)
+          : "sem corpo";
+      console.log(
+        `\x1b[36m[Server Request]\x1b[0m ${req.method} ${path}\nBody: ${body}`
+      );
+
+      const originalJson = res.json;
+      res.json = function (data) {
+        const duration = Date.now() - start;
+        console.log(
+          `\x1b[32m[Server Response]\x1b[0m ${req.method} ${path} ${res.statusCode} (${duration}ms)\nPayload: ${JSON.stringify(data, null, 2)}`
+        );
+        return originalJson.call(this, data);
+      };
+    }
+    next();
+  });
+
   app.get("/api/projects", isAuthenticated, async (req, res) => {
     try {
       const user = await getAppUser(req);
@@ -101,16 +126,23 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/projects/:id/characters", isAuthenticated, async (req, res) => {
-    try {
-      const projectId = toInt(req.params.id);
-      const { characterId } = req.body;
-      const link = await storage.addProjectCharacter({ projectId, characterId });
-      res.status(201).json(link);
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
+  app.post(
+    "/api/projects/:id/characters",
+    isAuthenticated,
+    async (req, res) => {
+      try {
+        const projectId = toInt(req.params.id);
+        const { characterId } = req.body;
+        const link = await storage.addProjectCharacter({
+          projectId,
+          characterId,
+        });
+        res.status(201).json(link);
+      } catch (error: any) {
+        res.status(500).json({ error: error.message });
+      }
     }
-  });
+  );
 
   app.delete(
     "/api/projects/:projectId/characters/:characterId",
@@ -202,8 +234,11 @@ export async function registerRoutes(
     try {
       const script = await storage.getScript(toInt(req.params.id));
       if (!script) return res.status(404).json({ error: "Script not found" });
-      const project = await storage.getProject(script.projectId);
-      res.json({ ...script, projectTitle: project?.title });
+      const [project, promptIds] = await Promise.all([
+        storage.getProject(script.projectId),
+        storage.getScriptPrompts(script.id),
+      ]);
+      res.json({ ...script, projectTitle: project?.title, promptIds });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
@@ -211,7 +246,11 @@ export async function registerRoutes(
 
   app.post("/api/scripts", isAuthenticated, async (req, res) => {
     try {
-      const script = await storage.createScript(req.body);
+      const { promptIds, ...scriptData } = req.body;
+      const script = await storage.createScript(scriptData);
+      if (promptIds && Array.isArray(promptIds)) {
+        await storage.updateScriptPrompts(script.id, promptIds);
+      }
       res.status(201).json(script);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -220,8 +259,14 @@ export async function registerRoutes(
 
   app.patch("/api/scripts/:id", isAuthenticated, async (req, res) => {
     try {
-      const script = await storage.updateScript(toInt(req.params.id), req.body);
+      const scriptId = toInt(req.params.id);
+      const { promptIds, ...scriptData } = req.body;
+      const script = await storage.updateScript(scriptId, scriptData);
       if (!script) return res.status(404).json({ error: "Script not found" });
+
+      if (promptIds && Array.isArray(promptIds)) {
+        await storage.updateScriptPrompts(scriptId, promptIds);
+      }
       res.json(script);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -242,6 +287,16 @@ export async function registerRoutes(
       const user = await getAppUser(req);
       const result = await storage.getPrompts(user.id);
       res.json(result);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/prompts/:id", isAuthenticated, async (req, res) => {
+    try {
+      const prompt = await storage.getPrompt(toInt(req.params.id));
+      if (!prompt) return res.status(404).json({ error: "Prompt not found" });
+      res.json(prompt);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
@@ -487,8 +542,15 @@ export async function registerRoutes(
   app.post("/api/ai/generate", isAuthenticated, async (req, res) => {
     try {
       const user = await getAppUser(req);
-      let { projectId, characterId, scriptId, promptId, userPrompt, type } =
-        req.body;
+      let {
+        projectId,
+        characterId,
+        scriptId,
+        promptId,
+        promptIds,
+        userPrompt,
+        type,
+      } = req.body;
 
       const profile = await storage.getActiveProfile(user.id);
       console.log(
@@ -511,7 +573,15 @@ export async function registerRoutes(
           "Você é um especialista em estruturação de histórias (Project Architect). Sua tarefa é expandir ideias embrionárias em títulos cativantes e premissas sólidas, mantendo um diálogo construtivo com o autor através de perguntas inteligentes. Sempre peça feedback ou faça perguntas ao final.";
       } else if (type === "wizard-script") {
         systemPrompt =
-          "Você é um roteirista profissional. Sua tarefa é produzir roteiros completos e detalhados seguindo o formato e estilo solicitados, respeitando fielmente o contexto dos personagens e da história fornecidos.";
+          "Você é um roteirista profissional. Sua tarefa é produzir roteiros completos e detalhados seguindo o formato e estilo solicitados.\n\n" +
+          "ATENÇÃO: GERAÇÃO DE DADOS ESTRUTURADOS.\n" +
+          "SCHEMA ESPERADO (JSON):\n" +
+          "{\n" +
+          '  "title": "Sugestão de título baseada no conteúdo",\n' +
+          '  "content": "O conteúdo do roteiro formatado (Markdown/Fountain/Texto)",\n' +
+          '  "analysis": "Breve explicação das escolhas criativas (opcional)"\n' +
+          "}\n\n" +
+          "Retorne APENAS o JSON válido. Sem blocos de código markdown. Sem conversa.";
       } else if (type === "character-generation") {
         systemPrompt =
           "ATENÇÃO: GERAÇÃO DE DADOS ESTRUTURADOS.\n" +
@@ -529,13 +599,17 @@ export async function registerRoutes(
         systemPrompt = "Você é um assistente de escrita criativa habilidoso. ";
       }
 
-      if (profile?.narrativeStyle && type !== "character-generation") {
+      if (
+        profile?.narrativeStyle &&
+        type !== "character-generation" &&
+        type !== "wizard-script"
+      ) {
         systemPrompt += ` Escreva neste estilo predominante: ${profile.narrativeStyle}.`;
       }
 
-      // For character generation, append explicit JSON instruction to user prompt as well to override any model tendencies
-      if (type === "character-generation") {
-        userPrompt = `${userPrompt}\n\nIMPORTANTE: Retorne APENAS um JSON válido.`;
+      // For structured generation, append explicit JSON instruction to user prompt
+      if (type === "character-generation" || type === "wizard-script") {
+        userPrompt = `${userPrompt}\n\nIMPORTANTE: Retorne APENAS um JSON válido seguindo estritamente o schema solicitado.`;
       }
 
       let project, character, script, promptRecord;
@@ -544,7 +618,8 @@ export async function registerRoutes(
         project = await storage.getProject(projectId);
         if (project) {
           contextParts.push(`Projeto: "${project.title}"`);
-          if (project.premise) contextParts.push(`Premissa: ${project.premise}`);
+          if (project.premise)
+            contextParts.push(`Premissa: ${project.premise}`);
           if (project.tone) contextParts.push(`Tom/Gênero: ${project.tone}`);
           const chars = await storage.getProjectCharacters(projectId);
           if (chars.length > 0) {
@@ -586,16 +661,46 @@ export async function registerRoutes(
         }
       }
 
+      // Handle multiple prompts
+      let additionalInstructions = "";
+      if (promptIds && Array.isArray(promptIds) && promptIds.length > 0) {
+        const selectedPrompts = await storage.getPromptsByIds(promptIds);
+        const systemParts = selectedPrompts
+          .filter((p) => p.type === "system")
+          .map((p) => p.content);
+        const otherParts = selectedPrompts
+          .filter((p) => p.type !== "system")
+          .map((p) => `[Prompt: ${p.name} (${p.type})]:\n${p.content}`);
+
+        if (systemParts.length > 0) {
+          systemPrompt +=
+            (systemPrompt.length > 0 ? "\n---\n" : "") +
+            systemParts.join("\n---\n");
+        }
+
+        if (otherParts.length > 0) {
+          additionalInstructions =
+            "\n\nInstruções Adicionais:\n" + otherParts.join("\n\n");
+        }
+      }
+
       let currentPrompt =
         contextParts.length > 0
-          ? `Contexto:\n${contextParts.join("\n")}\n\nSolicitação: ${userPrompt}`
-          : userPrompt;
+          ? `Contexto:\n${contextParts.join("\n")}\n\nSolicitação: ${userPrompt}${additionalInstructions}`
+          : `${userPrompt}${additionalInstructions}`;
+
+      console.log(
+        `\x1b[35m[AI LLM Call]\x1b[0m Model: ${model}, Temperature: ${temperature}`
+      );
+      console.log(`\x1b[34m[System Prompt]\x1b[0m\n${systemPrompt}`);
+      console.log(`\x1b[33m[User Prompt]\x1b[0m\n${currentPrompt}`);
 
       let result = "";
       const isGemini = model.startsWith("gemini");
       const isOpenRouter = model.includes("/");
 
-      const maxRetries = type === "character-generation" ? 3 : 1;
+      const maxRetries =
+        type === "character-generation" || type === "wizard-script" ? 3 : 1;
       let attempts = 0;
 
       while (attempts < maxRetries) {
@@ -637,7 +742,7 @@ export async function registerRoutes(
               max_tokens: maxTokens,
               temperature,
               response_format:
-                type === "character-generation"
+                type === "character-generation" || type === "wizard-script"
                   ? { type: "json_object" }
                   : undefined,
             });
@@ -667,14 +772,16 @@ export async function registerRoutes(
               max_tokens: maxTokens,
               temperature,
               response_format:
-                type === "character-generation"
+                type === "character-generation" || type === "wizard-script"
                   ? { type: "json_object" }
                   : undefined,
             });
             result = completion.choices[0]?.message?.content || "";
           }
 
-          if (type === "character-generation") {
+          console.log(`\x1b[32m[AI LLM Response]\x1b[0m\n${result}`);
+
+          if (type === "character-generation" || type === "wizard-script") {
             try {
               let jsonStr = result
                 .replace(/```json/g, "")
@@ -690,15 +797,24 @@ export async function registerRoutes(
 
               const parsed = JSON.parse(jsonStr);
 
-              const charSchema = z.object({
-                name: z.string(),
-                description: z.string().nullable().optional(),
-                personality: z.string().nullable().optional(),
-                background: z.string().nullable().optional(),
-                notes: z.string().nullable().optional(),
-              });
-
-              charSchema.parse(parsed);
+              if (type === "character-generation") {
+                const charSchema = z.object({
+                  name: z.string(),
+                  description: z.string().nullable().optional(),
+                  personality: z.string().nullable().optional(),
+                  background: z.string().nullable().optional(),
+                  notes: z.string().nullable().optional(),
+                });
+                charSchema.parse(parsed);
+              } else {
+                // wizard-script
+                const scriptSchema = z.object({
+                  title: z.string(),
+                  content: z.string(),
+                  analysis: z.string().optional(),
+                });
+                scriptSchema.parse(parsed);
+              }
 
               // Success!
               result = JSON.stringify(parsed);
@@ -709,19 +825,18 @@ export async function registerRoutes(
                 e.message
               );
               if (attempts >= maxRetries) {
-                // Even if it failed validation, we return the raw result so the user sees something happened,
-                // or we could throw. But returning raw allows the frontend to maybe show the error.
-                // Actually the user wants correct JSON.
-                // If all retries fail, we accept the last result but log it.
                 console.error("All retries failed for JSON generation");
+                throw new Error(
+                  `Falha ao gerar um JSON válido após ${maxRetries} tentativas: ${e.message}`
+                );
               } else {
                 currentPrompt += `\n\nERRO: Sua resposta anterior não foi um JSON válido ou não seguiu o schema. Erro: ${e.message}. \nRetorne APENAS o JSON corrigido.`;
                 continue; // Retry
               }
             }
+          } else {
+            break; // Normal text generation
           }
-
-          break; // If not character generation or success
         } catch (error) {
           if (attempts >= maxRetries) throw error;
           // If network error, maybe retry?
@@ -733,6 +848,7 @@ export async function registerRoutes(
       const execution = await storage.createExecution({
         userId: user.id,
         promptId: promptId || null,
+        promptIds: promptIds || null,
         projectId: projectId || null,
         scriptId: scriptId || null,
         characterId: characterId || null,

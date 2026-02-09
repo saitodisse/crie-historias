@@ -25,6 +25,7 @@ import {
   Clock,
   Cpu,
 } from "lucide-react";
+import { Markdown } from "@/components/markdown";
 import type { AIExecution } from "@shared/schema";
 
 interface ExecutionWithContext extends AIExecution {
@@ -282,8 +283,10 @@ export default function ExecutionsPage() {
                       Copiar
                     </Button>
                   </div>
-                  <div className="prose prose-sm max-w-none whitespace-pre-wrap rounded-md bg-muted p-4 font-serif dark:prose-invert">
-                    {selectedExec.result || "Sem resultado"}
+                  <div className="rounded-md bg-muted p-4">
+                    <Markdown className="prose-sm font-serif dark:prose-invert">
+                      {selectedExec.result || "Sem resultado"}
+                    </Markdown>
                   </div>
                 </div>
 

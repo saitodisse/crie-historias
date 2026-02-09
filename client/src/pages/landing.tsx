@@ -7,8 +7,7 @@ const features = [
   {
     icon: BookOpen,
     title: "Gerencie Suas Projetos",
-    description:
-      "Organize Projetos, premissas, tons e gêneros em um só lugar.",
+    description: "Organize Projetos, premissas, tons e gêneros em um só lugar.",
   },
   {
     icon: Users,

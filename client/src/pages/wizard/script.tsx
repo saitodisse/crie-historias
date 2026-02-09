@@ -42,6 +42,7 @@ export default function WizardScript() {
 
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
   const [selectedStyleIds, setSelectedStyleIds] = useState<number[]>([]);
+  const [selectedPromptIds, setSelectedPromptIds] = useState<number[]>([]);
 
   const { data: Project } = useQuery<Project>({
     queryKey: [`/api/projects/${projectId}`],
@@ -55,6 +56,7 @@ export default function WizardScript() {
   const templates =
     prompts?.filter((p) => p.category === "script-template") || [];
   const styles = prompts?.filter((p) => p.category === "script-style") || [];
+  const libraryPrompts = prompts?.filter((p) => p.category === "script") || [];
 
   const generateMutation = useMutation({
     mutationFn: async () => {
@@ -72,23 +74,54 @@ export default function WizardScript() {
         POR FAVOR, GERE O ROTEIRO COMPLETO PARA A Projeto E PERSONAGEM(S) PROVIDOS NO CONTEXTO.
       `;
 
-      const res = await apiRequest("POST", "/api/ai/generate", {
+      const payload = {
         projectId,
         userPrompt: combinedPrompt,
+        promptIds: selectedPromptIds,
         type: "wizard-script",
-      });
+      };
+      console.log(
+        "[Wizard Event] Final Script Generation Started",
+        JSON.stringify(payload, null, 2)
+      );
+
+      const res = await apiRequest("POST", "/api/ai/generate", payload);
       return res.json() as Promise<AIResult>;
     },
     onSuccess: async (data) => {
+      let scriptContent = data.result;
+      let scriptTitle = `Roteiro Final - ${Project?.title}`;
+
+      try {
+        // Clean markdown code blocks if present (though backend should have handled it, extra safety)
+        let jsonStr = data.result.trim();
+        if (jsonStr.startsWith("```json")) {
+          jsonStr = jsonStr.replace(/^```json/, "").replace(/```$/, "");
+        } else if (jsonStr.startsWith("```")) {
+          jsonStr = jsonStr.replace(/^```/, "").replace(/```$/, "");
+        }
+
+        const parsed = JSON.parse(jsonStr);
+        if (parsed.content) scriptContent = parsed.content;
+        if (parsed.title) scriptTitle = parsed.title;
+      } catch (e) {
+        console.warn("Could not parse AI response as JSON, using raw text:", e);
+      }
+
       // Create the script record
       const scriptRes = await apiRequest("POST", "/api/scripts", {
         projectId,
-        title: `Roteiro Final - ${Project?.title}`,
+        title: scriptTitle,
         type: "detailed",
-        content: data.result,
+        content: scriptContent,
         origin: "ai",
+        promptIds: selectedPromptIds,
       });
       const newScript = (await scriptRes.json()) as Script;
+      console.log(
+        "[Wizard Event] Script Saved Successfully",
+        JSON.stringify(newScript, null, 2)
+      );
 
       toast({ title: "Roteiro gerado com sucesso!" });
       navigate(`/scripts/${newScript.id}`);
@@ -201,10 +234,62 @@ export default function WizardScript() {
           </Card>
         </div>
 
+        {/* Biblioteca de Prompts */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-primary" />
+            <Label className="text-base font-semibold">
+              Prompts da Biblioteca (Roteiro)
+            </Label>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {libraryPrompts.map((p) => {
+              const isSelected = selectedPromptIds.includes(p.id);
+              return (
+                <div
+                  key={p.id}
+                  className={cn(
+                    "flex cursor-pointer flex-col gap-2 rounded-lg border bg-background p-4 transition-all hover:bg-accent",
+                    isSelected &&
+                      "border-primary bg-primary/5 ring-1 ring-primary"
+                  )}
+                  onClick={() => {
+                    setSelectedPromptIds((prev) =>
+                      prev.includes(p.id)
+                        ? prev.filter((id) => id !== p.id)
+                        : [...prev, p.id]
+                    );
+                  }}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">{p.name}</span>
+                    <Badge
+                      variant="outline"
+                      className="h-4 text-[10px] uppercase"
+                    >
+                      {p.type}
+                    </Badge>
+                  </div>
+                  <p className="line-clamp-2 text-xs italic text-muted-foreground">
+                    {p.content}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+          {libraryPrompts.length === 0 && (
+            <p className="text-sm italic text-muted-foreground">
+              Nenhum prompt da biblioteca disponível nesta categoria.
+            </p>
+          )}
+        </div>
+
         <div className="flex justify-between border-t pt-6 font-sans">
           <Button
             variant="ghost"
-            onClick={() => navigate(`/wizard/characters?projectId=${projectId}`)}
+            onClick={() =>
+              navigate(`/wizard/characters?projectId=${projectId}`)
+            }
             disabled={generateMutation.isPending}
           >
             <ChevronLeft className="mr-2 h-4 w-4" />
