@@ -1,9 +1,11 @@
 import { storage } from "./storage";
 import {
-  STORY_TONES,
+  PROJECT_TONES,
   THEME_PRESETS,
   STYLE_PRESETS,
   getSystemInstruction,
+  getComicStripScriptInstruction,
+  COMIC_STRIP_IDEA_PROMPT,
 } from "../shared/creative-constants";
 
 const DEFAULT_USER_ID = 1;
@@ -26,7 +28,7 @@ export async function seedDatabase(userId: number = DEFAULT_USER_ID) {
   const seedUser = await ensureSeedUser(userId);
   const effectiveUserId = seedUser.id;
 
-  const existingStories = await storage.getStories(effectiveUserId);
+  const existingStories = await storage.getProjects(effectiveUserId);
   if (existingStories.length > 0) {
     console.log(
       `Database already has data for user ${effectiveUserId}, skipping seed.`
@@ -62,7 +64,7 @@ export async function seedDatabase(userId: number = DEFAULT_USER_ID) {
   });
 
   // Histórias Exemplo
-  const story1 = await storage.createStory({
+  const project1 = await storage.createProject({
     userId: effectiveUserId,
     title: "O Crepúsculo de Neon",
     premise:
@@ -72,18 +74,18 @@ export async function seedDatabase(userId: number = DEFAULT_USER_ID) {
   });
 
   // Vínculos
-  await storage.addStoryCharacter({
-    storyId: story1.id,
+  await storage.addProjectCharacter({
+    projectId: project1.id,
     characterId: char1.id,
   });
-  await storage.addStoryCharacter({
-    storyId: story1.id,
+  await storage.addProjectCharacter({
+    projectId: project1.id,
     characterId: char2.id,
   });
 
   // Roteiros (Exemplo de Página 1)
   await storage.createScript({
-    storyId: story1.id,
+    projectId: project1.id,
     title: "Página 1 - A Chegada",
     type: "detailed",
     content: `[PÁGINA 1]\n\nPAINEL 1: Plano geral da cidade sob chuva de neon. Sombra da Noite observa do topo de um gárgula.\n\nPAINEL 2: Close no rosto de Sombra da Noite. Ele detecta um movimento suspeito.\n\nPAINEL 3: Ele salta para o abismo, a capa se abrindo como asas de morcego.`,
@@ -95,7 +97,7 @@ export async function seedDatabase(userId: number = DEFAULT_USER_ID) {
     await storage.createPrompt({
       userId: effectiveUserId,
       name: `Template: ${preset.label}`,
-      category: "story",
+      category: "project",
       type: "task",
       content: preset.prompt,
       active: true,
@@ -110,6 +112,36 @@ export async function seedDatabase(userId: number = DEFAULT_USER_ID) {
     type: "system",
     content: getSystemInstruction(4, "Aventura Épica"),
     active: true,
+  });
+
+  // Prompt Mestre de Quadrinhos (Tira Cômica)
+  await storage.createPrompt({
+    userId: effectiveUserId,
+    name: "Gerador de Tiras (3 Painéis)",
+    category: "script",
+    type: "system",
+    content: getComicStripScriptInstruction(),
+    active: true,
+  });
+
+  // Prompt de Ideias para Tiras
+  await storage.createPrompt({
+    userId: effectiveUserId,
+    name: "Ideias para Tiras Cômicas",
+    category: "project",
+    type: "task",
+    content: COMIC_STRIP_IDEA_PROMPT,
+    active: true,
+  });
+
+  // História Exemplo de Tira
+  await storage.createProject({
+    userId: effectiveUserId,
+    title: "A Tira do Dia",
+    premise:
+      "Tiras diárias mostrando a vida cotidiana de Sombra da Noite tentando manter sua identidade secreta enquanto faz compras no supermercado.",
+    tone: "Tira Cômica (3 Painéis)",
+    status: "in-development",
   });
 
   // Perfis Criativos (Baseado nos Style Presets)

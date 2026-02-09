@@ -28,7 +28,7 @@ import {
 import type { AIExecution } from "@shared/schema";
 
 interface ExecutionWithContext extends AIExecution {
-  storyTitle?: string;
+  projectTitle?: string;
   characterName?: string;
   scriptTitle?: string;
   promptName?: string;
@@ -69,7 +69,7 @@ export default function ExecutionsPage() {
     (e) =>
       e.userPrompt.toLowerCase().includes(search.toLowerCase()) ||
       e.result?.toLowerCase().includes(search.toLowerCase()) ||
-      e.storyTitle?.toLowerCase().includes(search.toLowerCase()) ||
+      e.projectTitle?.toLowerCase().includes(search.toLowerCase()) ||
       e.characterName?.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -130,8 +130,8 @@ export default function ExecutionsPage() {
                         {exec.model}
                       </span>
                     </div>
-                    {exec.storyTitle && (
-                      <Badge variant="secondary">{exec.storyTitle}</Badge>
+                    {exec.projectTitle && (
+                      <Badge variant="secondary">{exec.projectTitle}</Badge>
                     )}
                     {exec.characterName && (
                       <Badge variant="secondary">{exec.characterName}</Badge>
@@ -205,8 +205,8 @@ export default function ExecutionsPage() {
               <div className="space-y-4 pr-4">
                 <div className="flex flex-wrap items-center gap-2">
                   <Badge variant="secondary">{selectedExec.model}</Badge>
-                  {selectedExec.storyTitle && (
-                    <Badge variant="outline">{selectedExec.storyTitle}</Badge>
+                  {selectedExec.projectTitle && (
+                    <Badge variant="outline">{selectedExec.projectTitle}</Badge>
                   )}
                   {selectedExec.characterName && (
                     <Badge variant="outline">

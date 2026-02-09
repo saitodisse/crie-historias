@@ -9,8 +9,8 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { useAuth } from "@/hooks/use-auth";
 import NotFound from "@/pages/not-found";
-import StoriesPage from "@/pages/stories";
-import StoryDetailPage from "@/pages/story-detail";
+import ProjectsPage from "@/pages/projects";
+import ProjectDetailPage from "@/pages/project-detail";
 import CharactersPage from "@/pages/characters";
 import ScriptsPage from "@/pages/scripts";
 import ScriptDetailPage from "@/pages/script-detail";
@@ -28,8 +28,9 @@ import { Loader2 } from "lucide-react";
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={StoriesPage} />
-      <Route path="/stories/:id" component={StoryDetailPage} />
+      <Route path="/" component={ProjectsPage} />
+      <Route path="/projects" component={ProjectsPage} />
+      <Route path="/projects/:id" component={ProjectDetailPage} />
       <Route path="/characters" component={CharactersPage} />
       <Route path="/scripts" component={ScriptsPage} />
       <Route path="/scripts/:id" component={ScriptDetailPage} />

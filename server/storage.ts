@@ -1,20 +1,20 @@
 import {
   users,
-  stories,
+  projects,
   characters,
-  storyCharacters,
+  projectCharacters,
   scripts,
   prompts,
   creativeProfiles,
   aiExecutions,
   type User,
   type InsertUser,
-  type Story,
-  type InsertStory,
+  type Project,
+  type InsertProject,
   type Character,
   type InsertCharacter,
-  type StoryCharacter,
-  type InsertStoryCharacter,
+  type ProjectCharacter,
+  type InsertProjectCharacter,
   type Script,
   type InsertScript,
   type Prompt,
@@ -38,14 +38,14 @@ export interface IStorage {
   ): Promise<User>;
   createUser(user: InsertUser): Promise<User>;
 
-  getStories(userId: number): Promise<Story[]>;
-  getStory(id: number): Promise<Story | undefined>;
-  createStory(data: InsertStory): Promise<Story>;
-  updateStory(
+  getProjects(userId: number): Promise<Project[]>;
+  getProject(id: number): Promise<Project | undefined>;
+  createProject(data: InsertProject): Promise<Project>;
+  updateProject(
     id: number,
-    data: Partial<InsertStory>
-  ): Promise<Story | undefined>;
-  deleteStory(id: number): Promise<void>;
+    data: Partial<InsertProject>
+  ): Promise<Project | undefined>;
+  deleteProject(id: number): Promise<void>;
 
   getCharacters(userId: number): Promise<Character[]>;
   getCharacter(id: number): Promise<Character | undefined>;
@@ -56,12 +56,12 @@ export interface IStorage {
   ): Promise<Character | undefined>;
   deleteCharacter(id: number): Promise<void>;
 
-  getStoryCharacters(storyId: number): Promise<Character[]>;
-  addStoryCharacter(data: InsertStoryCharacter): Promise<StoryCharacter>;
-  removeStoryCharacter(storyId: number, characterId: number): Promise<void>;
+  getProjectCharacters(projectId: number): Promise<Character[]>;
+  addProjectCharacter(data: InsertProjectCharacter): Promise<ProjectCharacter>;
+  removeProjectCharacter(projectId: number, characterId: number): Promise<void>;
 
   getScripts(userId?: number): Promise<Script[]>;
-  getScriptsByStory(storyId: number): Promise<Script[]>;
+  getScriptsByProject(projectId: number): Promise<Script[]>;
   getScript(id: number): Promise<Script | undefined>;
   createScript(data: InsertScript): Promise<Script>;
   updateScript(
@@ -158,38 +158,41 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async getStories(userId: number): Promise<Story[]> {
+  async getProjects(userId: number): Promise<Project[]> {
     return db
       .select()
-      .from(stories)
-      .where(eq(stories.userId, userId))
-      .orderBy(desc(stories.updatedAt));
+      .from(projects)
+      .where(eq(projects.userId, userId))
+      .orderBy(desc(projects.updatedAt));
   }
 
-  async getStory(id: number): Promise<Story | undefined> {
-    const [story] = await db.select().from(stories).where(eq(stories.id, id));
-    return story || undefined;
+  async getProject(id: number): Promise<Project | undefined> {
+    const [project] = await db
+      .select()
+      .from(projects)
+      .where(eq(projects.id, id));
+    return project || undefined;
   }
 
-  async createStory(data: InsertStory): Promise<Story> {
-    const [story] = await db.insert(stories).values(data).returning();
-    return story;
+  async createProject(data: InsertProject): Promise<Project> {
+    const [project] = await db.insert(projects).values(data).returning();
+    return project;
   }
 
-  async updateStory(
+  async updateProject(
     id: number,
-    data: Partial<InsertStory>
-  ): Promise<Story | undefined> {
-    const [story] = await db
-      .update(stories)
+    data: Partial<InsertProject>
+  ): Promise<Project | undefined> {
+    const [project] = await db
+      .update(projects)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(stories.id, id))
+      .where(eq(projects.id, id))
       .returning();
-    return story || undefined;
+    return project || undefined;
   }
 
-  async deleteStory(id: number): Promise<void> {
-    await db.delete(stories).where(eq(stories.id, id));
+  async deleteProject(id: number): Promise<void> {
+    await db.delete(projects).where(eq(projects.id, id));
   }
 
   async getCharacters(userId: number): Promise<Character[]> {
@@ -226,15 +229,17 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteCharacter(id: number): Promise<void> {
-    await db.delete(storyCharacters).where(eq(storyCharacters.characterId, id));
+    await db
+      .delete(projectCharacters)
+      .where(eq(projectCharacters.characterId, id));
     await db.delete(characters).where(eq(characters.id, id));
   }
 
-  async getStoryCharacters(storyId: number): Promise<Character[]> {
+  async getProjectCharacters(projectId: number): Promise<Character[]> {
     const links = await db
       .select()
-      .from(storyCharacters)
-      .where(eq(storyCharacters.storyId, storyId));
+      .from(projectCharacters)
+      .where(eq(projectCharacters.projectId, projectId));
     if (links.length === 0) return [];
     const charIds = links.map((l) => l.characterId);
     const result: Character[] = [];
@@ -248,21 +253,23 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
 
-  async addStoryCharacter(data: InsertStoryCharacter): Promise<StoryCharacter> {
-    const [link] = await db.insert(storyCharacters).values(data).returning();
+  async addProjectCharacter(
+    data: InsertProjectCharacter
+  ): Promise<ProjectCharacter> {
+    const [link] = await db.insert(projectCharacters).values(data).returning();
     return link;
   }
 
-  async removeStoryCharacter(
-    storyId: number,
+  async removeProjectCharacter(
+    projectId: number,
     characterId: number
   ): Promise<void> {
     await db
-      .delete(storyCharacters)
+      .delete(projectCharacters)
       .where(
         and(
-          eq(storyCharacters.storyId, storyId),
-          eq(storyCharacters.characterId, characterId)
+          eq(projectCharacters.projectId, projectId),
+          eq(projectCharacters.characterId, characterId)
         )
       );
   }
@@ -271,11 +278,11 @@ export class DatabaseStorage implements IStorage {
     return db.select().from(scripts).orderBy(desc(scripts.updatedAt));
   }
 
-  async getScriptsByStory(storyId: number): Promise<Script[]> {
+  async getScriptsByProject(projectId: number): Promise<Script[]> {
     return db
       .select()
       .from(scripts)
-      .where(eq(scripts.storyId, storyId))
+      .where(eq(scripts.projectId, projectId))
       .orderBy(desc(scripts.updatedAt));
   }
 

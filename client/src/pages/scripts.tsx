@@ -9,15 +9,15 @@ import { useToast } from "@/hooks/use-toast";
 import { FileText, Trash2, BookOpen } from "lucide-react";
 import type { Script } from "@shared/schema";
 
-interface ScriptWithStory extends Script {
-  storyTitle?: string;
+interface ScriptWithProject extends Script {
+  projectTitle?: string;
 }
 
 export default function ScriptsPage() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
 
-  const { data: scripts, isLoading } = useQuery<ScriptWithStory[]>({
+  const { data: scripts, isLoading } = useQuery<ScriptWithProject[]>({
     queryKey: ["/api/scripts"],
   });
 
@@ -54,7 +54,7 @@ export default function ScriptsPage() {
             Roteiros
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Todos os roteiros vinculados às suas histórias
+            Todos os roteiros vinculados aos seus Projetos
           </p>
         </div>
       </div>
@@ -85,11 +85,11 @@ export default function ScriptsPage() {
                     <FileText className="h-5 w-5 shrink-0 text-primary" />
                     <div className="min-w-0">
                       <p className="text-sm font-medium">{script.title}</p>
-                      {script.storyTitle && (
+                      {script.projectTitle && (
                         <div className="mt-0.5 flex items-center gap-1">
                           <BookOpen className="h-3 w-3 text-muted-foreground" />
                           <p className="text-xs text-muted-foreground">
-                            {script.storyTitle}
+                            {script.projectTitle}
                           </p>
                         </div>
                       )}
@@ -129,7 +129,7 @@ export default function ScriptsPage() {
             </div>
             <h3 className="text-lg font-semibold">Nenhum roteiro encontrado</h3>
             <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-              Os roteiros são criados dentro das histórias. Vá para uma história
+              Os roteiros são criados dentro dos Projetos. Vá para um Projeto
               para criar um.
             </p>
           </div>

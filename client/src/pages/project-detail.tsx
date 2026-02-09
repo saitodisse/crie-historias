@@ -42,9 +42,9 @@ import {
   Send,
   MessageSquare,
 } from "lucide-react";
-import type { Story, Character, Script, AIExecution } from "@shared/schema";
+import type { Project, Character, Script, AIExecution } from "@shared/schema";
 
-interface StoryDetail extends Story {
+interface ProjectDetail extends Project {
   characters?: Character[];
   scripts?: Script[];
   aiExecutions?: AIExecution[];
@@ -55,11 +55,11 @@ interface AIResult {
   result: string;
 }
 
-export default function StoryDetailPage() {
+export default function ProjectDetailPage() {
   const params = useParams<{ id: string }>();
   const [, navigate] = useLocation();
   const { toast } = useToast();
-  const storyId = parseInt(params.id);
+  const projectId = parseInt(params.id);
 
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState("");
@@ -75,9 +75,9 @@ export default function StoryDetailPage() {
   const [aiUserPrompt, setAiUserPrompt] = useState("");
   const [aiResult, setAiResult] = useState<AIResult | null>(null);
 
-  const { data: story, isLoading } = useQuery<StoryDetail>({
-    queryKey: ["/api/stories", storyId],
-    enabled: !!storyId,
+  const { data: project, isLoading } = useQuery<ProjectDetail>({
+    queryKey: ["/api/projects", projectId],
+    enabled: !!projectId,
   });
 
   const { data: allCharacters } = useQuery<Character[]>({
@@ -86,7 +86,7 @@ export default function StoryDetailPage() {
 
   const updateMutation = useMutation({
     mutationFn: async () => {
-      await apiRequest("PATCH", `/api/stories/${storyId}`, {
+      await apiRequest("PATCH", `/api/projects/${projectId}`, {
         title,
         premise,
         tone,
@@ -94,34 +94,34 @@ export default function StoryDetailPage() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/stories", storyId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/stories"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
       setEditing(false);
-      toast({ title: "História atualizada" });
+      toast({ title: "Projeto atualizado" });
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: async () => {
-      await apiRequest("DELETE", `/api/stories/${storyId}`);
+      await apiRequest("DELETE", `/api/projects/${projectId}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/stories"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
       navigate("/");
-      toast({ title: "História removida" });
+      toast({ title: "Projeto removido" });
     },
   });
 
   const addCharMutation = useMutation({
     mutationFn: async (characterId: number) => {
-      await apiRequest("POST", `/api/stories/${storyId}/characters`, {
+      await apiRequest("POST", `/api/projects/${projectId}/characters`, {
         characterId,
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/stories", storyId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects", projectId] });
       setAddCharOpen(false);
-      toast({ title: "Personagem vinculado à história" });
+      toast({ title: "Personagem vinculado ao projeto" });
     },
   });
 
@@ -129,11 +129,11 @@ export default function StoryDetailPage() {
     mutationFn: async (characterId: number) => {
       await apiRequest(
         "DELETE",
-        `/api/stories/${storyId}/characters/${characterId}`
+        `/api/projects/${projectId}/characters/${characterId}`
       );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/stories", storyId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects", projectId] });
       toast({ title: "Vínculo removido" });
     },
   });
@@ -141,7 +141,7 @@ export default function StoryDetailPage() {
   const createScriptMutation = useMutation({
     mutationFn: async () => {
       await apiRequest("POST", "/api/scripts", {
-        storyId,
+        projectId,
         title: scriptTitle,
         type: scriptType,
         content: scriptContent,
@@ -149,7 +149,7 @@ export default function StoryDetailPage() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/stories", storyId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects", projectId] });
       setScriptDialogOpen(false);
       setScriptTitle("");
       setScriptContent("");
@@ -160,14 +160,14 @@ export default function StoryDetailPage() {
   const generateMutation = useMutation({
     mutationFn: async () => {
       const res = await apiRequest("POST", "/api/ai/generate", {
-        storyId,
+        projectId,
         userPrompt: aiUserPrompt,
-        type: "story",
+        type: "project",
       });
       return res.json() as Promise<AIResult>;
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/stories", storyId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects", projectId] });
       queryClient.invalidateQueries({ queryKey: ["/api/executions"] });
       setAiResult(data);
     },
@@ -181,16 +181,16 @@ export default function StoryDetailPage() {
   });
 
   const startEditing = () => {
-    if (story) {
-      setTitle(story.title);
-      setPremise(story.premise || "");
-      setTone(story.tone || "");
-      setStatus(story.status);
+    if (project) {
+      setTitle(project.title);
+      setPremise(project.premise || "");
+      setTone(project.tone || "");
+      setStatus(project.status);
       setEditing(true);
     }
   };
 
-  const linkedCharIds = new Set(story?.characters?.map((c) => c.id) || []);
+  const linkedCharIds = new Set(project?.characters?.map((c) => c.id) || []);
   const availableChars =
     allCharacters?.filter((c) => !linkedCharIds.has(c.id) && c.active) || [];
 
@@ -207,10 +207,10 @@ export default function StoryDetailPage() {
     );
   }
 
-  if (!story) {
+  if (!project) {
     return (
       <div className="flex h-full items-center justify-center">
-        <p className="text-muted-foreground">História não encontrada</p>
+        <p className="text-muted-foreground">projeto não encontrado</p>
       </div>
     );
   }
@@ -237,9 +237,9 @@ export default function StoryDetailPage() {
           ) : (
             <h1
               className="text-2xl font-bold tracking-tight"
-              data-testid="text-story-title"
+              data-testid="text-project-title"
             >
-              {story.title}
+              {project.title}
             </h1>
           )}
         </div>
@@ -256,7 +256,7 @@ export default function StoryDetailPage() {
               <Button
                 onClick={() => updateMutation.mutate()}
                 disabled={updateMutation.isPending}
-                data-testid="button-save-story"
+                data-testid="button-save-project"
               >
                 <Save className="mr-2 h-4 w-4" />
                 Salvar
@@ -284,8 +284,8 @@ export default function StoryDetailPage() {
                   <DialogHeader>
                     <DialogTitle>Gerar Conteúdo com IA</DialogTitle>
                     <DialogDescription>
-                      Contexto da história será enviado automaticamente junto
-                      com seu prompt.
+                      Contexto do projeto será enviado automaticamente junto com
+                      seu prompt.
                     </DialogDescription>
                   </DialogHeader>
                   <ScrollArea className="max-h-[65vh]">
@@ -444,7 +444,7 @@ export default function StoryDetailPage() {
               <Button
                 variant="outline"
                 onClick={startEditing}
-                data-testid="button-edit-story"
+                data-testid="button-edit-project"
               >
                 Editar
               </Button>
@@ -454,13 +454,13 @@ export default function StoryDetailPage() {
                 onClick={() => {
                   if (
                     window.confirm(
-                      "Deseja remover esta história e todos os seus roteiros?"
+                      "Deseja remover este projeto e todos os seus roteiros?"
                     )
                   ) {
                     deleteMutation.mutate();
                   }
                 }}
-                data-testid="button-delete-story"
+                data-testid="button-delete-project"
               >
                 <Trash2 className="h-4 w-4 text-destructive" />
               </Button>
@@ -490,9 +490,9 @@ export default function StoryDetailPage() {
                   </Select>
                 ) : (
                   <p className="mt-1 text-sm capitalize">
-                    {story.status === "draft"
+                    {project.status === "draft"
                       ? "Rascunho"
-                      : story.status === "in-development"
+                      : project.status === "in-development"
                         ? "Em Desenvolvimento"
                         : "Finalizado"}
                   </p>
@@ -510,7 +510,7 @@ export default function StoryDetailPage() {
                   />
                 ) : (
                   <p className="mt-1 text-sm">
-                    {story.tone || "Não especificado"}
+                    {project.tone || "Não especificado"}
                   </p>
                 )}
               </div>
@@ -519,7 +519,7 @@ export default function StoryDetailPage() {
                   Criado em
                 </Label>
                 <p className="mt-1 text-sm">
-                  {new Date(story.createdAt).toLocaleDateString("pt-BR")}
+                  {new Date(project.createdAt).toLocaleDateString("pt-BR")}
                 </p>
               </div>
             </div>
@@ -534,7 +534,7 @@ export default function StoryDetailPage() {
                 />
               ) : (
                 <p className="mt-1 whitespace-pre-wrap text-sm">
-                  {story.premise || "Nenhuma premissa definida"}
+                  {project.premise || "Nenhuma premissa definida"}
                 </p>
               )}
             </div>
@@ -547,18 +547,18 @@ export default function StoryDetailPage() {
           <TabsList>
             <TabsTrigger value="characters" data-testid="tab-characters">
               <Users className="mr-2 h-4 w-4" />
-              Personagens ({story.characters?.length || 0})
+              Personagens ({project.characters?.length || 0})
             </TabsTrigger>
             <TabsTrigger value="scripts" data-testid="tab-scripts">
               <FileText className="mr-2 h-4 w-4" />
-              Roteiros ({story.scripts?.length || 0})
+              Roteiros ({project.scripts?.length || 0})
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="characters" className="mt-4">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
               <p className="text-sm text-muted-foreground">
-                Personagens vinculados a esta história
+                Personagens vinculados a este projeto
               </p>
               <Dialog open={addCharOpen} onOpenChange={setAddCharOpen}>
                 <DialogTrigger asChild>
@@ -573,9 +573,9 @@ export default function StoryDetailPage() {
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Vincular Personagem à História</DialogTitle>
+                    <DialogTitle>Vincular Personagem ao Projeto</DialogTitle>
                     <DialogDescription>
-                      Selecione um personagem para vincular a esta história.
+                      Selecione um personagem para vincular a este projeto.
                     </DialogDescription>
                   </DialogHeader>
                   <div className="max-h-[50vh] space-y-2 overflow-auto pt-2">
@@ -607,9 +607,9 @@ export default function StoryDetailPage() {
                 </DialogContent>
               </Dialog>
             </div>
-            {story.characters && story.characters.length > 0 ? (
+            {project.characters && project.characters.length > 0 ? (
               <div className="grid gap-3 sm:grid-cols-2">
-                {story.characters.map((char) => (
+                {project.characters.map((char) => (
                   <Card
                     key={char.id}
                     data-testid={`card-linked-char-${char.id}`}
@@ -648,7 +648,7 @@ export default function StoryDetailPage() {
           <TabsContent value="scripts" className="mt-4">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
               <p className="text-sm text-muted-foreground">
-                Roteiros derivados desta história
+                Roteiros derivados deste projeto
               </p>
               <Dialog
                 open={scriptDialogOpen}
@@ -668,7 +668,7 @@ export default function StoryDetailPage() {
                   <DialogHeader>
                     <DialogTitle>Criar Roteiro</DialogTitle>
                     <DialogDescription>
-                      Crie um novo roteiro vinculado a esta história.
+                      Crie um novo roteiro vinculado a este projeto.
                     </DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4 pt-2">
@@ -724,9 +724,9 @@ export default function StoryDetailPage() {
                 </DialogContent>
               </Dialog>
             </div>
-            {story.scripts && story.scripts.length > 0 ? (
+            {project.scripts && project.scripts.length > 0 ? (
               <div className="space-y-3">
-                {story.scripts.map((script) => (
+                {project.scripts.map((script) => (
                   <Card
                     key={script.id}
                     className="hover-elevate cursor-pointer"

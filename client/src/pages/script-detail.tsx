@@ -39,7 +39,7 @@ import {
 import type { Script, AIExecution } from "@shared/schema";
 
 interface ScriptDetail extends Script {
-  storyTitle?: string;
+  projectTitle?: string;
 }
 
 interface AIResult {
@@ -97,7 +97,7 @@ export default function ScriptDetailPage() {
     mutationFn: async () => {
       const res = await apiRequest("POST", "/api/ai/generate", {
         scriptId,
-        storyId: script?.storyId,
+        projectId: script?.projectId,
         userPrompt: aiPrompt,
         type: "script",
       });
@@ -176,9 +176,9 @@ export default function ScriptDetailPage() {
                 {script.title}
               </h1>
             )}
-            {script.storyTitle && (
+            {script.projectTitle && (
               <p className="mt-0.5 text-sm text-muted-foreground">
-                História: {script.storyTitle}
+                Projeto: {script.projectTitle}
               </p>
             )}
           </div>
@@ -219,7 +219,7 @@ export default function ScriptDetailPage() {
                   <DialogHeader>
                     <DialogTitle>Gerar Conteúdo do Roteiro</DialogTitle>
                     <DialogDescription>
-                      O roteiro e história associada serão enviados como
+                      O roteiro e projeto associado serão enviados como
                       contexto.
                     </DialogDescription>
                   </DialogHeader>

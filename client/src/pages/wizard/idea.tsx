@@ -12,7 +12,7 @@ import { Send, Sparkles, ChevronRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import type { Story, AIExecution } from "@shared/schema";
+import type { Project, AIExecution } from "@shared/schema";
 
 interface AIResult {
   execution: AIExecution;
@@ -24,8 +24,8 @@ export default function WizardIdea() {
   const search = useSearch();
   const params = new URLSearchParams(search);
   // Persisted state from URL
-  const storyIdParam = params.get("storyId");
-  const storyId = storyIdParam ? parseInt(storyIdParam) : null;
+  const projectIdParam = params.get("projectId");
+  const projectId = projectIdParam ? parseInt(projectIdParam) : null;
 
   const { toast } = useToast();
   const [initialIdea, setInitialIdea] = useState("");
@@ -34,52 +34,52 @@ export default function WizardIdea() {
     { role: "user" | "ai"; content: string }[]
   >([]);
 
-  // Fetch story availability
-  const { data: story, refetch: refetchStory } = useQuery<Story>({
-    queryKey: [`/api/stories/${storyId}`],
-    enabled: !!storyId,
+  // Fetch Project availability
+  const { data: Project, refetch: refetchProject } = useQuery<Project>({
+    queryKey: [`/api/projects/${projectId}`],
+    enabled: !!projectId,
   });
 
-  // Fetch previous messages (Executions) to restore history
+  // Fetch previous messages (Executions) to restore hiProject
   const { data: executions } = useQuery<AIExecution[]>({
     queryKey: ["/api/executions"],
-    enabled: !!storyId,
+    enabled: !!projectId,
   });
 
   useEffect(() => {
-    // Only attempt to restore if we have no messages yet and have valid history
-    if (storyId && executions && messages.length === 0) {
-      const storyExecs = executions
-        .filter((e) => e.storyId === storyId && e.userPrompt)
+    // Only attempt to restore if we have no messages yet and have valid hiProject
+    if (projectId && executions && messages.length === 0) {
+      const projectExecs = executions
+        .filter((e) => e.projectId === projectId && e.userPrompt)
         .sort(
           (a, b) =>
             new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
         );
 
-      if (storyExecs.length > 0) {
-        const rebuiltMessages = storyExecs.flatMap((e) => [
+      if (projectExecs.length > 0) {
+        const rebuiltMessages = projectExecs.flatMap((e) => [
           { role: "user" as const, content: e.userPrompt || "" },
           { role: "ai" as const, content: e.result || "" },
         ]);
         setMessages(rebuiltMessages);
-      } else if (story?.premise) {
-        // Fallback if no executions found but story exists (maybe created manually?)
+      } else if (Project?.premise) {
+        // Fallback if no executions found but Project exists (maybe created manually?)
         setMessages([
           { role: "user", content: "Ideia salva..." },
           {
             role: "ai",
-            content: `Título: ${story.title}\n\nPremissa: ${story.premise}`,
+            content: `Título: ${Project.title}\n\nPremissa: ${Project.premise}`,
           },
         ]);
       }
     }
-  }, [executions, storyId, story, messages.length]);
+  }, [executions, projectId, Project, messages.length]);
 
   const generateMutation = useMutation({
     mutationFn: async (vars: { prompt: string; sId: number }) => {
       const res = await apiRequest("POST", "/api/ai/generate", {
         userPrompt: vars.prompt,
-        storyId: vars.sId,
+        projectId: vars.sId,
         type: "wizard-idea",
       });
       return res.json() as Promise<AIResult>;
@@ -87,9 +87,9 @@ export default function WizardIdea() {
     onSuccess: (data) => {
       setMessages((prev) => [...prev, { role: "ai", content: data.result }]);
       queryClient.invalidateQueries({ queryKey: ["/api/executions"] });
-      // Update story premise with refinement (last AI output)
-      if (storyId)
-        updateStoryMutation.mutate({ content: data.result, sId: storyId });
+      // Update Project premise with refinement (last AI output)
+      if (projectId)
+        updateProjectMutation.mutate({ content: data.result, sId: projectId });
     },
     onError: (err: Error) => {
       toast({
@@ -100,36 +100,38 @@ export default function WizardIdea() {
     },
   });
 
-  const createStoryMutation = useMutation({
+  const createProjectMutation = useMutation({
     mutationFn: async (idea: string) => {
-      const res = await apiRequest("POST", "/api/stories", {
+      const res = await apiRequest("POST", "/api/projects", {
         title: "Nova Aventura (Rascunho)",
         premise: idea,
         status: "draft",
       });
-      return res.json() as Promise<Story>;
+      return res.json() as Promise<Project>;
     },
     onSuccess: (data) => {
       // Update URL immediately
-      navigate(`/wizard/idea?storyId=${data.id}`);
+      navigate(`/wizard/idea?projectId=${data.id}`);
 
       // Then trigger generation
-      const prompt = `Ideia Inicial: ${initialIdea}\n\nPor favor, expanda esta ideia em um Título, uma Premissa detalhada e um Tom/Gênero. Ao final, faça 2 ou 3 perguntas para que eu possa refinar a história.`;
+      const prompt = `Ideia Inicial: ${initialIdea}\n\nPor favor, expanda esta ideia em um Título, uma Premissa detalhada e um Tom/Gênero. Ao final, faça 2 ou 3 perguntas para que eu possa refinar a Projeto.`;
       generateMutation.mutate({ prompt, sId: data.id });
     },
   });
 
-  const updateStoryMutation = useMutation({
+  const updateProjectMutation = useMutation({
     mutationFn: async (vars: { content: string; sId: number }) => {
       // Try to extract title if present
       const titleMatch = vars.content.match(/Título:\s*(.+?)(\n|$)/i);
       const updates: any = { premise: vars.content };
       if (titleMatch) updates.title = titleMatch[1];
 
-      await apiRequest("PATCH", `/api/stories/${vars.sId}`, updates);
+      await apiRequest("PATCH", `/api/projects/${vars.sId}`, updates);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/stories/${storyId}`] });
+      queryClient.invalidateQueries({
+        queryKey: [`/api/projects/${projectId}`],
+      });
     },
   });
 
@@ -137,20 +139,20 @@ export default function WizardIdea() {
     if (!initialIdea.trim()) return;
     const initialMsg = { role: "user" as const, content: initialIdea };
     setMessages([initialMsg]);
-    // Create story first
-    createStoryMutation.mutate(initialIdea);
+    // Create Project first
+    createProjectMutation.mutate(initialIdea);
   };
 
   const handleSendChat = () => {
-    if (!chatInput.trim() || !storyId) return;
+    if (!chatInput.trim() || !projectId) return;
     setMessages((prev) => [...prev, { role: "user", content: chatInput }]);
     const prompt = `Minha resposta/refinamento: ${chatInput}\n\nCom base nisso, atualize a Premissa e o Título se necessário, e continue o refinamento com novas perguntas se precisar.`;
-    generateMutation.mutate({ prompt, sId: storyId });
+    generateMutation.mutate({ prompt, sId: projectId });
     setChatInput("");
   };
 
   const isProcessing =
-    generateMutation.isPending || createStoryMutation.isPending;
+    generateMutation.isPending || createProjectMutation.isPending;
 
   return (
     <WizardLayout step={1}>
@@ -241,9 +243,9 @@ export default function WizardIdea() {
                   variant="secondary"
                   size="lg"
                   className="px-8 shadow-md"
-                  disabled={!storyId || isProcessing}
+                  disabled={!projectId || isProcessing}
                   onClick={() =>
-                    navigate(`/wizard/characters?storyId=${storyId}`)
+                    navigate(`/wizard/characters?projectId=${projectId}`)
                   }
                 >
                   Próximo: Escolher Personagens

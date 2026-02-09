@@ -49,7 +49,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { CreativeProfile } from "@shared/schema";
 
 const creativeItems = [
-  { title: "Histórias", url: "/", icon: BookOpen },
+  { title: "Projetos", url: "/", icon: BookOpen },
   { title: "Personagens", url: "/characters", icon: Users },
   { title: "Roteiros", url: "/scripts", icon: FileText },
 ];
@@ -290,7 +290,7 @@ export function AppSidebar() {
               <DialogTitle>Reset de Fábrica</DialogTitle>
               <DialogDescription>
                 Isso apagará permanentemente todos os dados personalizados e
-                restaurará as histórias e personagens padrão. Esta ação não pode
+                restaurará os projetos e personagens padrão. Esta ação não pode
                 ser desfeita.
               </DialogDescription>
             </DialogHeader>

@@ -26,7 +26,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import type { Story, Prompt, AIExecution, Script } from "@shared/schema";
+import type { Project, Prompt, AIExecution, Script } from "@shared/schema";
 
 interface AIResult {
   execution: AIExecution;
@@ -37,15 +37,15 @@ export default function WizardScript() {
   const [, navigate] = useLocation();
   const search = useSearch();
   const params = new URLSearchParams(search);
-  const storyId = parseInt(params.get("storyId") || "0");
+  const projectId = parseInt(params.get("projectId") || "0");
   const { toast } = useToast();
 
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
   const [selectedStyleIds, setSelectedStyleIds] = useState<number[]>([]);
 
-  const { data: story } = useQuery<Story>({
-    queryKey: [`/api/stories/${storyId}`],
-    enabled: !!storyId,
+  const { data: Project } = useQuery<Project>({
+    queryKey: [`/api/projects/${projectId}`],
+    enabled: !!projectId,
   });
 
   const { data: prompts, isLoading: isLoadingPrompts } = useQuery<Prompt[]>({
@@ -69,11 +69,11 @@ export default function WizardScript() {
         FORMATO/ESTRUTURA: ${template?.content || "Siga uma estrutura narrativa padrão."}
         ESTILO/TEMA: ${selectedStyles.map((s) => s.content).join(" ")}
 
-        POR FAVOR, GERE O ROTEIRO COMPLETO PARA A HISTÓRIA E PERSONAGEM(S) PROVIDOS NO CONTEXTO.
+        POR FAVOR, GERE O ROTEIRO COMPLETO PARA A Projeto E PERSONAGEM(S) PROVIDOS NO CONTEXTO.
       `;
 
       const res = await apiRequest("POST", "/api/ai/generate", {
-        storyId,
+        projectId,
         userPrompt: combinedPrompt,
         type: "wizard-script",
       });
@@ -82,8 +82,8 @@ export default function WizardScript() {
     onSuccess: async (data) => {
       // Create the script record
       const scriptRes = await apiRequest("POST", "/api/scripts", {
-        storyId,
-        title: `Roteiro Final - ${story?.title}`,
+        projectId,
+        title: `Roteiro Final - ${Project?.title}`,
         type: "detailed",
         content: data.result,
         origin: "ai",
@@ -204,7 +204,7 @@ export default function WizardScript() {
         <div className="flex justify-between border-t pt-6 font-sans">
           <Button
             variant="ghost"
-            onClick={() => navigate(`/wizard/characters?storyId=${storyId}`)}
+            onClick={() => navigate(`/wizard/characters?projectId=${projectId}`)}
             disabled={generateMutation.isPending}
           >
             <ChevronLeft className="mr-2 h-4 w-4" />

@@ -30,14 +30,14 @@ import type { Prompt } from "@shared/schema";
 
 const categoryColors: Record<string, string> = {
   character: "bg-blue-500/10 text-blue-700 dark:text-blue-400",
-  story: "bg-amber-500/10 text-amber-700 dark:text-amber-400",
+  Project: "bg-amber-500/10 text-amber-700 dark:text-amber-400",
   script: "bg-green-500/10 text-green-700 dark:text-green-400",
   refinement: "bg-purple-500/10 text-purple-700 dark:text-purple-400",
 };
 
 const categoryLabels: Record<string, string> = {
   character: "Personagem",
-  story: "História",
+  Project: "Projeto",
   script: "Roteiro",
   refinement: "Refinamento",
 };
@@ -77,7 +77,7 @@ const PromptForm = ({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="character">Personagem</SelectItem>
-            <SelectItem value="story">História</SelectItem>
+            <SelectItem value="Project">Projeto</SelectItem>
             <SelectItem value="script">Roteiro</SelectItem>
             <SelectItem value="refinement">Refinamento</SelectItem>
           </SelectContent>
@@ -105,7 +105,7 @@ const PromptForm = ({
       <Textarea
         value={form.content}
         onChange={(e) => setForm({ ...form, content: e.target.value })}
-        placeholder="Escreva seu modelo de prompt aqui. Use {{story.title}}, {{character.name}} etc. para variáveis."
+        placeholder="Escreva seu modelo de prompt aqui. Use {{Project.title}}, {{character.name}} etc. para variáveis."
         rows={8}
         className="font-mono text-sm"
         data-testid="input-prompt-content"
@@ -143,7 +143,7 @@ export default function PromptsPage() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState({
     name: "",
-    category: "story",
+    category: "Project",
     type: "task",
     content: "",
     active: true,
@@ -191,7 +191,7 @@ export default function PromptsPage() {
   const resetForm = () =>
     setForm({
       name: "",
-      category: "story",
+      category: "Project",
       type: "task",
       content: "",
       active: true,
@@ -272,7 +272,7 @@ export default function PromptsPage() {
         <Tabs value={category} onValueChange={setCategory}>
           <TabsList>
             <TabsTrigger value="all">Todos</TabsTrigger>
-            <TabsTrigger value="story">História</TabsTrigger>
+            <TabsTrigger value="Project">Projeto</TabsTrigger>
             <TabsTrigger value="character">Personagem</TabsTrigger>
             <TabsTrigger value="script">Roteiro</TabsTrigger>
             <TabsTrigger value="refinement">Refinamento</TabsTrigger>

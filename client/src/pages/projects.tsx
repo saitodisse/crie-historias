@@ -25,7 +25,7 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, BookOpen, Search, ChevronRight, Sparkles } from "lucide-react";
-import type { Story } from "@shared/schema";
+import type { Project } from "@shared/schema";
 
 const statusColors: Record<string, string> = {
   draft: "bg-muted text-muted-foreground",
@@ -39,7 +39,7 @@ const statusLabels: Record<string, string> = {
   finished: "Finalizado",
 };
 
-export default function StoriesPage() {
+export default function ProjectsPage() {
   const [, navigate] = useLocation();
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
@@ -49,13 +49,13 @@ export default function StoriesPage() {
   const [status, setStatus] = useState("draft");
   const { toast } = useToast();
 
-  const { data: stories, isLoading } = useQuery<Story[]>({
-    queryKey: ["/api/stories"],
+  const { data: projects, isLoading } = useQuery<Project[]>({
+    queryKey: ["/api/projects"],
   });
 
   const createMutation = useMutation({
     mutationFn: async () => {
-      const res = await apiRequest("POST", "/api/stories", {
+      const res = await apiRequest("POST", "/api/projects", {
         title,
         premise,
         tone,
@@ -64,27 +64,27 @@ export default function StoriesPage() {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/stories"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
       setOpen(false);
       setTitle("");
       setPremise("");
       setTone("");
       setStatus("draft");
-      toast({ title: "História criada com sucesso" });
+      toast({ title: "Projeto criado com sucesso" });
     },
     onError: (err: Error) => {
       toast({
-        title: "Erro ao criar história",
+        title: "Erro ao criar projeto",
         description: err.message,
         variant: "destructive",
       });
     },
   });
 
-  const filtered = stories?.filter(
-    (s) =>
-      s.title.toLowerCase().includes(search.toLowerCase()) ||
-      s.premise?.toLowerCase().includes(search.toLowerCase())
+  const filtered = projects?.filter(
+    (p) =>
+      p.title.toLowerCase().includes(search.toLowerCase()) ||
+      p.premise?.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -93,12 +93,12 @@ export default function StoriesPage() {
         <div>
           <h1
             className="text-2xl font-bold tracking-tight"
-            data-testid="text-stories-title"
+            data-testid="text-projects-title"
           >
-            Histórias
+            Projetos
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Gerencie suas histórias e narrativas criativas
+            Gerencie seus projetos e narrativas criativas
           </p>
         </div>
         <div className="flex gap-2">
@@ -109,18 +109,18 @@ export default function StoriesPage() {
             data-testid="button-wizard"
           >
             <Sparkles className="mr-2 h-4 w-4" />
-            Wizard de História
+            Wizard de Projeto
           </Button>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button data-testid="button-create-story">
+              <Button data-testid="button-create-project">
                 <Plus className="mr-2 h-4 w-4" />
-                Nova História
+                Novo Projeto
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Criar Nova História</DialogTitle>
+                <DialogTitle>Criar Novo Projeto</DialogTitle>
               </DialogHeader>
               <div className="space-y-4 pt-2">
                 <div className="space-y-2">
@@ -128,8 +128,8 @@ export default function StoriesPage() {
                   <Input
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Título da história..."
-                    data-testid="input-story-title"
+                    placeholder="Título do projeto..."
+                    data-testid="input-project-title"
                   />
                 </div>
                 <div className="space-y-2">
@@ -137,10 +137,10 @@ export default function StoriesPage() {
                   <Textarea
                     value={premise}
                     onChange={(e) => setPremise(e.target.value)}
-                    placeholder="Sobre o que é esta história?"
+                    placeholder="Sobre o que é este projeto?"
                     className="resize-none"
                     rows={3}
-                    data-testid="input-story-premise"
+                    data-testid="input-project-premise"
                   />
                 </div>
                 <div className="flex gap-4">
@@ -150,13 +150,13 @@ export default function StoriesPage() {
                       value={tone}
                       onChange={(e) => setTone(e.target.value)}
                       placeholder="ex: Fantasia Épica, Ficção Científica"
-                      data-testid="input-story-tone"
+                      data-testid="input-project-tone"
                     />
                   </div>
                   <div className="flex-1 space-y-2">
                     <Label>Status</Label>
                     <Select value={status} onValueChange={setStatus}>
-                      <SelectTrigger data-testid="select-story-status">
+                      <SelectTrigger data-testid="select-project-status">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -173,9 +173,9 @@ export default function StoriesPage() {
                   className="w-full"
                   onClick={() => createMutation.mutate()}
                   disabled={!title.trim() || createMutation.isPending}
-                  data-testid="button-submit-story"
+                  data-testid="button-submit-project"
                 >
-                  {createMutation.isPending ? "Criando..." : "Criar História"}
+                  {createMutation.isPending ? "Criando..." : "Criar Projeto"}
                 </Button>
               </div>
             </DialogContent>
@@ -189,9 +189,9 @@ export default function StoriesPage() {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar histórias..."
+            placeholder="Buscar projetos..."
             className="pl-9"
-            data-testid="input-search-stories"
+            data-testid="input-search-projects"
           />
         </div>
       </div>
@@ -214,40 +214,40 @@ export default function StoriesPage() {
           </div>
         ) : filtered && filtered.length > 0 ? (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((story) => (
+            {filtered.map((project) => (
               <Card
-                key={story.id}
+                key={project.id}
                 className="hover-elevate group cursor-pointer"
-                onClick={() => navigate(`/stories/${story.id}`)}
-                data-testid={`card-story-${story.id}`}
+                onClick={() => navigate(`/projects/${project.id}`)}
+                data-testid={`card-project-${project.id}`}
               >
                 <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 pb-2">
                   <div className="flex min-w-0 items-center gap-2">
                     <BookOpen className="h-4 w-4 shrink-0 text-primary" />
                     <h3 className="truncate text-sm font-semibold">
-                      {story.title}
+                      {project.title}
                     </h3>
                   </div>
                   <Badge
                     variant="secondary"
-                    className={statusColors[story.status] || ""}
+                    className={statusColors[project.status] || ""}
                   >
-                    {statusLabels[story.status] || story.status}
+                    {statusLabels[project.status] || project.status}
                   </Badge>
                 </CardHeader>
                 <CardContent>
-                  {story.premise ? (
+                  {project.premise ? (
                     <p className="line-clamp-2 text-sm text-muted-foreground">
-                      {story.premise}
+                      {project.premise}
                     </p>
                   ) : (
                     <p className="text-sm italic text-muted-foreground">
                       Sem premissa
                     </p>
                   )}
-                  {story.tone && (
+                  {project.tone && (
                     <p className="mt-2 text-xs text-muted-foreground">
-                      {story.tone}
+                      {project.tone}
                     </p>
                   )}
                   <div className="mt-3 flex items-center justify-end">
@@ -262,11 +262,9 @@ export default function StoriesPage() {
             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
               <BookOpen className="h-8 w-8 text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-semibold">
-              Nenhuma história encontrada
-            </h3>
+            <h3 className="text-lg font-semibold">Nenhum projeto encontrado</h3>
             <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-              Crie sua primeira história para começar a construir seu universo
+              Crie seu primeiro projeto para começar a construir seu universo
               criativo.
             </p>
           </div>

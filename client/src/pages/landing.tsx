@@ -6,9 +6,9 @@ import { ThemeToggle } from "@/components/theme-toggle";
 const features = [
   {
     icon: BookOpen,
-    title: "Gerencie Suas Histórias",
+    title: "Gerencie Suas Projetos",
     description:
-      "Organize histórias, premissas, tons e gêneros em um só lugar.",
+      "Organize Projetos, premissas, tons e gêneros em um só lugar.",
   },
   {
     icon: Users,
@@ -20,7 +20,7 @@ const features = [
     icon: FileText,
     title: "Escreva Roteiros",
     description:
-      "Crie roteiros manuais ou gerados por IA vinculados às suas histórias.",
+      "Crie roteiros manuais ou gerados por IA vinculados às suas Projetos.",
   },
   {
     icon: Sparkles,
@@ -55,7 +55,7 @@ export default function LandingPage() {
           </h2>
           <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
             Plataforma completa para escritores criativos com geração de
-            conteúdo assistida por IA, gerenciamento de histórias, personagens e
+            conteúdo assistida por IA, gerenciamento de Projetos, personagens e
             roteiros.
           </p>
           <div className="pt-4">

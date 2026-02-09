@@ -170,7 +170,7 @@ const CharacterForm = ({
         <Textarea
           value={form.background}
           onChange={(e) => setForm({ ...form, background: e.target.value })}
-          placeholder="História de vida, motivações, segredos..."
+          placeholder="Projeto de vida, motivações, segredos..."
           rows={2}
           className="resize-none"
           data-testid="input-char-background"
@@ -320,7 +320,7 @@ export default function CharactersPage() {
             Personagens
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Personagens que podem ser vinculados a qualquer história
+            Personagens que podem ser vinculados a qualquer Projeto
           </p>
         </div>
         <Dialog
@@ -494,7 +494,7 @@ export default function CharactersPage() {
             </h3>
             <p className="mt-1 max-w-sm text-sm text-muted-foreground">
               Crie personagens reutilizáveis que podem ser compartilhados entre
-              múltiplas histórias.
+              múltiplas Projetos.
             </p>
           </div>
         )}

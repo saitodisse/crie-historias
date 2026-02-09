@@ -8,7 +8,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { encrypt, decrypt } from "./crypto";
 import { getAuthUser, isAuthenticated } from "./auth";
 import {
-  insertStorySchema,
+  insertProjectSchema,
   insertCharacterSchema,
   insertScriptSchema,
   insertPromptSchema,
@@ -40,38 +40,38 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
-  app.get("/api/stories", isAuthenticated, async (req, res) => {
+  app.get("/api/projects", isAuthenticated, async (req, res) => {
     try {
       const user = await getAppUser(req);
-      const result = await storage.getStories(user.id);
+      const result = await storage.getProjects(user.id);
       res.json(result);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
   });
 
-  app.get("/api/stories/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/projects/:id", isAuthenticated, async (req, res) => {
     try {
       const id = toInt(req.params.id);
-      const story = await storage.getStory(id);
-      if (!story) return res.status(404).json({ error: "Story not found" });
-      const storyChars = await storage.getStoryCharacters(id);
-      const storyScripts = await storage.getScriptsByStory(id);
-      res.json({ ...story, characters: storyChars, scripts: storyScripts });
+      const project = await storage.getProject(id);
+      if (!project) return res.status(404).json({ error: "Project not found" });
+      const storyChars = await storage.getProjectCharacters(id);
+      const storyScripts = await storage.getScriptsByProject(id);
+      res.json({ ...project, characters: storyChars, scripts: storyScripts });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
   });
 
-  app.post("/api/stories", isAuthenticated, async (req, res) => {
+  app.post("/api/projects", isAuthenticated, async (req, res) => {
     try {
       const user = await getAppUser(req);
-      const parsed = insertStorySchema
+      const parsed = insertProjectSchema
         .partial()
-        .extend({ title: insertStorySchema.shape.title })
+        .extend({ title: insertProjectSchema.shape.title })
         .parse({ ...req.body, userId: user.id });
-      const story = await storage.createStory(parsed as any);
-      res.status(201).json(story);
+      const project = await storage.createProject(parsed as any);
+      res.status(201).json(project);
     } catch (error: any) {
       if (error.name === "ZodError")
         return res
@@ -81,31 +81,31 @@ export async function registerRoutes(
     }
   });
 
-  app.patch("/api/stories/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/projects/:id", isAuthenticated, async (req, res) => {
     try {
       const id = toInt(req.params.id);
-      const story = await storage.updateStory(id, req.body);
-      if (!story) return res.status(404).json({ error: "Story not found" });
-      res.json(story);
+      const project = await storage.updateProject(id, req.body);
+      if (!project) return res.status(404).json({ error: "Project not found" });
+      res.json(project);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
   });
 
-  app.delete("/api/stories/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/projects/:id", isAuthenticated, async (req, res) => {
     try {
-      await storage.deleteStory(toInt(req.params.id));
+      await storage.deleteProject(toInt(req.params.id));
       res.status(204).send();
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
   });
 
-  app.post("/api/stories/:id/characters", isAuthenticated, async (req, res) => {
+  app.post("/api/projects/:id/characters", isAuthenticated, async (req, res) => {
     try {
-      const storyId = toInt(req.params.id);
+      const projectId = toInt(req.params.id);
       const { characterId } = req.body;
-      const link = await storage.addStoryCharacter({ storyId, characterId });
+      const link = await storage.addProjectCharacter({ projectId, characterId });
       res.status(201).json(link);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -113,12 +113,12 @@ export async function registerRoutes(
   });
 
   app.delete(
-    "/api/stories/:storyId/characters/:characterId",
+    "/api/projects/:projectId/characters/:characterId",
     isAuthenticated,
     async (req, res) => {
       try {
-        await storage.removeStoryCharacter(
-          toInt(req.params.storyId),
+        await storage.removeProjectCharacter(
+          toInt(req.params.projectId),
           toInt(req.params.characterId)
         );
         res.status(204).send();
@@ -188,8 +188,8 @@ export async function registerRoutes(
       const allScripts = await storage.getScripts();
       const enriched = await Promise.all(
         allScripts.map(async (s) => {
-          const story = await storage.getStory(s.storyId);
-          return { ...s, storyTitle: story?.title };
+          const project = await storage.getProject(s.projectId);
+          return { ...s, projectTitle: project?.title };
         })
       );
       res.json(enriched);
@@ -202,8 +202,8 @@ export async function registerRoutes(
     try {
       const script = await storage.getScript(toInt(req.params.id));
       if (!script) return res.status(404).json({ error: "Script not found" });
-      const story = await storage.getStory(script.storyId);
-      res.json({ ...script, storyTitle: story?.title });
+      const project = await storage.getProject(script.projectId);
+      res.json({ ...script, projectTitle: project?.title });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
@@ -487,7 +487,7 @@ export async function registerRoutes(
   app.post("/api/ai/generate", isAuthenticated, async (req, res) => {
     try {
       const user = await getAppUser(req);
-      let { storyId, characterId, scriptId, promptId, userPrompt, type } =
+      let { projectId, characterId, scriptId, promptId, userPrompt, type } =
         req.body;
 
       const profile = await storage.getActiveProfile(user.id);
@@ -508,7 +508,7 @@ export async function registerRoutes(
 
       if (type === "wizard-idea") {
         systemPrompt =
-          "Você é um especialista em estruturação de histórias (Story Architect). Sua tarefa é expandir ideias embrionárias em títulos cativantes e premissas sólidas, mantendo um diálogo construtivo com o autor através de perguntas inteligentes. Sempre peça feedback ou faça perguntas ao final.";
+          "Você é um especialista em estruturação de histórias (Project Architect). Sua tarefa é expandir ideias embrionárias em títulos cativantes e premissas sólidas, mantendo um diálogo construtivo com o autor através de perguntas inteligentes. Sempre peça feedback ou faça perguntas ao final.";
       } else if (type === "wizard-script") {
         systemPrompt =
           "Você é um roteirista profissional. Sua tarefa é produzir roteiros completos e detalhados seguindo o formato e estilo solicitados, respeitando fielmente o contexto dos personagens e da história fornecidos.";
@@ -538,15 +538,15 @@ export async function registerRoutes(
         userPrompt = `${userPrompt}\n\nIMPORTANTE: Retorne APENAS um JSON válido.`;
       }
 
-      let story, character, script, promptRecord;
+      let project, character, script, promptRecord;
 
-      if (storyId) {
-        story = await storage.getStory(storyId);
-        if (story) {
-          contextParts.push(`História: "${story.title}"`);
-          if (story.premise) contextParts.push(`Premissa: ${story.premise}`);
-          if (story.tone) contextParts.push(`Tom/Gênero: ${story.tone}`);
-          const chars = await storage.getStoryCharacters(storyId);
+      if (projectId) {
+        project = await storage.getProject(projectId);
+        if (project) {
+          contextParts.push(`Projeto: "${project.title}"`);
+          if (project.premise) contextParts.push(`Premissa: ${project.premise}`);
+          if (project.tone) contextParts.push(`Tom/Gênero: ${project.tone}`);
+          const chars = await storage.getProjectCharacters(projectId);
           if (chars.length > 0) {
             contextParts.push(
               `Personagens: ${chars.map((c) => `${c.name} - ${c.personality || c.description || ""}`).join("; ")}`
@@ -733,7 +733,7 @@ export async function registerRoutes(
       const execution = await storage.createExecution({
         userId: user.id,
         promptId: promptId || null,
-        storyId: storyId || null,
+        projectId: projectId || null,
         scriptId: scriptId || null,
         characterId: characterId || null,
         systemPromptSnapshot: systemPrompt,
@@ -757,15 +757,15 @@ export async function registerRoutes(
       const execs = await storage.getExecutions(user.id);
       const enriched = await Promise.all(
         execs.map(async (e) => {
-          const [story, character, script, prompt] = await Promise.all([
-            e.storyId ? storage.getStory(e.storyId) : undefined,
+          const [project, character, script, prompt] = await Promise.all([
+            e.projectId ? storage.getProject(e.projectId) : undefined,
             e.characterId ? storage.getCharacter(e.characterId) : undefined,
             e.scriptId ? storage.getScript(e.scriptId) : undefined,
             e.promptId ? storage.getPrompt(e.promptId) : undefined,
           ]);
           return {
             ...e,
-            storyTitle: story?.title,
+            projectTitle: project?.title,
             characterName: character?.name,
             scriptTitle: script?.title,
             promptName: prompt?.name,
@@ -785,10 +785,10 @@ export async function registerRoutes(
       const {
         aiExecutions,
         scripts,
-        storyCharacters,
+        projectCharacters,
         prompts,
         creativeProfiles,
-        stories,
+        projects,
         characters,
       } = await import("@shared/schema");
       const { seedDatabase } = await import("./seed");
@@ -801,29 +801,29 @@ export async function registerRoutes(
         .delete(scripts)
         .where(
           inArray(
-            scripts.storyId,
+            scripts.projectId,
             db
-              .select({ id: stories.id })
-              .from(stories)
-              .where(eq(stories.userId, user.id))
+              .select({ id: projects.id })
+              .from(projects)
+              .where(eq(projects.userId, user.id))
           )
         );
       await db
-        .delete(storyCharacters)
+        .delete(projectCharacters)
         .where(
           inArray(
-            storyCharacters.storyId,
+            projectCharacters.projectId,
             db
-              .select({ id: stories.id })
-              .from(stories)
-              .where(eq(stories.userId, user.id))
+              .select({ id: projects.id })
+              .from(projects)
+              .where(eq(projects.userId, user.id))
           )
         );
       await db.delete(prompts).where(eq(prompts.userId, user.id));
       await db
         .delete(creativeProfiles)
         .where(eq(creativeProfiles.userId, user.id));
-      await db.delete(stories).where(eq(stories.userId, user.id));
+      await db.delete(projects).where(eq(projects.userId, user.id));
       await db.delete(characters).where(eq(characters.userId, user.id));
 
       await seedDatabase(user.id);

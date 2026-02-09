@@ -26,7 +26,7 @@ export default function WizardLayout({ children, step }: WizardLayoutProps) {
         {/* Header */}
         <div className="space-y-2 text-center">
           <h1 className="bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-4xl font-bold tracking-tight text-transparent">
-            Crie sua História
+            Crie sua Projeto
           </h1>
           <p className="text-lg text-muted-foreground">
             Siga os passos para transformar sua ideia em um roteiro completo

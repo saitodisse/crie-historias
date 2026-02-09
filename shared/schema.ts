@@ -25,14 +25,14 @@ export const users = pgTable("users", {
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
-  stories: many(stories),
+  projects: many(projects),
   characters: many(characters),
   prompts: many(prompts),
   creativeProfiles: many(creativeProfiles),
   aiExecutions: many(aiExecutions),
 }));
 
-export const stories = pgTable("stories", {
+export const projects = pgTable("projects", {
   id: serial("id").primaryKey(),
   userId: integer("user_id")
     .notNull()
@@ -49,10 +49,10 @@ export const stories = pgTable("stories", {
     .notNull(),
 });
 
-export const storiesRelations = relations(stories, ({ one, many }) => ({
-  user: one(users, { fields: [stories.userId], references: [users.id] }),
+export const projectsRelations = relations(projects, ({ one, many }) => ({
+  user: one(users, { fields: [projects.userId], references: [users.id] }),
   scripts: many(scripts),
-  storyCharacters: many(storyCharacters),
+  projectCharacters: many(projectCharacters),
   aiExecutions: many(aiExecutions),
 }));
 
@@ -77,29 +77,29 @@ export const characters = pgTable("characters", {
 
 export const charactersRelations = relations(characters, ({ one, many }) => ({
   user: one(users, { fields: [characters.userId], references: [users.id] }),
-  storyCharacters: many(storyCharacters),
+  projectCharacters: many(projectCharacters),
   aiExecutions: many(aiExecutions),
 }));
 
-export const storyCharacters = pgTable("story_characters", {
+export const projectCharacters = pgTable("project_characters", {
   id: serial("id").primaryKey(),
-  storyId: integer("story_id")
+  projectId: integer("project_id")
     .notNull()
-    .references(() => stories.id, { onDelete: "cascade" }),
+    .references(() => projects.id, { onDelete: "cascade" }),
   characterId: integer("character_id")
     .notNull()
     .references(() => characters.id, { onDelete: "cascade" }),
 });
 
-export const storyCharactersRelations = relations(
-  storyCharacters,
+export const projectCharactersRelations = relations(
+  projectCharacters,
   ({ one }) => ({
-    story: one(stories, {
-      fields: [storyCharacters.storyId],
-      references: [stories.id],
+    project: one(projects, {
+      fields: [projectCharacters.projectId],
+      references: [projects.id],
     }),
     character: one(characters, {
-      fields: [storyCharacters.characterId],
+      fields: [projectCharacters.characterId],
       references: [characters.id],
     }),
   })
@@ -107,9 +107,9 @@ export const storyCharactersRelations = relations(
 
 export const scripts = pgTable("scripts", {
   id: serial("id").primaryKey(),
-  storyId: integer("story_id")
+  projectId: integer("project_id")
     .notNull()
-    .references(() => stories.id, { onDelete: "cascade" }),
+    .references(() => projects.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
   type: text("type").notNull().default("synopsis"),
   content: text("content"),
@@ -123,7 +123,10 @@ export const scripts = pgTable("scripts", {
 });
 
 export const scriptsRelations = relations(scripts, ({ one, many }) => ({
-  story: one(stories, { fields: [scripts.storyId], references: [stories.id] }),
+  project: one(projects, {
+    fields: [scripts.projectId],
+    references: [projects.id],
+  }),
   aiExecutions: many(aiExecutions),
 }));
 
@@ -183,7 +186,7 @@ export const aiExecutions = pgTable("ai_executions", {
     .notNull()
     .references(() => users.id),
   promptId: integer("prompt_id").references(() => prompts.id),
-  storyId: integer("story_id").references(() => stories.id),
+  projectId: integer("project_id").references(() => projects.id),
   scriptId: integer("script_id").references(() => scripts.id),
   characterId: integer("character_id").references(() => characters.id),
   systemPromptSnapshot: text("system_prompt_snapshot"),
@@ -203,9 +206,9 @@ export const aiExecutionsRelations = relations(aiExecutions, ({ one }) => ({
     fields: [aiExecutions.promptId],
     references: [prompts.id],
   }),
-  story: one(stories, {
-    fields: [aiExecutions.storyId],
-    references: [stories.id],
+  project: one(projects, {
+    fields: [aiExecutions.projectId],
+    references: [projects.id],
   }),
   script: one(scripts, {
     fields: [aiExecutions.scriptId],
@@ -218,7 +221,7 @@ export const aiExecutionsRelations = relations(aiExecutions, ({ one }) => ({
 }));
 
 export const insertUserSchema = createInsertSchema(users).omit({ id: true });
-export const insertStorySchema = createInsertSchema(stories).omit({
+export const insertProjectSchema = createInsertSchema(projects).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
@@ -228,8 +231,8 @@ export const insertCharacterSchema = createInsertSchema(characters).omit({
   createdAt: true,
   updatedAt: true,
 });
-export const insertStoryCharacterSchema = createInsertSchema(
-  storyCharacters
+export const insertProjectCharacterSchema = createInsertSchema(
+  projectCharacters
 ).omit({ id: true });
 export const insertScriptSchema = createInsertSchema(scripts).omit({
   id: true,
@@ -251,12 +254,14 @@ export const insertAiExecutionSchema = createInsertSchema(aiExecutions).omit({
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
-export type Story = typeof stories.$inferSelect;
-export type InsertStory = z.infer<typeof insertStorySchema>;
+export type Project = typeof projects.$inferSelect;
+export type InsertProject = z.infer<typeof insertProjectSchema>;
 export type Character = typeof characters.$inferSelect;
 export type InsertCharacter = z.infer<typeof insertCharacterSchema>;
-export type StoryCharacter = typeof storyCharacters.$inferSelect;
-export type InsertStoryCharacter = z.infer<typeof insertStoryCharacterSchema>;
+export type ProjectCharacter = typeof projectCharacters.$inferSelect;
+export type InsertProjectCharacter = z.infer<
+  typeof insertProjectCharacterSchema
+>;
 export type Script = typeof scripts.$inferSelect;
 export type InsertScript = z.infer<typeof insertScriptSchema>;
 export type Prompt = typeof prompts.$inferSelect;

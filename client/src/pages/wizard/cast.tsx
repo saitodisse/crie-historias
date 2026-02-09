@@ -17,20 +17,20 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import type { Character, Story } from "@shared/schema";
+import type { Character, Project } from "@shared/schema";
 
 export default function WizardCast() {
   const [, navigate] = useLocation();
   const search = useSearch();
   const params = new URLSearchParams(search);
-  const storyId = parseInt(params.get("storyId") || "0");
+  const projectId = parseInt(params.get("projectId") || "0");
   const { toast } = useToast();
 
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
-  const { data: story } = useQuery<Story>({
-    queryKey: [`/api/stories/${storyId}`],
-    enabled: !!storyId,
+  const { data: Project } = useQuery<Project>({
+    queryKey: [`/api/projects/${projectId}`],
+    enabled: !!projectId,
   });
 
   const {
@@ -43,20 +43,20 @@ export default function WizardCast() {
 
   const linkMutation = useMutation({
     mutationFn: async () => {
-      // Link each selected character to the story
+      // Link each selected character to the Project
       // Ideally this would be a batch operation, but using existing endpoints:
       await Promise.all(
         selectedIds.map((id) =>
-          apiRequest("POST", `/api/stories/${storyId}/characters`, {
+          apiRequest("POST", `/api/projects/${projectId}/characters`, {
             characterId: id,
           })
         )
       );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/stories/${storyId}`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/projects/${projectId}`] });
       const charIdsQuery = selectedIds.join(",");
-      navigate(`/wizard/script?storyId=${storyId}&charIds=${charIdsQuery}`);
+      navigate(`/wizard/script?projectId=${projectId}&charIds=${charIdsQuery}`);
     },
     onError: (err: Error) => {
       toast({
@@ -89,7 +89,7 @@ export default function WizardCast() {
         <div className="flex items-center justify-between">
           <div className="space-y-1">
             <h2 className="text-2xl font-semibold">
-              Quem participará da história?
+              Quem participará da Projeto?
             </h2>
             <p className="text-muted-foreground">
               Selecione os personagens que estarão presentes no roteiro.
@@ -174,7 +174,7 @@ export default function WizardCast() {
         <div className="flex justify-between border-t pt-6 font-sans">
           <Button
             variant="ghost"
-            onClick={() => navigate(`/wizard/idea?storyId=${storyId}`)}
+            onClick={() => navigate(`/wizard/idea?projectId=${projectId}`)}
           >
             <ChevronLeft className="mr-2 h-4 w-4" />
             Voltar
