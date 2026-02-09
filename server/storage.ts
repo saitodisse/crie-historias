@@ -508,12 +508,12 @@ export class DatabaseStorage implements IStorage {
 
   async exportData(): Promise<any> {
     const defaultUser = await db.query.users.findFirst({
-        orderBy: (users, { asc }) => [asc(users.id)],
+      orderBy: (users, { asc }) => [asc(users.id)],
     });
 
     // If no user exists, we can still export empty arrays
     // But realistically the app needs a user to function.
-    
+
     // We export everything raw
     const [
       allUsers,
@@ -541,7 +541,7 @@ export class DatabaseStorage implements IStorage {
       version: 1,
       timestamp: new Date().toISOString(),
       data: {
-        users: allUsers.map(u => ({
+        users: allUsers.map((u) => ({
           ...u,
           password: "redacted",
           openaiKey: null,
@@ -562,22 +562,24 @@ export class DatabaseStorage implements IStorage {
 
   async importData(importPayload: any): Promise<void> {
     const { data } = importPayload;
-    
+
     // Simple validation
     if (!data || !data.users) {
-        throw new Error("Invalid import data format");
+      throw new Error("Invalid import data format");
     }
 
     // Capture existing keys to preserve them if needed
     // We match by externalAuthId or username
-    const existingUsers = await db.select({
-      externalAuthId: users.externalAuthId,
-      username: users.username,
-      openaiKey: users.openaiKey,
-      geminiKey: users.geminiKey,
-      openrouterKey: users.openrouterKey,
-      password: users.password,
-    }).from(users);
+    const existingUsers = await db
+      .select({
+        externalAuthId: users.externalAuthId,
+        username: users.username,
+        openaiKey: users.openaiKey,
+        geminiKey: users.geminiKey,
+        openrouterKey: users.openrouterKey,
+        password: users.password,
+      })
+      .from(users);
 
     await db.transaction(async (tx) => {
       // 1. Delete all existing data in correct order to avoid FK constraints
@@ -595,9 +597,10 @@ export class DatabaseStorage implements IStorage {
       // We sanitize users from the import payload to ensure no keys/passwords are imported
       const sanitizedUsers = data.users.map((u: any) => {
         // Find if this user existed before and has keys to preserve
-        const existing = existingUsers.find(ex => 
-          (u.externalAuthId && ex.externalAuthId === u.externalAuthId) || 
-          (ex.username === u.username)
+        const existing = existingUsers.find(
+          (ex) =>
+            (u.externalAuthId && ex.externalAuthId === u.externalAuthId) ||
+            ex.username === u.username
         );
 
         return {
@@ -609,19 +612,28 @@ export class DatabaseStorage implements IStorage {
           openrouterKey: existing?.openrouterKey || null,
         };
       });
-      
-      if (sanitizedUsers.length > 0) await tx.insert(users).values(sanitizedUsers);
-      if (data.projects.length > 0) await tx.insert(projects).values(data.projects);
-      if (data.characters.length > 0) await tx.insert(characters).values(data.characters);
-      if (data.prompts.length > 0) await tx.insert(prompts).values(data.prompts);
-      if (data.creativeProfiles.length > 0) await tx.insert(creativeProfiles).values(data.creativeProfiles);
-      
-      if (data.scripts.length > 0) await tx.insert(scripts).values(data.scripts);
-      
-      if (data.projectCharacters.length > 0) await tx.insert(projectCharacters).values(data.projectCharacters);
-      if (data.scriptPrompts.length > 0) await tx.insert(scriptPrompts).values(data.scriptPrompts);
-      
-      if (data.aiExecutions.length > 0) await tx.insert(aiExecutions).values(data.aiExecutions);
+
+      if (sanitizedUsers.length > 0)
+        await tx.insert(users).values(sanitizedUsers);
+      if (data.projects.length > 0)
+        await tx.insert(projects).values(data.projects);
+      if (data.characters.length > 0)
+        await tx.insert(characters).values(data.characters);
+      if (data.prompts.length > 0)
+        await tx.insert(prompts).values(data.prompts);
+      if (data.creativeProfiles.length > 0)
+        await tx.insert(creativeProfiles).values(data.creativeProfiles);
+
+      if (data.scripts.length > 0)
+        await tx.insert(scripts).values(data.scripts);
+
+      if (data.projectCharacters.length > 0)
+        await tx.insert(projectCharacters).values(data.projectCharacters);
+      if (data.scriptPrompts.length > 0)
+        await tx.insert(scriptPrompts).values(data.scriptPrompts);
+
+      if (data.aiExecutions.length > 0)
+        await tx.insert(aiExecutions).values(data.aiExecutions);
 
       // 3. Reset sequences
       const tables = [
@@ -637,7 +649,11 @@ export class DatabaseStorage implements IStorage {
       ];
 
       for (const table of tables) {
-         await tx.execute(sql.raw(`SELECT setval('${table}_id_seq', (SELECT MAX(id) FROM ${table}));`));
+        await tx.execute(
+          sql.raw(
+            `SELECT setval('${table}_id_seq', (SELECT MAX(id) FROM ${table}));`
+          )
+        );
       }
     });
   }

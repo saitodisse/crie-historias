@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.5] - 2026-02-09
+
+### Changed
+
+- Refatoração das rotas do servidor para melhor organização modular.
+- Atualização da lógica de importação/exportação de dados no `storage.ts`.
+
 ## [1.0.4] - 2026-02-08
 
 ### Added
