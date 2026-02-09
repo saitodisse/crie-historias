@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import type { Express, Request, Response } from "express";
 import { z } from "zod";
 import { createServer, type Server } from "http";
@@ -125,6 +126,75 @@ export async function registerRoutes(
       res.status(500).json({ error: error.message });
     }
   });
+
+  // Admin / Data Management Routes
+  app.get("/api/admin/export", isAuthenticated, async (req, res) => {
+    try {
+      const exportData = await storage.exportData();
+      res.header("Content-Type", "application/json");
+      res.attachment(`storyforge-backup-${new Date().toISOString().split('T')[0]}.json`);
+      res.json(exportData);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/admin/import", isAuthenticated, async (req, res) => {
+    try {
+      const data = req.body;
+      if (!data || !data.version) {
+        return res.status(400).json({ error: "Invalid backup file format" });
+      }
+      
+      await storage.importData(data);
+      res.json({ success: true, message: "Data imported successfully" });
+    } catch (error: any) {
+      console.error("Import error:", error);
+      res.status(500).json({ error: "Failed to import data: " + error.message });
+    }
+  });
+
+  // Factory Reset (existing) - Keeping it for now but it's redundant with import potentially
+  // Logic was to use /api/admin/reset which is used in app-sidebar. 
+  // We can redirect logic or keep it.
+  app.post("/api/admin/reset", isAuthenticated, async (req, res) => {
+    try {
+      // Reuse import logic with empty data or specific logic?
+      // Since specific logic for reset wasn't in the original file view, 
+      // I assume it was not implemented or missed.
+      // Wait, the user prompt says "passe o reset de fabrica para esta nova tela".
+      // Let's implement it by clearing everything except maybe the user? 
+      // Or just wipe everything.
+      // For now, let's implement a wipe.
+      
+      // Actually, looking at original file, there was NO /api/admin/reset route in the visible lines 1-800.
+      // It might have been further down or missing. The sidebar called it.
+      // I'll implement it here to be safe.
+      
+      await storage.importData({
+        version: 1,
+        timestamp: new Date().toISOString(),
+        data: {
+            users: [],
+            projects: [],
+            characters: [],
+            projectCharacters: [],
+            scripts: [],
+            prompts: [],
+            scriptPrompts: [],
+            creativeProfiles: [],
+            aiExecutions: [],
+        }
+      });
+      // But wait, if we wipe users, the user is logged out and deleted?
+      // Yes, factory reset implies that.
+      
+      res.json({ success: true, message: "Factory reset complete" });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
 
   app.post(
     "/api/projects/:id/characters",

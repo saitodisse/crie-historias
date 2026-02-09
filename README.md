@@ -37,6 +37,7 @@ npm run dev
 - [Autenticacao](#autenticacao)
 - [Integracao com IA](#integracao-com-ia)
 - [Perfis Criativos](#perfis-criativos)
+- [Gerenciamento de Dados](#gerenciamento-de-dados)
 - [Gerenciamento de Chaves de API](#gerenciamento-de-chaves-de-api)
 - [Auditabilidade de Prompts](#auditabilidade-de-prompts)
 - [Rotas da API](#rotas-da-api)
@@ -101,6 +102,13 @@ A plataforma registra cada interacao com IA de forma auditavel, armazenando o pr
 - Seletor de perfil ativo na barra lateral
 - Visualizacao do modelo e temperatura do perfil ativo
 - Um perfil ativo por usuario
+- Gerenciado na pagina de Configuracoes
+
+### Gerenciamento de Dados
+
+- **Exportacao:** Backup completo dos dados (projetos, personagens, roteiros, etc.) em formato JSON. (Chaves de API e senhas nao sao exportadas por seguranca).
+- **Importacao:** Restaura os dados do backup. As chaves de API atuais sao preservadas para os usuários correspondentes. Atencao: substitui todos os outros dados (projetos, historico, etc.).
+- **Factory Reset:** Limpa todos os dados do usuario e restaura o estado inicial do sistema.
 
 ### Historico de Execucoes
 
@@ -462,6 +470,13 @@ A pagina de "Execucoes" permite navegar por todo o historico de interacoes com I
 | PATCH  | `/api/profiles/:id`          | Atualiza perfil         |
 | DELETE | `/api/profiles/:id`          | Remove perfil           |
 | POST   | `/api/profiles/:id/activate` | Ativa perfil            |
+
+### Administracao de Dados
+
+| Metodo | Rota                | Descricao                                    |
+| ------ | ------------------- | -------------------------------------------- |
+| GET    | `/api/admin/export` | Exporta dados do usuario (sem chaves de API) |
+| POST   | `/api/admin/import` | Importa dados e substitui estado atual       |
 
 ### Inteligencia Artificial
 

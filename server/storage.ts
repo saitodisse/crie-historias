@@ -26,7 +26,7 @@ import {
   type InsertAIExecution,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, sql } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -101,6 +101,9 @@ export interface IStorage {
   getExecutions(userId: number): Promise<AIExecution[]>;
   getExecution(id: number): Promise<AIExecution | undefined>;
   createExecution(data: InsertAIExecution): Promise<AIExecution>;
+
+  exportData(): Promise<any>;
+  importData(data: any): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -501,6 +504,142 @@ export class DatabaseStorage implements IStorage {
   async createExecution(data: InsertAIExecution): Promise<AIExecution> {
     const [exec] = await db.insert(aiExecutions).values(data).returning();
     return exec;
+  }
+
+  async exportData(): Promise<any> {
+    const defaultUser = await db.query.users.findFirst({
+        orderBy: (users, { asc }) => [asc(users.id)],
+    });
+
+    // If no user exists, we can still export empty arrays
+    // But realistically the app needs a user to function.
+    
+    // We export everything raw
+    const [
+      allUsers,
+      allProjects,
+      allCharacters,
+      allProjectCharacters,
+      allScripts,
+      allPrompts,
+      allScriptPrompts,
+      allCreativeProfiles,
+      allAiExecutions,
+    ] = await Promise.all([
+      db.select().from(users),
+      db.select().from(projects),
+      db.select().from(characters),
+      db.select().from(projectCharacters),
+      db.select().from(scripts),
+      db.select().from(prompts),
+      db.select().from(scriptPrompts),
+      db.select().from(creativeProfiles),
+      db.select().from(aiExecutions),
+    ]);
+
+    return {
+      version: 1,
+      timestamp: new Date().toISOString(),
+      data: {
+        users: allUsers.map(u => ({
+          ...u,
+          password: "redacted",
+          openaiKey: null,
+          geminiKey: null,
+          openrouterKey: null,
+        })),
+        projects: allProjects,
+        characters: allCharacters,
+        projectCharacters: allProjectCharacters,
+        scripts: allScripts,
+        prompts: allPrompts,
+        scriptPrompts: allScriptPrompts,
+        creativeProfiles: allCreativeProfiles,
+        aiExecutions: allAiExecutions,
+      },
+    };
+  }
+
+  async importData(importPayload: any): Promise<void> {
+    const { data } = importPayload;
+    
+    // Simple validation
+    if (!data || !data.users) {
+        throw new Error("Invalid import data format");
+    }
+
+    // Capture existing keys to preserve them if needed
+    // We match by externalAuthId or username
+    const existingUsers = await db.select({
+      externalAuthId: users.externalAuthId,
+      username: users.username,
+      openaiKey: users.openaiKey,
+      geminiKey: users.geminiKey,
+      openrouterKey: users.openrouterKey,
+      password: users.password,
+    }).from(users);
+
+    await db.transaction(async (tx) => {
+      // 1. Delete all existing data in correct order to avoid FK constraints
+      await tx.delete(aiExecutions);
+      await tx.delete(scriptPrompts);
+      await tx.delete(projectCharacters);
+      await tx.delete(scripts);
+      await tx.delete(projects);
+      await tx.delete(characters);
+      await tx.delete(prompts);
+      await tx.delete(creativeProfiles);
+      await tx.delete(users);
+
+      // 2. Insert new data in correct order
+      // We sanitize users from the import payload to ensure no keys/passwords are imported
+      const sanitizedUsers = data.users.map((u: any) => {
+        // Find if this user existed before and has keys to preserve
+        const existing = existingUsers.find(ex => 
+          (u.externalAuthId && ex.externalAuthId === u.externalAuthId) || 
+          (ex.username === u.username)
+        );
+
+        return {
+          ...u,
+          // ALWAYS ignore keys and password from import payload
+          password: existing?.password || "redacted",
+          openaiKey: existing?.openaiKey || null,
+          geminiKey: existing?.geminiKey || null,
+          openrouterKey: existing?.openrouterKey || null,
+        };
+      });
+      
+      if (sanitizedUsers.length > 0) await tx.insert(users).values(sanitizedUsers);
+      if (data.projects.length > 0) await tx.insert(projects).values(data.projects);
+      if (data.characters.length > 0) await tx.insert(characters).values(data.characters);
+      if (data.prompts.length > 0) await tx.insert(prompts).values(data.prompts);
+      if (data.creativeProfiles.length > 0) await tx.insert(creativeProfiles).values(data.creativeProfiles);
+      
+      if (data.scripts.length > 0) await tx.insert(scripts).values(data.scripts);
+      
+      if (data.projectCharacters.length > 0) await tx.insert(projectCharacters).values(data.projectCharacters);
+      if (data.scriptPrompts.length > 0) await tx.insert(scriptPrompts).values(data.scriptPrompts);
+      
+      if (data.aiExecutions.length > 0) await tx.insert(aiExecutions).values(data.aiExecutions);
+
+      // 3. Reset sequences
+      const tables = [
+        "users",
+        "projects",
+        "characters",
+        "scripts",
+        "prompts",
+        "creative_profiles",
+        "ai_executions",
+        "project_characters",
+        "script_prompts",
+      ];
+
+      for (const table of tables) {
+         await tx.execute(sql.raw(`SELECT setval('${table}_id_seq', (SELECT MAX(id) FROM ${table}));`));
+      }
+    });
   }
 }
 

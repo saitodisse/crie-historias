@@ -11,11 +11,12 @@ This document provides a summary of the "Crie Histórias" project, intended for 
 - **Story Management:** Create, edit, and delete stories with title, premise, tone, and status. Link existing characters to stories.
 - **Character Management:** Create reusable characters with detailed descriptions, personality, and background. AI-assisted character description generation.
 - **Scripts:** Create story-linked scripts (synopsis, outline, detailed), with manual or AI-generated content.
+- **Settings & Data:** Centralized settings page for managing creative profiles, factory reset, and data import/export (JSON dump).
 - **Prompt Library:** Save and version prompts for reuse, with categories and types.
 - **AI Content Generation:** Supports OpenAI, Google Gemini, and OpenRouter. Provides full observability of sent prompts, system prompts, parameters, and results for each generation.
-- **Creative Profiles:** Configure AI model preferences (model, temperature, max tokens, narrative style) per profile, with an active profile selector.
+- **Creative Profiles:** Configure AI model preferences (model, temperature, max tokens, narrative style) per profile, with an active profile selector. Managed in the Settings page.
 - **Execution History:** Comprehensive audit trail of all AI calls, storing prompts, models, parameters, and results.
-- **User Profile:** API key configuration (encrypted) for OpenAI, Gemini, and OpenRouter, and creative profile management.
+- **User Profile:** API key configuration (encrypted) for OpenAI, Gemini, and OpenRouter.
 
 **Architecture:**
 The application follows a client-server architecture:
