@@ -15,7 +15,8 @@ const categoryColors: Record<string, string> = {
   project: "bg-amber-500/10 text-amber-700 dark:text-amber-400",
   script: "bg-green-500/10 text-green-700 dark:text-green-400",
   refinement: "bg-purple-500/10 text-purple-700 dark:text-purple-400",
-  GLOBAL: "bg-red-500/10 text-red-700 dark:text-red-400 font-bold border border-red-200/50",
+  GLOBAL:
+    "bg-red-500/10 text-red-700 dark:text-red-400 font-bold border border-red-200/50",
 };
 
 const categoryLabels: Record<string, string> = {

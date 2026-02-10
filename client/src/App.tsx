@@ -73,7 +73,7 @@ function AuthenticatedApp() {
       <div className="flex min-h-screen w-full">
         <AppSidebar />
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-50 flex items-center justify-between gap-2 border-b bg-background p-2 backdrop-blur-sm support-[backdrop-filter]:bg-background/60">
+          <header className="support-[backdrop-filter]:bg-background/60 sticky top-0 z-50 flex items-center justify-between gap-2 border-b bg-background p-2 backdrop-blur-sm">
             <SidebarTrigger data-testid="button-sidebar-toggle" />
             <ThemeToggle />
           </header>

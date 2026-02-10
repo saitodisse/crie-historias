@@ -201,7 +201,9 @@ export default function ExecutionsPage() {
                 <div className="flex flex-wrap items-center gap-2">
                   <Badge variant="secondary">{selectedExec!.model}</Badge>
                   {selectedExec!.projectTitle && (
-                    <Badge variant="outline">{selectedExec!.projectTitle}</Badge>
+                    <Badge variant="outline">
+                      {selectedExec!.projectTitle}
+                    </Badge>
                   )}
                   {selectedExec!.characterName && (
                     <Badge variant="outline">

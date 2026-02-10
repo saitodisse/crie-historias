@@ -39,7 +39,9 @@ export async function seedDatabase(userId: number = DEFAULT_USER_ID) {
       throw new Error("Invalid configuration file: missing 'data' property");
     }
 
-    console.log(`Seeding database for user ${effectiveUserId} from ${configPath}...`);
+    console.log(
+      `Seeding database for user ${effectiveUserId} from ${configPath}...`
+    );
 
     // Use the smart import service to clear and import data
     await importDataForUser(effectiveUserId, jsonConfig.data);

@@ -628,7 +628,9 @@ export class DatabaseStorage implements IStorage {
       if (data.prompts && data.prompts.length > 0)
         await tx.insert(prompts).values(data.prompts.map(mapUserId));
       if (data.creativeProfiles && data.creativeProfiles.length > 0)
-        await tx.insert(creativeProfiles).values(data.creativeProfiles.map(mapUserId));
+        await tx
+          .insert(creativeProfiles)
+          .values(data.creativeProfiles.map(mapUserId));
 
       if (data.scripts && data.scripts.length > 0)
         await tx.insert(scripts).values(data.scripts);

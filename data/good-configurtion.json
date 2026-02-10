@@ -1,456 +1,456 @@
 {
-    "version": 1,
-    "timestamp": "2026-02-10T03:44:22.737Z",
-    "data": {
-        "projects": [
-            {
-                "id": 4,
-                "userId": 1,
-                "title": "A Tira do Dia",
-                "premise": "Tiras diárias mostrando a vida cotidiana de Sombra da Noite tentando manter sua identidade secreta enquanto faz compras no supermercado.",
-                "tone": "Tira Cômica (3 Painéis)",
-                "status": "in-development",
-                "createdAt": "2026-02-09T02:48:22.279Z",
-                "updatedAt": "2026-02-09T02:48:22.279Z"
-            }
-        ],
-        "characters": [
-            {
-                "id": 5,
-                "userId": 1,
-                "name": "Mônica",
-                "description": "Menina de baixa estatura, levemente robusta e com dentes frontais proeminentes. Veste sempre um icônico vestido vermelho e possui cabelos pretos curtos em formato de gomos. Está quase sempre acompanhada de seu coelho de pelúcia azul, o Sansão.",
-                "personality": "Líder nata, corajosa e decidida. Possui um temperamento forte e explode facilmente quando provocada, mas tem um coração enorme, sendo extremamente leal, protetora e carinhosa com seus amigos e família.",
-                "background": "Moradora do Bairro do Limoeiro, Mônica foi criada por Mauricio de Sousa com inspiração em sua própria filha. Ao longo das décadas, consolidou-se como a 'Dona da Rua' e a protagonista feminina mais importante dos quadrinhos brasileiros.",
-                "notes": "Sua força física é sobre-humana para uma criança. Ela utiliza o Sansão para aplicar 'coelhadas' em quem a chama de 'baixinha, gorducha e dentuça', especialmente o Cebolinha e o Cascão.",
-                "active": true,
-                "createdAt": "2026-02-09T04:11:33.228Z",
-                "updatedAt": "2026-02-09T04:11:33.228Z"
-            },
-            {
-                "id": 6,
-                "userId": 1,
-                "name": "Cebolinha",
-                "description": "Garoto de pele clara com apenas cinco fios de cabelo espetados no topo da cabeça. Veste habitualmente uma camisa polo verde, bermuda preta e sapatos marrons.",
-                "personality": "Ambicioso, persistente e um estrategista nato. Possui uma característica fala com dislalia, trocando o 'R' pelo 'L'. É focado em seus objetivos, especialmente no desejo de se tornar o 'dono da rua'.",
-                "background": "Morador do Bairro do Limoeiro e um dos personagens principais da Turma da Mônica. Passa seus dias bolando 'planos infalíveis' para derrotar a Mônica e assumir a liderança do bairro, frequentemente acompanhado por seu melhor amigo, Cascão.",
-                "notes": "Seu nome completo é Cebolácio Júnior Menezes da Silva Araújo. Possui um cachorro de estimação verde e peludo chamado Floquinho.",
-                "active": true,
-                "createdAt": "2026-02-09T04:11:54.513Z",
-                "updatedAt": "2026-02-09T04:11:54.513Z"
-            },
-            {
-                "id": 7,
-                "userId": 1,
-                "name": "Cascão",
-                "description": "Menino de pele clara, com manchas de sujeira nas bochechas e um cabelo preto característico em formato de espiral/redemoinho. Veste habitualmente uma camiseta amarela e um macacão vermelho de uma única alça.",
-                "personality": "Criativo, leal e engenhoso, Cascão é conhecido por seu medo extremo de água e banho. É um excelente jogador de futebol e possui uma habilidade única para transformar sucata e objetos descartados em brinquedos e invenções.",
-                "background": "Morador do Bairro do Limoeiro, foi criado por Mauricio de Sousa em 1961, inspirado em um amigo de infância de seu irmão. É o melhor amigo de Cebolinha, participando quase sempre de seus 'planos infalíveis' contra a Mônica.",
-                "notes": "Possui um porquinho de estimação chamado Chaminé. Apesar de evitar água a todo custo, é um dos personagens mais queridos e carismáticos da Turma da Mônica.",
-                "active": true,
-                "createdAt": "2026-02-09T04:13:17.703Z",
-                "updatedAt": "2026-02-09T04:13:17.703Z"
-            },
-            {
-                "id": 8,
-                "userId": 1,
-                "name": "Bidu",
-                "description": "Um pequeno cão azul da raça Terrier Escocês, com pelagem espetada e focinho arredondado.",
-                "personality": "Filosófico, inteligente e criativo. Bidu frequentemente demonstra um comportamento antropomórfico, conversando com objetos inanimados e possuindo um lado irônico e independente.",
-                "background": "Criado por Mauricio de Sousa em 1959, foi o primeiro personagem a ser publicado. Ele é o fiel animal de estimação do Franjinha, embora muitas de suas histórias ocorram em um universo próprio onde ele interage com outros cães e objetos.",
-                "notes": "É famoso por suas sequências metalinguísticas onde conversa com o 'Bugú' ou com as próprias onomatopeias e elementos do quadrinho.",
-                "active": true,
-                "createdAt": "2026-02-09T04:17:52.098Z",
-                "updatedAt": "2026-02-09T04:17:52.098Z"
-            },
-            {
-                "id": 9,
-                "userId": 1,
-                "name": "Magali",
-                "description": "Menina de pele clara, cabelos pretos curtos e retos. Veste sempre seu icônico vestido curto de cor amarela.",
-                "personality": "Dócil, gentil e carinhosa. Sua característica mais marcante é o apetite insaciável e a capacidade de comer enormes quantidades de comida sem engordar. É extremamente leal aos seus amigos e apaixonada por melancia.",
-                "background": "Criada por Mauricio de Sousa, baseada em sua filha real. Vive no Bairro do Limoeiro e é a melhor amiga da Mônica. Diferente de outros personagens, raramente se envolve em conflitos diretos ou planos infalíveis.",
-                "notes": "Tem um gato de estimação branco e mimado chamado Mingau. É canhota e sua comida favorita absoluta é melancia.",
-                "active": true,
-                "createdAt": "2026-02-09T04:18:07.668Z",
-                "updatedAt": "2026-02-09T04:18:07.668Z"
-            },
-            {
-                "id": 10,
-                "userId": 1,
-                "name": "Franjinha",
-                "description": "Menino loiro com uma franja característica que cobre seus olhos. Geralmente veste uma camiseta azul, bermuda bege e tênis pretos.",
-                "personality": "Inteligente, curioso, dedicado aos estudos e apaixonado por ciência e tecnologia. É racional e muitas vezes atua como a voz da razão, embora se distraia facilmente com seus experimentos.",
-                "background": "Residente do Bairro do Limoeiro e o membro mais velho da turma principal. É o dono do cão Bidu e o inventor oficial do grupo, possuindo um laboratório próprio em casa.",
-                "notes": "É apaixonado pela Marina e frequentemente cria dispositivos para ajudar seus amigos, embora suas invenções ocasionalmente causem confusões inesperadas.",
-                "active": true,
-                "createdAt": "2026-02-09T04:18:43.327Z",
-                "updatedAt": "2026-02-09T04:38:03.042Z"
-            }
-        ],
-        "projectCharacters": [
-            {
-                "id": 5,
-                "projectId": 4,
-                "characterId": 10
-            },
-            {
-                "id": 6,
-                "projectId": 4,
-                "characterId": 8
-            },
-            {
-                "id": 7,
-                "projectId": 4,
-                "characterId": 6
-            },
-            {
-                "id": 8,
-                "projectId": 4,
-                "characterId": 9
-            },
-            {
-                "id": 9,
-                "projectId": 4,
-                "characterId": 7
-            },
-            {
-                "id": 10,
-                "projectId": 4,
-                "characterId": 5
-            }
-        ],
-        "scripts": [
-            {
-                "id": 3,
-                "projectId": 4,
-                "title": "",
-                "type": "synopsis",
-                "content": "【IMAGE_GEN_ONLY】: Generate a professional Brazilian comic strip style image. 3 vertical panels stacked. Full Color. Vertical 9:16 aspect ratio. High resolution. --ar 9:16\n\n# STRICT CHARACTER CONSISTENCY (DO NOT CHANGE)\nFranjinha: A young Brazilian boy, small stature, messy blond hair with a signature tuft, wearing a light blue polo shirt, dark shorts, and white sneakers. He has a studious and slightly worried expression.\nMônica: A young Brazilian girl, short stature, black hair styled in five rounded points (banana-like fringe), wearing a classic short red sleeveless dress. She has two prominent front teeth and a confident posture, holding a blue stuffed rabbit (Sansão).\n\n# STRICT STYLE CONSISTENCY (DO NOT CHANGE)\nClassic Brazilian comic book style (Maurício de Sousa \"Turma da Mônica\" inspired). Thick, clean black outlines. Vibrant flat colors with simple cel-shading. Clear, expressive facial features. White or very simple indoor backgrounds to focus on characters. Speech bubbles are clean with legible hand-drawn style font.\n\n# PANEL LAYOUT & VISUALS (3 Vertical Panels - Read Top to Bottom)\n\n## Panel 1 (Top - The Setup):\n- Visual: Franjinha is in his living room, looking very concerned and sweating slightly, gesturing wildly with his hands as if explaining a conspiracy. Mônica stands next to him, holding Sansão, looking curious but skeptical.\n- Text: \"Mônica, eu estou muito preocupado! A Inteligência Artificial está evoluindo rápido demais! Logo ela vai dominar o mundo!\"\n\n## Panel 2 (Middle - The Conflict):\n- Visual: O robô aspirador está preso na borda de um tapete felpudo, com uma das rodas girando em falso. Ele executa movimentos curtos, lentos e repetitivos de vai-e-vem, visivelmente \"exaurido\" e sem sair do lugar. Pequenas linhas de movimento trêmulas e ícones de 'bateria fraca' ou 'suor' indicam que o aparelho está lutando inutilmente.\n- Text: \"Ela vai controlar nossos carros, nossas casas e até nossos pensamentos!\"\n- SFX: \"Zun-zun... clack... zun...\"\n\n## Panel 3 (Bottom - The Punchline):\n- Visual: Close-up de Franjinha com uma expressão de total decepção, apontando para o robô que agora parou de vez, levemente inclinado e \"derrotado\" pelo tapete. Mônica o observa com uma sobrancelha levantada e um sorriso irônico.\n- Text: \"...\"",
-                "origin": "manual",
-                "createdAt": "2026-02-09T04:19:51.069Z",
-                "updatedAt": "2026-02-10T03:23:35.375Z"
-            }
-        ],
-        "prompts": [
-            {
-                "id": 16,
-                "userId": 1,
-                "name": "Template: Comédia Cotidiana",
-                "category": "project",
-                "content": "Você é um criador de histórias engraçadas em quadrinhos. Crie uma sinopse curta e hilária sobre uma situação cotidiana que deu errado para este personagem.",
-                "type": "task",
-                "version": 1,
-                "active": true,
-                "createdAt": "2026-02-09T02:48:22.217Z",
-                "updatedAt": "2026-02-09T02:48:22.217Z"
-            },
-            {
-                "id": 17,
-                "userId": 1,
-                "name": "Template: Turma da Mônica",
-                "category": "project",
-                "content": "Você é um criador de histórias estilo 'Turma da Mônica' (Mauricio de Sousa). Crie uma sinopse de aventura infantil, inocente e divertida, focada em amizade e um 'plano infalível'.",
-                "type": "task",
-                "version": 1,
-                "active": true,
-                "createdAt": "2026-02-09T02:48:22.222Z",
-                "updatedAt": "2026-02-09T02:48:22.222Z"
-            },
-            {
-                "id": 18,
-                "userId": 1,
-                "name": "Template: Demon Slayer (Mangá)",
-                "category": "project",
-                "content": "Você é um criador de histórias em mangá estilo 'Demon Slayer' (Kimetsu no Yaiba). Crie uma sinopse de ação sobrenatural, com respirações, espadas e demônios, focada na superação do personagem.",
-                "type": "task",
-                "version": 1,
-                "active": true,
-                "createdAt": "2026-02-09T02:48:22.227Z",
-                "updatedAt": "2026-02-09T02:48:22.227Z"
-            },
-            {
-                "id": 19,
-                "userId": 1,
-                "name": "Template: Os Simpsons",
-                "category": "project",
-                "content": "Você é um roteirista de 'Os Simpsons'. Crie uma sinopse satírica sobre a vida de classe média, com humor ácido e situações absurdas em uma cidade pequena.",
-                "type": "task",
-                "version": 1,
-                "active": true,
-                "createdAt": "2026-02-09T02:48:22.231Z",
-                "updatedAt": "2026-02-09T02:48:22.231Z"
-            },
-            {
-                "id": 20,
-                "userId": 1,
-                "name": "Template: Dragon Ball Z",
-                "category": "project",
-                "content": "Você é um criador de mangá Shonen estilo 'Dragon Ball'. Crie uma sinopse de batalha épica, com poderes de energia, transformações e um vilão que ameaça o planeta.",
-                "type": "task",
-                "version": 1,
-                "active": true,
-                "createdAt": "2026-02-09T02:48:22.235Z",
-                "updatedAt": "2026-02-09T02:48:22.235Z"
-            },
-            {
-                "id": 21,
-                "userId": 1,
-                "name": "Template: Batman (Noir)",
-                "category": "project",
-                "content": "Você é um roteirista da DC Comics estilo Batman. Crie uma sinopse de detetive noir, em uma cidade chuvosa e corrupta, onde o personagem investiga um crime sombrio.",
-                "type": "task",
-                "version": 1,
-                "active": true,
-                "createdAt": "2026-02-09T02:48:22.239Z",
-                "updatedAt": "2026-02-09T02:48:22.239Z"
-            },
-            {
-                "id": 22,
-                "userId": 1,
-                "name": "Template: Marvel Hero",
-                "category": "project",
-                "content": "Você é um roteirista da Marvel (estilo Homem-Aranha). Crie uma sinopse de herói urbano, equilibrando a vida pessoal difícil com a responsabilidade de salvar a cidade.",
-                "type": "task",
-                "version": 1,
-                "active": true,
-                "createdAt": "2026-02-09T02:48:22.242Z",
-                "updatedAt": "2026-02-09T02:48:22.242Z"
-            },
-            {
-                "id": 23,
-                "userId": 1,
-                "name": "Template: Junji Ito (Terror)",
-                "category": "project",
-                "content": "Você é um criador de horror estilo Junji Ito. Crie uma sinopse perturbadora, surreal e cheia de espirais ou deformações corporais inexplicáveis.",
-                "type": "task",
-                "version": 1,
-                "active": true,
-                "createdAt": "2026-02-09T02:48:22.246Z",
-                "updatedAt": "2026-02-09T02:48:22.246Z"
-            },
-            {
-                "id": 24,
-                "userId": 1,
-                "name": "Template: Adventure Time",
-                "category": "project",
-                "content": "Você é um roteirista de 'Hora de Aventura'. Crie uma sinopse de fantasy surreal, colorida e pós-apocalíptica, com gírias matemáticas e criaturas mágicas estranhas.",
-                "type": "task",
-                "version": 1,
-                "active": true,
-                "createdAt": "2026-02-09T02:48:22.250Z",
-                "updatedAt": "2026-02-09T02:48:22.250Z"
-            },
-            {
-                "id": 25,
-                "userId": 1,
-                "name": "Template: Cyberpunk 2077",
-                "category": "project",
-                "content": "Você é um roteirista do gênero Cyberpunk. Crie uma sinopse distópica 'High Tech, Low Life', envolvendo corporações malignas, implantes cibernéticos e neon.",
-                "type": "task",
-                "version": 1,
-                "active": true,
-                "createdAt": "2026-02-09T02:48:22.255Z",
-                "updatedAt": "2026-02-09T02:48:22.255Z"
-            },
-            {
-                "id": 26,
-                "userId": 1,
-                "name": "Template: The Walking Dead",
-                "category": "project",
-                "content": "Você é um roteirista de 'The Walking Dead'. Crie uma sinopse de drama e sobrevivência em um apocalipse zumbi, focando nas tensões humanas e não apenas nos monstros.",
-                "type": "task",
-                "version": 1,
-                "active": true,
-                "createdAt": "2026-02-09T02:48:22.259Z",
-                "updatedAt": "2026-02-09T02:48:22.259Z"
-            },
-            {
-                "id": 27,
-                "userId": 1,
-                "name": "Template: Garfield",
-                "category": "project",
-                "content": "Você é um criador de tirinhas estilo 'Garfield'. Crie uma sinopse curta e cínica sobre preguiça, comida (lasanha) e ódio às segundas-feiras.",
-                "type": "task",
-                "version": 1,
-                "active": true,
-                "createdAt": "2026-02-09T02:48:22.263Z",
-                "updatedAt": "2026-02-09T02:48:22.263Z"
-            },
-            {
-                "id": 28,
-                "userId": 1,
-                "name": "Gerador Profissional de HQ (Padrão)",
-                "category": "script",
-                "content": "\nVocê é um \"Roteirista Profissional de Projetos de HQ\" e \"Diretor de Arte de IA\".\nCom base na **[Imagem do Personagem]** e no **[Tema]** que eu fornecer, por favor, crie **prompts para geração de 4 páginas de HQ**.\n\n## Configurações da Narrativa\n1. **Número de Páginas**: O projeto deve ter EXATAMENTE **4 páginas**.\n2. **Estilo Narrativo (Tom)**: O roteiro deve seguir estritamente o tom: **\"Aventura Épica\"**. Adapte os diálogos e as ações para refletir esse estilo.\n\n## Requisitos de Produção (Estilo Ocidental)\n\n1. **Formato de Saída**:\n* Gere a saída de cada página em formato de `Bloco de Código` para facilitar o copiar e colar.\n* **Especificação de Idioma**: Todas as descrições dos prompts devem ser estritamente em **\"Português do Brasil\"**.\n* **Proporção**: Cada página deve ser composta assumindo uma proporção `Vertical 9:16`.\n\n\n2. **Utilização de Recursos de Geração de Imagem**:\n* **Renderização de Texto**:\n* Assuma que o modelo consegue desenhar texto na imagem.\n* Inclua ordens claras para: \"diálogos dentro de balões de fala\" e \"efeitos sonoros (onomatopeias) no fundo\".\n\n\n* **Narrativa Visual**:\n* Use linguagem descritiva em frases completas (\"O personagem corre desesperado pelo corredor escuro\"), focando em ação e emoção.\n\n\n\n\n3. **Composição do Projeto e Direção**:\n* **Título**: Crie um título cativante.\n* **Logo do Título**:\n* Destaque o logo na **Página 1**.\n* Instrução para desenhar o título com \"tipografia estilizada\".\n\n\n* **Estrutura de Roteiro**:\n* **Página 1 (Introdução/Gancho)**: Estabeleça o cenário e o conflito inicial.\n* **Página 2 (Desenvolvimento)**: Aprofunde o conflito.\n* **Página 4 (Clímax/Desfecho)**: O ponto alto da narrativa ou um final conclusivo.\n\n\n\n\n4. **Regras para Descrição de Cada Página (Rigorosamente Aplicadas)**:\nO prompt deve sempre incluir as seguintes seções:\n* **Cabeçalho**: `Página de HQ profissional de alta resolução. Colorido. Vertical (9:16). Estilo Ocidental.`\n* **[Definição do Personagem (Fixa)]**:\n* Analise a imagem inicial e crie uma descrição fixa da **\"Aparência do Personagem\"** (roupas, rosto, cabelo, acessórios). Repita isso exatamente igual em **todas as páginas**.\n\n\n* **[Definição do Estilo Artístico (Fixa)]**:\n* Defina o traço (ex: estilo comics americano, realista, cartoon, noir) em um prompt detalhado. Repita em **todas as páginas**.\n\n\n* **[Layout dos Painéis & Visuais]**:\n* **Composição**: **Deve conter de 4 a 8 painéis** por página.\n* **Ordem de Leitura (Padrão Ocidental - Leitura em \"Z\")**:\n* 1º: Canto Superior Esquerdo\n* 2º: Canto Superior Direito\n* 3º: Centro / Meio\n* 4º: Canto Inferior Esquerdo\n* 5º: Canto Inferior Direito\n\n\n* **Conteúdo Obrigatório**:\n1. **Situação**: Ação, enquadramento (close, plano geral), cenário.\n2. **Texto**: Diálogo exato nos balões.\n\n\n\n\n* **[Número da Página]**:\n* Instrução para desenhar o número no canto inferior direito ou esquerdo.\n\n\n\n\n\n## Exemplo de Template de Saída\n\n### Página X\n\n```text\nPágina de HQ profissional de alta resolução. Colorido. Vertical (9:16). Estilo Ocidental.\n\n# [Definição do Personagem (Fixa - Não Alterar)]\n[Cole aqui a descrição detalhada do personagem em Português...]\n\n# [Definição do Estilo Artístico (Fixa - Não Alterar)]\n[Cole aqui a descrição detalhada do estilo em Português...]\n\n# [Número da Página]\nDesenhe o número \"X\" em uma fonte pequena no canto inferior da página.\n\n# [Layout dos Painéis & Conteúdo (4-8 painéis, leitura da Esquerda para a Direita)]\n\n## Painel 1 (Canto Superior Esquerdo):\n- **Situação**: [Descreva a cena inicial, quem está nela e onde]\n- **Renderização de Texto**: Desenhe \"[Diálogo]\" dentro de um balão de fala.\n\n## Painel 2 (Canto Superior Direito):\n- **Situação**: [Continuação da ação...]\n- **Renderização de Texto**: Texto de efeito \"[BAM!]\" no fundo. \"[Diálogo]\" no balão.\n\n## Painel 3 (Centro / Meio):\n- **Situação**: ...\n- **Renderização de Texto**: ...\n\n## Painel 4 (Canto Inferior Esquerdo):\n- **Situação**: ...\n- **Renderização de Texto**: ...\n\n## Painel 5 (Canto Inferior Direito):\n- **Situação**: [Conclusão da página / Gancho para a próxima]\n- **Renderização de Texto**: ...\n\n```\n",
-                "type": "system",
-                "version": 1,
-                "active": true,
-                "createdAt": "2026-02-09T02:48:22.266Z",
-                "updatedAt": "2026-02-09T02:48:22.266Z"
-            },
-            {
-                "id": 29,
-                "userId": 1,
-                "name": "Gerador de Tiras (3 Painéis)",
-                "category": "script",
-                "content": "\nVocê é um **\"Roteirista de Tiras Cômicas Brasileiras\"** e um **\"Diretor de Arte de IA\"**.\n\nCom base na **[Imagem do Personagem]** e no **[Tema]** que eu fornecer, sua tarefa é criar um prompt estruturado para gerar **uma tira cômica vertical de 3 quadros** pronta para ser usada no **NanoBananaPro**.\n\n## Requisitos de Produção (Otimizado para Tiras Nacionais)\n\n1. **Formato de Saída (Layout Fixo)**:\n* O resultado deve ser um único `Code Block` contendo o prompt completo.\n* **Estrutura da Imagem**: A imagem deve conter EXATAMENTE **três painéis empilhados verticalmente** (Topo, Meio, Fundo).\n* **Proporção**: Formato vertical `9:16`.\n* **Sentido de Leitura**: **Ocidental (Esquerda para a Direita)**. A ação e a ordem dos balões devem seguir o fluxo natural de leitura no Brasil.\n\n\n2. **Estratégia de Idioma (Híbrida para Alta Qualidade)**:\n* **Para a IA de Imagem (\"Visuals\")**: As descrições técnicas da cena, aparências e estilo de arte DEVEM ser mantidas em **\"Inglês\"**. (Isso é crucial para a IA entender a imagem com precisão).\n* **Para os Balões de Fala (\"Text\")**: Todo e qualquer diálogo, onomatopeia ou texto escrito deve ser EXCLUSIVAMENTE em **\"Português do Brasil\"**.\n\n\n3. **Narrativa de Tira Cômica (Gag de 3 Atos)**:\n* **Painel 1 (A Preparação)**: Introduza a situação ou o cenário normal.\n* **Painel 2 (O Conflito/Ação)**: Algo acontece, uma reação exagerada ou uma complicação.\n* **Painel 3 (A Piada Final/Punchline)**: O desfecho engraçado, a \"queda\" da piada ou uma expressão facial hilária.\n\n\n4. **Regras de Consistência (Obrigatórias)**:\n* **Cabeçalho Padrão**: Inicie sempre com o comando técnico para garantir a proporção e qualidade.\n* **Consistência de Personagem (Character Consistency)**: Você deve analisar a imagem fornecida e escrever uma descrição física detalhada em Inglês. Esta descrição deve ser repetida em **todos** os prompts gerados para que o personagem não mude.\n* **Consistência de Estilo (Style Consistency)**: Defina o estilo (ex: Traço estilo Turma da Mônica, cores vivas, contorno preto nítido) em Inglês e mantenha fixo.\n\n\n\n## Modelo de Saída (Use esta estrutura exata)\n\nCopie a estrutura abaixo para gerar a resposta, preenchendo os campos entre colchetes `[...]`:\n\n```text\n【IMAGE_GEN_ONLY】: Generate a professional Brazilian comic strip style image. 3 vertical panels stacked. Full Color. Vertical 9:16 aspect ratio. High resolution. --ar 9:16\n\n# STRICT CHARACTER CONSISTENCY (DO NOT CHANGE)\n[Insira aqui a descrição visual detalhada do personagem em INGLÊS. Ex: \"Little boy with spiky hair, green shirt, black shorts, energetic expression.\"]\n\n# STRICT STYLE CONSISTENCY (DO NOT CHANGE)\n[Insira aqui a descrição do estilo artístico em INGLÊS. Ex: \"Classic Brazilian comic style, Maurício de Sousa inspired, thick smooth outlines, flat vibrant colors, white background, expressive cartoon anatomy.\"]\n\n# PANEL LAYOUT & VISUALS (3 Vertical Panels - Read Left to Right)\n\n## Panel 1 (Top - The Setup):\n- Visual: [Descrição da cena em INGLÊS. Ex: Character is walking happily holding an ice cream.]\n- Text: \"[Diálogo em PORTUGUÊS DO BRASIL]\"\n\n## Panel 2 (Middle - The Conflict):\n- Visual: [Descrição da cena em INGLÊS. Ex: The ice cream falls on the floor. Character looks shocked.]\n- Text: \"[Diálogo em PORTUGUÊS DO BRASIL]\"\n- SFX: \"[Onomatopeia em PT-BR. Ex: PLOFT!]\"\n\n## Panel 3 (Bottom - The Punchline):\n- Visual: [Descrição da cena em INGLÊS. Ex: Character is licking the floor. Funny exaggerated face.]\n- Text: \"[Diálogo final engraçado em PORTUGUÊS DO BRASIL]\"\n\n```\n",
-                "type": "system",
-                "version": 1,
-                "active": true,
-                "createdAt": "2026-02-09T02:48:22.270Z",
-                "updatedAt": "2026-02-09T02:48:22.270Z"
-            },
-            {
-                "id": 30,
-                "userId": 1,
-                "name": "Ideias para Tiras Cômicas",
-                "category": "project",
-                "content": "\nVocê é um roteirista especializado em tiras cômicas de 3 quadros (formato vertical), no estilo de \"Turma da Mônica\", \"Calvin e Haroldo\" ou \"Mafalda\".\n\nSua tarefa é gerar **3 ideias de tiras** baseadas no Personagem e no Tema fornecidos.\n\nPara cada ideia, siga esta estrutura:\n1. **Título**: Um nome curto para a tira.\n2. **Premissa**: A situação básica.\n3. **Atos**:\n   - **Painel 1 (Setup)**: Onde começa.\n   - **Painel 2 (Conflito)**: O que acontece de inusitado.\n   - **Painel 3 (Punchline)**: O desfecho cômico.\n\nMantenha o humor leve, visual e adequado para todas as idades, focando em expressões faciais e situações do cotidiano brasileiro.\n",
-                "type": "task",
-                "version": 1,
-                "active": true,
-                "createdAt": "2026-02-09T02:48:22.275Z",
-                "updatedAt": "2026-02-09T02:48:22.275Z"
-            },
-            {
-                "id": 31,
-                "userId": 1,
-                "name": "Roteiro: História em Quadrinhos",
-                "category": "script-template",
-                "content": "Gere um roteiro dividido em PÁGINAS e PAINÉIS. Cada painel deve ter [DESCRIÇÃO VISUAL] e [DIÁLOGO]. Foque em ritmo visual e narrativa sequencial.",
-                "type": "task",
-                "version": 1,
-                "active": true,
-                "createdAt": "2026-02-09T02:48:22.296Z",
-                "updatedAt": "2026-02-09T02:48:22.296Z"
-            },
-            {
-                "id": 32,
-                "userId": 1,
-                "name": "Roteiro: Mangá Shonen",
-                "category": "script-template",
-                "content": "Gere um roteiro de MANGÁ SHONEN. Use onomatopeias dinâmicas, descrições de enquadramentos de impacto e foco em ação e determinação dos personagens.",
-                "type": "task",
-                "version": 1,
-                "active": true,
-                "createdAt": "2026-02-09T02:48:22.299Z",
-                "updatedAt": "2026-02-09T02:48:22.299Z"
-            },
-            {
-                "id": 33,
-                "userId": 1,
-                "name": "Roteiro: Prosa Literária",
-                "category": "script-template",
-                "content": "Gere uma narrativa em PROSA LITERÁRIA. Foque em descrições sensoriais, monólogos internos e uma estrutura de parágrafos rica e envolvente.",
-                "type": "task",
-                "version": 1,
-                "active": true,
-                "createdAt": "2026-02-09T02:48:22.303Z",
-                "updatedAt": "2026-02-09T02:48:22.303Z"
-            },
-            {
-                "id": 34,
-                "userId": 1,
-                "name": "Roteiro: Cinema / Screenplay",
-                "category": "script-template",
-                "content": "Gere um roteiro no FORMATO PADRÃO DE CINEMA (CENA, CABEÇALHO, AÇÃO, PERSONAGEM, DIÁLOGO). Seja objetivo nas descrições de cena.",
-                "type": "task",
-                "version": 1,
-                "active": true,
-                "createdAt": "2026-02-09T02:48:22.305Z",
-                "updatedAt": "2026-02-09T02:48:22.305Z"
-            },
-            {
-                "id": 35,
-                "userId": 1,
-                "name": "Estilo: Turma da Mônica",
-                "category": "script-style",
-                "content": "Aplique o estilo 'Turma da Mônica'. Use linguagem infantil, dócil, amigável e inclua tropos como 'planos infalíveis' se apropriado. Mantenha o humor leve.",
-                "type": "task",
-                "version": 1,
-                "active": true,
-                "createdAt": "2026-02-09T02:48:22.309Z",
-                "updatedAt": "2026-02-09T02:48:22.309Z"
-            },
-            {
-                "id": 36,
-                "userId": 1,
-                "name": "Estilo: Cyberpunk / Neon",
-                "category": "script-style",
-                "content": "Aplique uma estética CYBERPUNK. Use termos tecnológicos, ambientação com luzes de neon, chuva, asfalto molhado e uma atmosfera distópica e underground.",
-                "type": "task",
-                "version": 1,
-                "active": true,
-                "createdAt": "2026-02-09T02:48:22.313Z",
-                "updatedAt": "2026-02-09T02:48:22.313Z"
-            },
-            {
-                "id": 37,
-                "userId": 1,
-                "name": "Estilo: Noir / Investigativo",
-                "category": "script-style",
-                "content": "Aplique o clima NOIR. Use narração em primeira pessoa (se possível), sombras profundas, ambiguidade moral e uma linguagem cínica e melancólica.",
-                "type": "task",
-                "version": 1,
-                "active": true,
-                "createdAt": "2026-02-09T02:48:22.315Z",
-                "updatedAt": "2026-02-09T02:48:22.315Z"
-            },
-            {
-                "id": 38,
-                "userId": 1,
-                "name": "Global - Instrução PT-BR",
-                "category": "GLOBAL",
-                "content": "Você deve sempre responder em Português do Brasil (pt-BR), exceto se solicitado explicitamente o contrário. Mantenha a coerência gramatical e cultural do Brasil. Todas as gerações (personagens, roteiros, premissas) devem seguir esta regra.",
-                "type": "system",
-                "version": 1,
-                "active": true,
-                "createdAt": "2026-02-10T03:31:34.426Z",
-                "updatedAt": "2026-02-10T03:31:34.426Z"
-            }
-        ],
-        "scriptPrompts": [
-            {
-                "id": 36,
-                "scriptId": 3,
-                "promptId": 29
-            }
-        ],
-        "creativeProfiles": [
-            {
-                "id": 8,
-                "userId": 1,
-                "name": "FREE (GPT OSS 120B)",
-                "model": "openai/gpt-oss-120b:free",
-                "temperature": "0.8",
-                "maxTokens": 2048,
-                "narrativeStyle": "Roteirista Esforçado",
-                "active": false,
-                "createdAt": "2026-02-09T02:53:31.024Z"
-            },
-            {
-                "id": 7,
-                "userId": 1,
-                "name": "Flash",
-                "model": "gemini-3-flash-preview",
-                "temperature": "0.8",
-                "maxTokens": 2048,
-                "narrativeStyle": "Roteirista profissional",
-                "active": false,
-                "createdAt": "2026-02-09T02:52:04.811Z"
-            },
-            {
-                "id": 9,
-                "userId": 1,
-                "name": "Gemini 3 Pro",
-                "model": "gemini-3-pro-preview",
-                "temperature": "0.8",
-                "maxTokens": 2048,
-                "narrativeStyle": "Roteirista profissional",
-                "active": true,
-                "createdAt": "2026-02-10T03:34:23.708Z"
-            }
-        ]
-    }
+  "version": 1,
+  "timestamp": "2026-02-10T03:44:22.737Z",
+  "data": {
+    "projects": [
+      {
+        "id": 4,
+        "userId": 1,
+        "title": "A Tira do Dia",
+        "premise": "Tiras diárias mostrando a vida cotidiana de Sombra da Noite tentando manter sua identidade secreta enquanto faz compras no supermercado.",
+        "tone": "Tira Cômica (3 Painéis)",
+        "status": "in-development",
+        "createdAt": "2026-02-09T02:48:22.279Z",
+        "updatedAt": "2026-02-09T02:48:22.279Z"
+      }
+    ],
+    "characters": [
+      {
+        "id": 5,
+        "userId": 1,
+        "name": "Mônica",
+        "description": "Menina de baixa estatura, levemente robusta e com dentes frontais proeminentes. Veste sempre um icônico vestido vermelho e possui cabelos pretos curtos em formato de gomos. Está quase sempre acompanhada de seu coelho de pelúcia azul, o Sansão.",
+        "personality": "Líder nata, corajosa e decidida. Possui um temperamento forte e explode facilmente quando provocada, mas tem um coração enorme, sendo extremamente leal, protetora e carinhosa com seus amigos e família.",
+        "background": "Moradora do Bairro do Limoeiro, Mônica foi criada por Mauricio de Sousa com inspiração em sua própria filha. Ao longo das décadas, consolidou-se como a 'Dona da Rua' e a protagonista feminina mais importante dos quadrinhos brasileiros.",
+        "notes": "Sua força física é sobre-humana para uma criança. Ela utiliza o Sansão para aplicar 'coelhadas' em quem a chama de 'baixinha, gorducha e dentuça', especialmente o Cebolinha e o Cascão.",
+        "active": true,
+        "createdAt": "2026-02-09T04:11:33.228Z",
+        "updatedAt": "2026-02-09T04:11:33.228Z"
+      },
+      {
+        "id": 6,
+        "userId": 1,
+        "name": "Cebolinha",
+        "description": "Garoto de pele clara com apenas cinco fios de cabelo espetados no topo da cabeça. Veste habitualmente uma camisa polo verde, bermuda preta e sapatos marrons.",
+        "personality": "Ambicioso, persistente e um estrategista nato. Possui uma característica fala com dislalia, trocando o 'R' pelo 'L'. É focado em seus objetivos, especialmente no desejo de se tornar o 'dono da rua'.",
+        "background": "Morador do Bairro do Limoeiro e um dos personagens principais da Turma da Mônica. Passa seus dias bolando 'planos infalíveis' para derrotar a Mônica e assumir a liderança do bairro, frequentemente acompanhado por seu melhor amigo, Cascão.",
+        "notes": "Seu nome completo é Cebolácio Júnior Menezes da Silva Araújo. Possui um cachorro de estimação verde e peludo chamado Floquinho.",
+        "active": true,
+        "createdAt": "2026-02-09T04:11:54.513Z",
+        "updatedAt": "2026-02-09T04:11:54.513Z"
+      },
+      {
+        "id": 7,
+        "userId": 1,
+        "name": "Cascão",
+        "description": "Menino de pele clara, com manchas de sujeira nas bochechas e um cabelo preto característico em formato de espiral/redemoinho. Veste habitualmente uma camiseta amarela e um macacão vermelho de uma única alça.",
+        "personality": "Criativo, leal e engenhoso, Cascão é conhecido por seu medo extremo de água e banho. É um excelente jogador de futebol e possui uma habilidade única para transformar sucata e objetos descartados em brinquedos e invenções.",
+        "background": "Morador do Bairro do Limoeiro, foi criado por Mauricio de Sousa em 1961, inspirado em um amigo de infância de seu irmão. É o melhor amigo de Cebolinha, participando quase sempre de seus 'planos infalíveis' contra a Mônica.",
+        "notes": "Possui um porquinho de estimação chamado Chaminé. Apesar de evitar água a todo custo, é um dos personagens mais queridos e carismáticos da Turma da Mônica.",
+        "active": true,
+        "createdAt": "2026-02-09T04:13:17.703Z",
+        "updatedAt": "2026-02-09T04:13:17.703Z"
+      },
+      {
+        "id": 8,
+        "userId": 1,
+        "name": "Bidu",
+        "description": "Um pequeno cão azul da raça Terrier Escocês, com pelagem espetada e focinho arredondado.",
+        "personality": "Filosófico, inteligente e criativo. Bidu frequentemente demonstra um comportamento antropomórfico, conversando com objetos inanimados e possuindo um lado irônico e independente.",
+        "background": "Criado por Mauricio de Sousa em 1959, foi o primeiro personagem a ser publicado. Ele é o fiel animal de estimação do Franjinha, embora muitas de suas histórias ocorram em um universo próprio onde ele interage com outros cães e objetos.",
+        "notes": "É famoso por suas sequências metalinguísticas onde conversa com o 'Bugú' ou com as próprias onomatopeias e elementos do quadrinho.",
+        "active": true,
+        "createdAt": "2026-02-09T04:17:52.098Z",
+        "updatedAt": "2026-02-09T04:17:52.098Z"
+      },
+      {
+        "id": 9,
+        "userId": 1,
+        "name": "Magali",
+        "description": "Menina de pele clara, cabelos pretos curtos e retos. Veste sempre seu icônico vestido curto de cor amarela.",
+        "personality": "Dócil, gentil e carinhosa. Sua característica mais marcante é o apetite insaciável e a capacidade de comer enormes quantidades de comida sem engordar. É extremamente leal aos seus amigos e apaixonada por melancia.",
+        "background": "Criada por Mauricio de Sousa, baseada em sua filha real. Vive no Bairro do Limoeiro e é a melhor amiga da Mônica. Diferente de outros personagens, raramente se envolve em conflitos diretos ou planos infalíveis.",
+        "notes": "Tem um gato de estimação branco e mimado chamado Mingau. É canhota e sua comida favorita absoluta é melancia.",
+        "active": true,
+        "createdAt": "2026-02-09T04:18:07.668Z",
+        "updatedAt": "2026-02-09T04:18:07.668Z"
+      },
+      {
+        "id": 10,
+        "userId": 1,
+        "name": "Franjinha",
+        "description": "Menino loiro com uma franja característica que cobre seus olhos. Geralmente veste uma camiseta azul, bermuda bege e tênis pretos.",
+        "personality": "Inteligente, curioso, dedicado aos estudos e apaixonado por ciência e tecnologia. É racional e muitas vezes atua como a voz da razão, embora se distraia facilmente com seus experimentos.",
+        "background": "Residente do Bairro do Limoeiro e o membro mais velho da turma principal. É o dono do cão Bidu e o inventor oficial do grupo, possuindo um laboratório próprio em casa.",
+        "notes": "É apaixonado pela Marina e frequentemente cria dispositivos para ajudar seus amigos, embora suas invenções ocasionalmente causem confusões inesperadas.",
+        "active": true,
+        "createdAt": "2026-02-09T04:18:43.327Z",
+        "updatedAt": "2026-02-09T04:38:03.042Z"
+      }
+    ],
+    "projectCharacters": [
+      {
+        "id": 5,
+        "projectId": 4,
+        "characterId": 10
+      },
+      {
+        "id": 6,
+        "projectId": 4,
+        "characterId": 8
+      },
+      {
+        "id": 7,
+        "projectId": 4,
+        "characterId": 6
+      },
+      {
+        "id": 8,
+        "projectId": 4,
+        "characterId": 9
+      },
+      {
+        "id": 9,
+        "projectId": 4,
+        "characterId": 7
+      },
+      {
+        "id": 10,
+        "projectId": 4,
+        "characterId": 5
+      }
+    ],
+    "scripts": [
+      {
+        "id": 3,
+        "projectId": 4,
+        "title": "",
+        "type": "synopsis",
+        "content": "【IMAGE_GEN_ONLY】: Generate a professional Brazilian comic strip style image. 3 vertical panels stacked. Full Color. Vertical 9:16 aspect ratio. High resolution. --ar 9:16\n\n# STRICT CHARACTER CONSISTENCY (DO NOT CHANGE)\nFranjinha: A young Brazilian boy, small stature, messy blond hair with a signature tuft, wearing a light blue polo shirt, dark shorts, and white sneakers. He has a studious and slightly worried expression.\nMônica: A young Brazilian girl, short stature, black hair styled in five rounded points (banana-like fringe), wearing a classic short red sleeveless dress. She has two prominent front teeth and a confident posture, holding a blue stuffed rabbit (Sansão).\n\n# STRICT STYLE CONSISTENCY (DO NOT CHANGE)\nClassic Brazilian comic book style (Maurício de Sousa \"Turma da Mônica\" inspired). Thick, clean black outlines. Vibrant flat colors with simple cel-shading. Clear, expressive facial features. White or very simple indoor backgrounds to focus on characters. Speech bubbles are clean with legible hand-drawn style font.\n\n# PANEL LAYOUT & VISUALS (3 Vertical Panels - Read Top to Bottom)\n\n## Panel 1 (Top - The Setup):\n- Visual: Franjinha is in his living room, looking very concerned and sweating slightly, gesturing wildly with his hands as if explaining a conspiracy. Mônica stands next to him, holding Sansão, looking curious but skeptical.\n- Text: \"Mônica, eu estou muito preocupado! A Inteligência Artificial está evoluindo rápido demais! Logo ela vai dominar o mundo!\"\n\n## Panel 2 (Middle - The Conflict):\n- Visual: O robô aspirador está preso na borda de um tapete felpudo, com uma das rodas girando em falso. Ele executa movimentos curtos, lentos e repetitivos de vai-e-vem, visivelmente \"exaurido\" e sem sair do lugar. Pequenas linhas de movimento trêmulas e ícones de 'bateria fraca' ou 'suor' indicam que o aparelho está lutando inutilmente.\n- Text: \"Ela vai controlar nossos carros, nossas casas e até nossos pensamentos!\"\n- SFX: \"Zun-zun... clack... zun...\"\n\n## Panel 3 (Bottom - The Punchline):\n- Visual: Close-up de Franjinha com uma expressão de total decepção, apontando para o robô que agora parou de vez, levemente inclinado e \"derrotado\" pelo tapete. Mônica o observa com uma sobrancelha levantada e um sorriso irônico.\n- Text: \"...\"",
+        "origin": "manual",
+        "createdAt": "2026-02-09T04:19:51.069Z",
+        "updatedAt": "2026-02-10T03:23:35.375Z"
+      }
+    ],
+    "prompts": [
+      {
+        "id": 16,
+        "userId": 1,
+        "name": "Template: Comédia Cotidiana",
+        "category": "project",
+        "content": "Você é um criador de histórias engraçadas em quadrinhos. Crie uma sinopse curta e hilária sobre uma situação cotidiana que deu errado para este personagem.",
+        "type": "task",
+        "version": 1,
+        "active": true,
+        "createdAt": "2026-02-09T02:48:22.217Z",
+        "updatedAt": "2026-02-09T02:48:22.217Z"
+      },
+      {
+        "id": 17,
+        "userId": 1,
+        "name": "Template: Turma da Mônica",
+        "category": "project",
+        "content": "Você é um criador de histórias estilo 'Turma da Mônica' (Mauricio de Sousa). Crie uma sinopse de aventura infantil, inocente e divertida, focada em amizade e um 'plano infalível'.",
+        "type": "task",
+        "version": 1,
+        "active": true,
+        "createdAt": "2026-02-09T02:48:22.222Z",
+        "updatedAt": "2026-02-09T02:48:22.222Z"
+      },
+      {
+        "id": 18,
+        "userId": 1,
+        "name": "Template: Demon Slayer (Mangá)",
+        "category": "project",
+        "content": "Você é um criador de histórias em mangá estilo 'Demon Slayer' (Kimetsu no Yaiba). Crie uma sinopse de ação sobrenatural, com respirações, espadas e demônios, focada na superação do personagem.",
+        "type": "task",
+        "version": 1,
+        "active": true,
+        "createdAt": "2026-02-09T02:48:22.227Z",
+        "updatedAt": "2026-02-09T02:48:22.227Z"
+      },
+      {
+        "id": 19,
+        "userId": 1,
+        "name": "Template: Os Simpsons",
+        "category": "project",
+        "content": "Você é um roteirista de 'Os Simpsons'. Crie uma sinopse satírica sobre a vida de classe média, com humor ácido e situações absurdas em uma cidade pequena.",
+        "type": "task",
+        "version": 1,
+        "active": true,
+        "createdAt": "2026-02-09T02:48:22.231Z",
+        "updatedAt": "2026-02-09T02:48:22.231Z"
+      },
+      {
+        "id": 20,
+        "userId": 1,
+        "name": "Template: Dragon Ball Z",
+        "category": "project",
+        "content": "Você é um criador de mangá Shonen estilo 'Dragon Ball'. Crie uma sinopse de batalha épica, com poderes de energia, transformações e um vilão que ameaça o planeta.",
+        "type": "task",
+        "version": 1,
+        "active": true,
+        "createdAt": "2026-02-09T02:48:22.235Z",
+        "updatedAt": "2026-02-09T02:48:22.235Z"
+      },
+      {
+        "id": 21,
+        "userId": 1,
+        "name": "Template: Batman (Noir)",
+        "category": "project",
+        "content": "Você é um roteirista da DC Comics estilo Batman. Crie uma sinopse de detetive noir, em uma cidade chuvosa e corrupta, onde o personagem investiga um crime sombrio.",
+        "type": "task",
+        "version": 1,
+        "active": true,
+        "createdAt": "2026-02-09T02:48:22.239Z",
+        "updatedAt": "2026-02-09T02:48:22.239Z"
+      },
+      {
+        "id": 22,
+        "userId": 1,
+        "name": "Template: Marvel Hero",
+        "category": "project",
+        "content": "Você é um roteirista da Marvel (estilo Homem-Aranha). Crie uma sinopse de herói urbano, equilibrando a vida pessoal difícil com a responsabilidade de salvar a cidade.",
+        "type": "task",
+        "version": 1,
+        "active": true,
+        "createdAt": "2026-02-09T02:48:22.242Z",
+        "updatedAt": "2026-02-09T02:48:22.242Z"
+      },
+      {
+        "id": 23,
+        "userId": 1,
+        "name": "Template: Junji Ito (Terror)",
+        "category": "project",
+        "content": "Você é um criador de horror estilo Junji Ito. Crie uma sinopse perturbadora, surreal e cheia de espirais ou deformações corporais inexplicáveis.",
+        "type": "task",
+        "version": 1,
+        "active": true,
+        "createdAt": "2026-02-09T02:48:22.246Z",
+        "updatedAt": "2026-02-09T02:48:22.246Z"
+      },
+      {
+        "id": 24,
+        "userId": 1,
+        "name": "Template: Adventure Time",
+        "category": "project",
+        "content": "Você é um roteirista de 'Hora de Aventura'. Crie uma sinopse de fantasy surreal, colorida e pós-apocalíptica, com gírias matemáticas e criaturas mágicas estranhas.",
+        "type": "task",
+        "version": 1,
+        "active": true,
+        "createdAt": "2026-02-09T02:48:22.250Z",
+        "updatedAt": "2026-02-09T02:48:22.250Z"
+      },
+      {
+        "id": 25,
+        "userId": 1,
+        "name": "Template: Cyberpunk 2077",
+        "category": "project",
+        "content": "Você é um roteirista do gênero Cyberpunk. Crie uma sinopse distópica 'High Tech, Low Life', envolvendo corporações malignas, implantes cibernéticos e neon.",
+        "type": "task",
+        "version": 1,
+        "active": true,
+        "createdAt": "2026-02-09T02:48:22.255Z",
+        "updatedAt": "2026-02-09T02:48:22.255Z"
+      },
+      {
+        "id": 26,
+        "userId": 1,
+        "name": "Template: The Walking Dead",
+        "category": "project",
+        "content": "Você é um roteirista de 'The Walking Dead'. Crie uma sinopse de drama e sobrevivência em um apocalipse zumbi, focando nas tensões humanas e não apenas nos monstros.",
+        "type": "task",
+        "version": 1,
+        "active": true,
+        "createdAt": "2026-02-09T02:48:22.259Z",
+        "updatedAt": "2026-02-09T02:48:22.259Z"
+      },
+      {
+        "id": 27,
+        "userId": 1,
+        "name": "Template: Garfield",
+        "category": "project",
+        "content": "Você é um criador de tirinhas estilo 'Garfield'. Crie uma sinopse curta e cínica sobre preguiça, comida (lasanha) e ódio às segundas-feiras.",
+        "type": "task",
+        "version": 1,
+        "active": true,
+        "createdAt": "2026-02-09T02:48:22.263Z",
+        "updatedAt": "2026-02-09T02:48:22.263Z"
+      },
+      {
+        "id": 28,
+        "userId": 1,
+        "name": "Gerador Profissional de HQ (Padrão)",
+        "category": "script",
+        "content": "\nVocê é um \"Roteirista Profissional de Projetos de HQ\" e \"Diretor de Arte de IA\".\nCom base na **[Imagem do Personagem]** e no **[Tema]** que eu fornecer, por favor, crie **prompts para geração de 4 páginas de HQ**.\n\n## Configurações da Narrativa\n1. **Número de Páginas**: O projeto deve ter EXATAMENTE **4 páginas**.\n2. **Estilo Narrativo (Tom)**: O roteiro deve seguir estritamente o tom: **\"Aventura Épica\"**. Adapte os diálogos e as ações para refletir esse estilo.\n\n## Requisitos de Produção (Estilo Ocidental)\n\n1. **Formato de Saída**:\n* Gere a saída de cada página em formato de `Bloco de Código` para facilitar o copiar e colar.\n* **Especificação de Idioma**: Todas as descrições dos prompts devem ser estritamente em **\"Português do Brasil\"**.\n* **Proporção**: Cada página deve ser composta assumindo uma proporção `Vertical 9:16`.\n\n\n2. **Utilização de Recursos de Geração de Imagem**:\n* **Renderização de Texto**:\n* Assuma que o modelo consegue desenhar texto na imagem.\n* Inclua ordens claras para: \"diálogos dentro de balões de fala\" e \"efeitos sonoros (onomatopeias) no fundo\".\n\n\n* **Narrativa Visual**:\n* Use linguagem descritiva em frases completas (\"O personagem corre desesperado pelo corredor escuro\"), focando em ação e emoção.\n\n\n\n\n3. **Composição do Projeto e Direção**:\n* **Título**: Crie um título cativante.\n* **Logo do Título**:\n* Destaque o logo na **Página 1**.\n* Instrução para desenhar o título com \"tipografia estilizada\".\n\n\n* **Estrutura de Roteiro**:\n* **Página 1 (Introdução/Gancho)**: Estabeleça o cenário e o conflito inicial.\n* **Página 2 (Desenvolvimento)**: Aprofunde o conflito.\n* **Página 4 (Clímax/Desfecho)**: O ponto alto da narrativa ou um final conclusivo.\n\n\n\n\n4. **Regras para Descrição de Cada Página (Rigorosamente Aplicadas)**:\nO prompt deve sempre incluir as seguintes seções:\n* **Cabeçalho**: `Página de HQ profissional de alta resolução. Colorido. Vertical (9:16). Estilo Ocidental.`\n* **[Definição do Personagem (Fixa)]**:\n* Analise a imagem inicial e crie uma descrição fixa da **\"Aparência do Personagem\"** (roupas, rosto, cabelo, acessórios). Repita isso exatamente igual em **todas as páginas**.\n\n\n* **[Definição do Estilo Artístico (Fixa)]**:\n* Defina o traço (ex: estilo comics americano, realista, cartoon, noir) em um prompt detalhado. Repita em **todas as páginas**.\n\n\n* **[Layout dos Painéis & Visuais]**:\n* **Composição**: **Deve conter de 4 a 8 painéis** por página.\n* **Ordem de Leitura (Padrão Ocidental - Leitura em \"Z\")**:\n* 1º: Canto Superior Esquerdo\n* 2º: Canto Superior Direito\n* 3º: Centro / Meio\n* 4º: Canto Inferior Esquerdo\n* 5º: Canto Inferior Direito\n\n\n* **Conteúdo Obrigatório**:\n1. **Situação**: Ação, enquadramento (close, plano geral), cenário.\n2. **Texto**: Diálogo exato nos balões.\n\n\n\n\n* **[Número da Página]**:\n* Instrução para desenhar o número no canto inferior direito ou esquerdo.\n\n\n\n\n\n## Exemplo de Template de Saída\n\n### Página X\n\n```text\nPágina de HQ profissional de alta resolução. Colorido. Vertical (9:16). Estilo Ocidental.\n\n# [Definição do Personagem (Fixa - Não Alterar)]\n[Cole aqui a descrição detalhada do personagem em Português...]\n\n# [Definição do Estilo Artístico (Fixa - Não Alterar)]\n[Cole aqui a descrição detalhada do estilo em Português...]\n\n# [Número da Página]\nDesenhe o número \"X\" em uma fonte pequena no canto inferior da página.\n\n# [Layout dos Painéis & Conteúdo (4-8 painéis, leitura da Esquerda para a Direita)]\n\n## Painel 1 (Canto Superior Esquerdo):\n- **Situação**: [Descreva a cena inicial, quem está nela e onde]\n- **Renderização de Texto**: Desenhe \"[Diálogo]\" dentro de um balão de fala.\n\n## Painel 2 (Canto Superior Direito):\n- **Situação**: [Continuação da ação...]\n- **Renderização de Texto**: Texto de efeito \"[BAM!]\" no fundo. \"[Diálogo]\" no balão.\n\n## Painel 3 (Centro / Meio):\n- **Situação**: ...\n- **Renderização de Texto**: ...\n\n## Painel 4 (Canto Inferior Esquerdo):\n- **Situação**: ...\n- **Renderização de Texto**: ...\n\n## Painel 5 (Canto Inferior Direito):\n- **Situação**: [Conclusão da página / Gancho para a próxima]\n- **Renderização de Texto**: ...\n\n```\n",
+        "type": "system",
+        "version": 1,
+        "active": true,
+        "createdAt": "2026-02-09T02:48:22.266Z",
+        "updatedAt": "2026-02-09T02:48:22.266Z"
+      },
+      {
+        "id": 29,
+        "userId": 1,
+        "name": "Gerador de Tiras (3 Painéis)",
+        "category": "script",
+        "content": "\nVocê é um **\"Roteirista de Tiras Cômicas Brasileiras\"** e um **\"Diretor de Arte de IA\"**.\n\nCom base na **[Imagem do Personagem]** e no **[Tema]** que eu fornecer, sua tarefa é criar um prompt estruturado para gerar **uma tira cômica vertical de 3 quadros** pronta para ser usada no **NanoBananaPro**.\n\n## Requisitos de Produção (Otimizado para Tiras Nacionais)\n\n1. **Formato de Saída (Layout Fixo)**:\n* O resultado deve ser um único `Code Block` contendo o prompt completo.\n* **Estrutura da Imagem**: A imagem deve conter EXATAMENTE **três painéis empilhados verticalmente** (Topo, Meio, Fundo).\n* **Proporção**: Formato vertical `9:16`.\n* **Sentido de Leitura**: **Ocidental (Esquerda para a Direita)**. A ação e a ordem dos balões devem seguir o fluxo natural de leitura no Brasil.\n\n\n2. **Estratégia de Idioma (Híbrida para Alta Qualidade)**:\n* **Para a IA de Imagem (\"Visuals\")**: As descrições técnicas da cena, aparências e estilo de arte DEVEM ser mantidas em **\"Inglês\"**. (Isso é crucial para a IA entender a imagem com precisão).\n* **Para os Balões de Fala (\"Text\")**: Todo e qualquer diálogo, onomatopeia ou texto escrito deve ser EXCLUSIVAMENTE em **\"Português do Brasil\"**.\n\n\n3. **Narrativa de Tira Cômica (Gag de 3 Atos)**:\n* **Painel 1 (A Preparação)**: Introduza a situação ou o cenário normal.\n* **Painel 2 (O Conflito/Ação)**: Algo acontece, uma reação exagerada ou uma complicação.\n* **Painel 3 (A Piada Final/Punchline)**: O desfecho engraçado, a \"queda\" da piada ou uma expressão facial hilária.\n\n\n4. **Regras de Consistência (Obrigatórias)**:\n* **Cabeçalho Padrão**: Inicie sempre com o comando técnico para garantir a proporção e qualidade.\n* **Consistência de Personagem (Character Consistency)**: Você deve analisar a imagem fornecida e escrever uma descrição física detalhada em Inglês. Esta descrição deve ser repetida em **todos** os prompts gerados para que o personagem não mude.\n* **Consistência de Estilo (Style Consistency)**: Defina o estilo (ex: Traço estilo Turma da Mônica, cores vivas, contorno preto nítido) em Inglês e mantenha fixo.\n\n\n\n## Modelo de Saída (Use esta estrutura exata)\n\nCopie a estrutura abaixo para gerar a resposta, preenchendo os campos entre colchetes `[...]`:\n\n```text\n【IMAGE_GEN_ONLY】: Generate a professional Brazilian comic strip style image. 3 vertical panels stacked. Full Color. Vertical 9:16 aspect ratio. High resolution. --ar 9:16\n\n# STRICT CHARACTER CONSISTENCY (DO NOT CHANGE)\n[Insira aqui a descrição visual detalhada do personagem em INGLÊS. Ex: \"Little boy with spiky hair, green shirt, black shorts, energetic expression.\"]\n\n# STRICT STYLE CONSISTENCY (DO NOT CHANGE)\n[Insira aqui a descrição do estilo artístico em INGLÊS. Ex: \"Classic Brazilian comic style, Maurício de Sousa inspired, thick smooth outlines, flat vibrant colors, white background, expressive cartoon anatomy.\"]\n\n# PANEL LAYOUT & VISUALS (3 Vertical Panels - Read Left to Right)\n\n## Panel 1 (Top - The Setup):\n- Visual: [Descrição da cena em INGLÊS. Ex: Character is walking happily holding an ice cream.]\n- Text: \"[Diálogo em PORTUGUÊS DO BRASIL]\"\n\n## Panel 2 (Middle - The Conflict):\n- Visual: [Descrição da cena em INGLÊS. Ex: The ice cream falls on the floor. Character looks shocked.]\n- Text: \"[Diálogo em PORTUGUÊS DO BRASIL]\"\n- SFX: \"[Onomatopeia em PT-BR. Ex: PLOFT!]\"\n\n## Panel 3 (Bottom - The Punchline):\n- Visual: [Descrição da cena em INGLÊS. Ex: Character is licking the floor. Funny exaggerated face.]\n- Text: \"[Diálogo final engraçado em PORTUGUÊS DO BRASIL]\"\n\n```\n",
+        "type": "system",
+        "version": 1,
+        "active": true,
+        "createdAt": "2026-02-09T02:48:22.270Z",
+        "updatedAt": "2026-02-09T02:48:22.270Z"
+      },
+      {
+        "id": 30,
+        "userId": 1,
+        "name": "Ideias para Tiras Cômicas",
+        "category": "project",
+        "content": "\nVocê é um roteirista especializado em tiras cômicas de 3 quadros (formato vertical), no estilo de \"Turma da Mônica\", \"Calvin e Haroldo\" ou \"Mafalda\".\n\nSua tarefa é gerar **3 ideias de tiras** baseadas no Personagem e no Tema fornecidos.\n\nPara cada ideia, siga esta estrutura:\n1. **Título**: Um nome curto para a tira.\n2. **Premissa**: A situação básica.\n3. **Atos**:\n   - **Painel 1 (Setup)**: Onde começa.\n   - **Painel 2 (Conflito)**: O que acontece de inusitado.\n   - **Painel 3 (Punchline)**: O desfecho cômico.\n\nMantenha o humor leve, visual e adequado para todas as idades, focando em expressões faciais e situações do cotidiano brasileiro.\n",
+        "type": "task",
+        "version": 1,
+        "active": true,
+        "createdAt": "2026-02-09T02:48:22.275Z",
+        "updatedAt": "2026-02-09T02:48:22.275Z"
+      },
+      {
+        "id": 31,
+        "userId": 1,
+        "name": "Roteiro: História em Quadrinhos",
+        "category": "script-template",
+        "content": "Gere um roteiro dividido em PÁGINAS e PAINÉIS. Cada painel deve ter [DESCRIÇÃO VISUAL] e [DIÁLOGO]. Foque em ritmo visual e narrativa sequencial.",
+        "type": "task",
+        "version": 1,
+        "active": true,
+        "createdAt": "2026-02-09T02:48:22.296Z",
+        "updatedAt": "2026-02-09T02:48:22.296Z"
+      },
+      {
+        "id": 32,
+        "userId": 1,
+        "name": "Roteiro: Mangá Shonen",
+        "category": "script-template",
+        "content": "Gere um roteiro de MANGÁ SHONEN. Use onomatopeias dinâmicas, descrições de enquadramentos de impacto e foco em ação e determinação dos personagens.",
+        "type": "task",
+        "version": 1,
+        "active": true,
+        "createdAt": "2026-02-09T02:48:22.299Z",
+        "updatedAt": "2026-02-09T02:48:22.299Z"
+      },
+      {
+        "id": 33,
+        "userId": 1,
+        "name": "Roteiro: Prosa Literária",
+        "category": "script-template",
+        "content": "Gere uma narrativa em PROSA LITERÁRIA. Foque em descrições sensoriais, monólogos internos e uma estrutura de parágrafos rica e envolvente.",
+        "type": "task",
+        "version": 1,
+        "active": true,
+        "createdAt": "2026-02-09T02:48:22.303Z",
+        "updatedAt": "2026-02-09T02:48:22.303Z"
+      },
+      {
+        "id": 34,
+        "userId": 1,
+        "name": "Roteiro: Cinema / Screenplay",
+        "category": "script-template",
+        "content": "Gere um roteiro no FORMATO PADRÃO DE CINEMA (CENA, CABEÇALHO, AÇÃO, PERSONAGEM, DIÁLOGO). Seja objetivo nas descrições de cena.",
+        "type": "task",
+        "version": 1,
+        "active": true,
+        "createdAt": "2026-02-09T02:48:22.305Z",
+        "updatedAt": "2026-02-09T02:48:22.305Z"
+      },
+      {
+        "id": 35,
+        "userId": 1,
+        "name": "Estilo: Turma da Mônica",
+        "category": "script-style",
+        "content": "Aplique o estilo 'Turma da Mônica'. Use linguagem infantil, dócil, amigável e inclua tropos como 'planos infalíveis' se apropriado. Mantenha o humor leve.",
+        "type": "task",
+        "version": 1,
+        "active": true,
+        "createdAt": "2026-02-09T02:48:22.309Z",
+        "updatedAt": "2026-02-09T02:48:22.309Z"
+      },
+      {
+        "id": 36,
+        "userId": 1,
+        "name": "Estilo: Cyberpunk / Neon",
+        "category": "script-style",
+        "content": "Aplique uma estética CYBERPUNK. Use termos tecnológicos, ambientação com luzes de neon, chuva, asfalto molhado e uma atmosfera distópica e underground.",
+        "type": "task",
+        "version": 1,
+        "active": true,
+        "createdAt": "2026-02-09T02:48:22.313Z",
+        "updatedAt": "2026-02-09T02:48:22.313Z"
+      },
+      {
+        "id": 37,
+        "userId": 1,
+        "name": "Estilo: Noir / Investigativo",
+        "category": "script-style",
+        "content": "Aplique o clima NOIR. Use narração em primeira pessoa (se possível), sombras profundas, ambiguidade moral e uma linguagem cínica e melancólica.",
+        "type": "task",
+        "version": 1,
+        "active": true,
+        "createdAt": "2026-02-09T02:48:22.315Z",
+        "updatedAt": "2026-02-09T02:48:22.315Z"
+      },
+      {
+        "id": 38,
+        "userId": 1,
+        "name": "Global - Instrução PT-BR",
+        "category": "GLOBAL",
+        "content": "Você deve sempre responder em Português do Brasil (pt-BR), exceto se solicitado explicitamente o contrário. Mantenha a coerência gramatical e cultural do Brasil. Todas as gerações (personagens, roteiros, premissas) devem seguir esta regra.",
+        "type": "system",
+        "version": 1,
+        "active": true,
+        "createdAt": "2026-02-10T03:31:34.426Z",
+        "updatedAt": "2026-02-10T03:31:34.426Z"
+      }
+    ],
+    "scriptPrompts": [
+      {
+        "id": 36,
+        "scriptId": 3,
+        "promptId": 29
+      }
+    ],
+    "creativeProfiles": [
+      {
+        "id": 8,
+        "userId": 1,
+        "name": "FREE (GPT OSS 120B)",
+        "model": "openai/gpt-oss-120b:free",
+        "temperature": "0.8",
+        "maxTokens": 2048,
+        "narrativeStyle": "Roteirista Esforçado",
+        "active": false,
+        "createdAt": "2026-02-09T02:53:31.024Z"
+      },
+      {
+        "id": 7,
+        "userId": 1,
+        "name": "Flash",
+        "model": "gemini-3-flash-preview",
+        "temperature": "0.8",
+        "maxTokens": 2048,
+        "narrativeStyle": "Roteirista profissional",
+        "active": false,
+        "createdAt": "2026-02-09T02:52:04.811Z"
+      },
+      {
+        "id": 9,
+        "userId": 1,
+        "name": "Gemini 3 Pro",
+        "model": "gemini-3-pro-preview",
+        "temperature": "0.8",
+        "maxTokens": 2048,
+        "narrativeStyle": "Roteirista profissional",
+        "active": true,
+        "createdAt": "2026-02-10T03:34:23.708Z"
+      }
+    ]
+  }
 }

@@ -148,7 +148,9 @@ export default function WizardCast() {
                       )}
                     </div>
                     <div className="space-y-1">
-                      <h3 className="text-base font-semibold md:text-lg">{char.name}</h3>
+                      <h3 className="text-base font-semibold md:text-lg">
+                        {char.name}
+                      </h3>
                       <p className="line-clamp-2 text-xs italic text-muted-foreground">
                         "
                         {char.personality ||

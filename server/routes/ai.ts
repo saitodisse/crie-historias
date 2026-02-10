@@ -190,16 +190,11 @@ router.post("/ai/generate", isAuthenticated, async (req, res) => {
       systemPrompt =
         "Você é um especialista em estruturação de histórias (Project Architect). Sua tarefa é expandir ideias embrionárias em títulos cativantes e premissas sólidas, mantendo um diálogo construtivo com o autor através de perguntas inteligentes. Sempre peça feedback ou faça perguntas ao final.";
     } else if (type === "wizard-script") {
-      systemPrompt =
-        "Você é um roteirista profissional. Sua tarefa é produzir roteiros completos e detalhados seguindo o formato e estilo solicitados.\n\n" +
-        "ATENÇÃO: GERAÇÃO DE DADOS ESTRUTURADOS.\n" +
-        "SCHEMA ESPERADO (JSON):\n" +
-        "{\n" +
-        '  "title": "Sugestão de título baseada no conteúdo",\n' +
-        '  "content": "O conteúdo do roteiro formatado (Markdown/Fountain/Texto)",\n' +
-        '  "analysis": "Breve explicação das escolhas criativas (opcional)"\n' +
-        "}\n\n" +
-        "Retorne APENAS o JSON válido. Sem blocos de código markdown. Sem conversa.";
+      "Você é um roteirista profissional. Sua tarefa é produzir roteiros completos e detalhados seguindo o formato e estilo solicitados.\n\n" +
+        "Retorne APENAS o conteúdo do roteiro formatado em Markdown.\n" +
+        "NÃO utilize JSON.\n" +
+        "NÃO inclua textos introdutórios ou conversas.\n" +
+        "Se possível, inclua um título no topo do roteiro usando # Título.";
     } else if (type === "character-generation") {
       systemPrompt =
         "ATENÇÃO: GERAÇÃO DE DADOS ESTRUTURADOS.\n" +
@@ -226,13 +221,13 @@ router.post("/ai/generate", isAuthenticated, async (req, res) => {
     if (
       profile?.narrativeStyle &&
       type !== "character-generation" &&
-      type !== "wizard-script"
+      type !== "character-generation"
     ) {
       systemPrompt += ` Escreva neste estilo predominante: ${profile.narrativeStyle}.`;
     }
 
     // For structured generation, append explicit JSON instruction to user prompt
-    if (type === "character-generation" || type === "wizard-script") {
+    if (type === "character-generation") {
       userPrompt = `${userPrompt}\n\nIMPORTANTE: Retorne APENAS um JSON válido seguindo estritamente o schema solicitado.`;
     }
 
@@ -313,10 +308,14 @@ router.post("/ai/generate", isAuthenticated, async (req, res) => {
         : `${userPrompt}${additionalInstructions}`;
 
     // Inject Global Prompts
-    const globalPrompts = await storage.getActivePromptsByCategory(user.id, "GLOBAL");
+    const globalPrompts = await storage.getActivePromptsByCategory(
+      user.id,
+      "GLOBAL"
+    );
     if (globalPrompts.length > 0) {
-      const globalContent = globalPrompts.map(p => p.content).join("\n---\n");
-      systemPrompt = globalContent + (systemPrompt ? "\n---\n" + systemPrompt : "");
+      const globalContent = globalPrompts.map((p) => p.content).join("\n---\n");
+      systemPrompt =
+        globalContent + (systemPrompt ? "\n---\n" + systemPrompt : "");
     }
 
     console.log(
@@ -329,8 +328,7 @@ router.post("/ai/generate", isAuthenticated, async (req, res) => {
     const isGemini = model.startsWith("gemini");
     const isOpenRouter = model.includes("/");
 
-    const maxRetries =
-      type === "character-generation" || type === "wizard-script" ? 3 : 1;
+    const maxRetries = type === "character-generation" ? 3 : 1;
     let attempts = 0;
 
     while (attempts < maxRetries) {
@@ -372,7 +370,7 @@ router.post("/ai/generate", isAuthenticated, async (req, res) => {
             max_tokens: maxTokens,
             temperature,
             response_format:
-              type === "character-generation" || type === "wizard-script"
+              type === "character-generation"
                 ? { type: "json_object" }
                 : undefined,
           });
@@ -400,7 +398,7 @@ router.post("/ai/generate", isAuthenticated, async (req, res) => {
             max_tokens: maxTokens,
             temperature,
             response_format:
-              type === "character-generation" || type === "wizard-script"
+              type === "character-generation"
                 ? { type: "json_object" }
                 : undefined,
           });
@@ -409,7 +407,7 @@ router.post("/ai/generate", isAuthenticated, async (req, res) => {
 
         console.log(`\x1b[32m[AI LLM Response]\x1b[0m\n${result}`);
 
-        if (type === "character-generation" || type === "wizard-script") {
+        if (type === "character-generation") {
           try {
             let jsonStr = result
               .replace(/```json/g, "")
@@ -434,14 +432,6 @@ router.post("/ai/generate", isAuthenticated, async (req, res) => {
                 notes: z.string().nullable().optional(),
               });
               charSchema.parse(parsed);
-            } else if (type === "wizard-script") {
-              // wizard-script
-              const scriptSchema = z.object({
-                title: z.string(),
-                content: z.string(),
-                analysis: z.string().optional(),
-              });
-              scriptSchema.parse(parsed);
             }
 
             // Success!
@@ -475,11 +465,11 @@ router.post("/ai/generate", isAuthenticated, async (req, res) => {
 
     const execution = await storage.createExecution({
       userId: user.id,
-      promptId: promptId || null,
+      promptId: promptRecord ? promptRecord.id : null,
       promptIds: promptIds || null,
-      projectId: projectId || null,
-      scriptId: scriptId || null,
-      characterId: characterId || null,
+      projectId: project ? project.id : null,
+      scriptId: script ? script.id : null,
+      characterId: character ? character.id : null,
       systemPromptSnapshot: systemPrompt,
       userPrompt,
       finalPrompt: currentPrompt,

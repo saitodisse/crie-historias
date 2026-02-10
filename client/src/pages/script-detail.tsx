@@ -27,16 +27,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import {
-  ArrowLeft,
-  Save,
-  Trash2,
-  Sparkles,
-  Copy,
-  Send,
-  MessageSquare,
-  Wand2,
-} from "lucide-react";
+import { ArrowLeft, Save, Trash2, Sparkles, Send, Wand2 } from "lucide-react";
 import { Markdown } from "@/components/markdown";
 import type { Script, AIExecution, Prompt } from "@shared/schema";
 
@@ -50,6 +41,8 @@ interface AIResult {
   result: string;
 }
 
+import { ScriptGeneratorDialog } from "@/components/script-generator-dialog";
+
 export default function ScriptDetailPage() {
   const params = useParams<{ id: string }>();
   const [, navigate] = useLocation();
@@ -61,9 +54,7 @@ export default function ScriptDetailPage() {
   const [type, setType] = useState("synopsis");
   const [content, setContent] = useState("");
   const [aiOpen, setAiOpen] = useState(false);
-  const [aiPrompt, setAiPrompt] = useState("");
   const [selectedPromptIds, setSelectedPromptIds] = useState<number[]>([]);
-  const [aiResult, setAiResult] = useState<AIResult | null>(null);
   const [adjustOpen, setAdjustOpen] = useState(false);
   const [adjustPrompt, setAdjustPrompt] = useState("");
   const [adjustResult, setAdjustResult] = useState<AIResult | null>(null);
@@ -113,31 +104,6 @@ export default function ScriptDetailPage() {
     },
   });
 
-  const generateMutation = useMutation({
-    mutationFn: async () => {
-      const res = await apiRequest("POST", "/api/ai/generate", {
-        scriptId,
-        projectId: script?.projectId,
-        userPrompt: aiPrompt,
-        promptIds: selectedPromptIds,
-        type: "script",
-      });
-      return res.json() as Promise<AIResult>;
-    },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/scripts", scriptId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/executions"] });
-      setAiResult(data);
-    },
-    onError: (err: Error) => {
-      toast({
-        title: "Geração falhou",
-        description: err.message,
-        variant: "destructive",
-      });
-    },
-  });
-
   const deleteMutation = useMutation({
     mutationFn: async () => {
       await apiRequest("DELETE", `/api/scripts/${scriptId}`);
@@ -182,7 +148,10 @@ export default function ScriptDetailPage() {
           setAdjustOpen(false);
           setAdjustResult(null);
           setAdjustPrompt("");
-          toast({ title: "Ajuste aplicado", description: "O conteúdo foi atualizado. Não esqueça de salvar." });
+          toast({
+            title: "Ajuste aplicado",
+            description: "O conteúdo foi atualizado. Não esqueça de salvar.",
+          });
         }
       } catch (e) {
         // Fallback if not valid JSON or missing content
@@ -191,7 +160,10 @@ export default function ScriptDetailPage() {
         setAdjustOpen(false);
         setAdjustResult(null);
         setAdjustPrompt("");
-        toast({ title: "Ajuste aplicado", description: "O conteúdo foi atualizado. Não esqueça de salvar." });
+        toast({
+          title: "Ajuste aplicado",
+          description: "O conteúdo foi atualizado. Não esqueça de salvar.",
+        });
       }
     }
   };
@@ -278,233 +250,24 @@ export default function ScriptDetailPage() {
             </>
           ) : (
             <>
-              <Dialog
-                open={aiOpen}
-                onOpenChange={(o) => {
-                  setAiOpen(o);
-                  if (!o) {
-                    setAiResult(null);
-                    setAiPrompt("");
-                  }
-                }}
+              <Button
+                variant="outline"
+                onClick={() => setAiOpen(true)}
+                data-testid="button-ai-script"
               >
-                <DialogTrigger asChild>
-                  <Button variant="outline" data-testid="button-ai-script">
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    Gerar com IA
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-h-[85vh] max-w-3xl">
-                  <DialogHeader>
-                    <DialogTitle>Gerar Conteúdo do Roteiro</DialogTitle>
-                    <DialogDescription>
-                      O roteiro e projeto associado serão enviados como
-                      contexto.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <ScrollArea className="max-h-[65vh]">
-                    <div className="space-y-4 pr-4">
-                      {!aiResult ? (
-                        <>
-                          <Textarea
-                            value={aiPrompt}
-                            onChange={(e) => setAiPrompt(e.target.value)}
-                            placeholder="ex: Expanda isto em um roteiro completo, adicione mais diálogos..."
-                            rows={4}
-                            data-testid="input-ai-script-prompt"
-                          />
+                <Sparkles className="mr-2 h-4 w-4" />
+                Gerar com IA
+              </Button>
 
-                          <div className="space-y-2">
-                            <Label className="text-sm font-medium">
-                              Prompts Adicionais (Categoria Roteiro)
-                            </Label>
-                            <div className="flex flex-wrap gap-2">
-                              {scriptPrompts.map((p) => {
-                                const isSelected = selectedPromptIds.includes(
-                                  p.id
-                                );
-                                return (
-                                  <Button
-                                    key={p.id}
-                                    variant={
-                                      isSelected ? "secondary" : "outline"
-                                    }
-                                    size="sm"
-                                    className={`h-auto flex-col items-start px-3 py-2 text-left ${
-                                      isSelected
-                                        ? "border-primary/50 bg-primary/10"
-                                        : ""
-                                    }`}
-                                    onClick={() => {
-                                      setSelectedPromptIds((prev) =>
-                                        prev.includes(p.id)
-                                          ? prev.filter((id) => id !== p.id)
-                                          : [...prev, p.id]
-                                      );
-                                    }}
-                                  >
-                                    <div className="flex w-full items-center justify-between gap-2">
-                                      <span className="text-xs font-semibold leading-tight">
-                                        {p.name}
-                                      </span>
-                                      <Badge
-                                        variant="outline"
-                                        className="h-4 px-1 text-[9px] uppercase leading-none"
-                                      >
-                                        {p.type}
-                                      </Badge>
-                                    </div>
-                                    <span className="mt-1 line-clamp-1 text-[10px] text-muted-foreground">
-                                      {p.content}
-                                    </span>
-                                  </Button>
-                                );
-                              })}
-                            </div>
-                            {scriptPrompts.length === 0 && (
-                              <p className="text-xs italic text-muted-foreground">
-                                Nenhum prompt de roteiro encontrado em
-                                biblioteca.
-                              </p>
-                            )}
-                          </div>
-                          <Button
-                            className="w-full"
-                            onClick={() => generateMutation.mutate()}
-                            disabled={
-                              !aiPrompt.trim() || generateMutation.isPending
-                            }
-                            data-testid="button-submit-ai-script"
-                          >
-                            <Send className="mr-2 h-4 w-4" />
-                            {generateMutation.isPending
-                              ? "Gerando..."
-                              : "Enviar para IA"}
-                          </Button>
-                        </>
-                      ) : (
-                        <>
-                          <div className="flex flex-wrap items-center gap-2">
-                            <Badge variant="secondary">
-                              {aiResult.execution.model}
-                            </Badge>
-                            <Badge variant="outline">
-                              {JSON.stringify(
-                                (aiResult.execution.parameters as any)
-                                  ?.maxTokens || 0
-                              )}{" "}
-                              tokens máx.
-                            </Badge>
-                          </div>
-
-                          <div>
-                            <div className="mb-1 flex items-center justify-between gap-2">
-                              <Label className="flex items-center gap-1 text-xs text-muted-foreground">
-                                <Send className="h-3 w-3" /> Enviado (Prompt
-                                Final)
-                              </Label>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => {
-                                  navigator.clipboard.writeText(
-                                    aiResult.execution.finalPrompt
-                                  );
-                                  toast({ title: "Prompt copiado" });
-                                }}
-                              >
-                                <Copy className="mr-1 h-3 w-3" />
-                                Copiar
-                              </Button>
-                            </div>
-                            <pre
-                              className="mt-1 max-h-32 overflow-auto whitespace-pre-wrap rounded-md bg-muted p-3 font-mono text-xs"
-                              data-testid="text-ai-sent"
-                            >
-                              {aiResult.execution.finalPrompt}
-                            </pre>
-                          </div>
-
-                          {aiResult.execution.systemPromptSnapshot && (
-                            <div>
-                              <Label className="text-xs text-muted-foreground">
-                                Prompt de Sistema
-                              </Label>
-                              <pre className="mt-1 max-h-24 overflow-auto whitespace-pre-wrap rounded-md bg-muted p-3 font-mono text-xs">
-                                {aiResult.execution.systemPromptSnapshot}
-                              </pre>
-                            </div>
-                          )}
-
-                          <Separator />
-
-                          <div>
-                            <div className="mb-1 flex items-center justify-between gap-2">
-                              <Label className="flex items-center gap-1 text-xs text-muted-foreground">
-                                <MessageSquare className="h-3 w-3" /> Recebido
-                                (Resultado)
-                              </Label>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => {
-                                  if (aiResult.result) {
-                                    navigator.clipboard.writeText(
-                                      aiResult.result
-                                    );
-                                    toast({ title: "Resultado copiado" });
-                                  }
-                                }}
-                              >
-                                <Copy className="mr-1 h-3 w-3" />
-                                Copiar
-                              </Button>
-                            </div>
-                            {aiResult.result ? (
-                              <div
-                                className="rounded-md bg-muted p-4"
-                                data-testid="text-ai-result"
-                              >
-                                <Markdown className="prose-sm font-serif dark:prose-invert">
-                                  {aiResult.result}
-                                </Markdown>
-                              </div>
-                            ) : (
-                              <div
-                                className="rounded-md bg-destructive/10 p-4 text-sm text-destructive"
-                                data-testid="text-ai-empty"
-                              >
-                                A IA retornou um resultado vazio. Tente um
-                                modelo diferente ou reformule o prompt.
-                              </div>
-                            )}
-                          </div>
-
-                          <div className="flex gap-2">
-                            <Button
-                              variant="outline"
-                              onClick={() => setAiResult(null)}
-                              data-testid="button-ai-new-prompt"
-                            >
-                              Novo Prompt
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              onClick={() => {
-                                setAiOpen(false);
-                                setAiResult(null);
-                                setAiPrompt("");
-                              }}
-                            >
-                              Fechar
-                            </Button>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </ScrollArea>
-                </DialogContent>
-              </Dialog>
+              <ScriptGeneratorDialog
+                open={aiOpen}
+                onOpenChange={setAiOpen}
+                scriptId={scriptId}
+                projectId={script?.projectId}
+                availablePrompts={scriptPrompts}
+                initialPromptIds={selectedPromptIds}
+                onPromptSelectionChange={setSelectedPromptIds}
+              />
 
               <Dialog
                 open={adjustOpen}
@@ -517,7 +280,10 @@ export default function ScriptDetailPage() {
                 }}
               >
                 <DialogTrigger asChild>
-                  <Button variant="outline" data-testid="button-adjust-ai-script">
+                  <Button
+                    variant="outline"
+                    data-testid="button-adjust-ai-script"
+                  >
                     <Wand2 className="mr-2 h-4 w-4" />
                     Ajustar com IA
                   </Button>
@@ -526,7 +292,8 @@ export default function ScriptDetailPage() {
                   <DialogHeader>
                     <DialogTitle>Ajustar Roteiro com IA</DialogTitle>
                     <DialogDescription>
-                      O conteúdo atual do roteiro será enviado para a IA junto com suas instruções.
+                      O conteúdo atual do roteiro será enviado para a IA junto
+                      com suas instruções.
                     </DialogDescription>
                   </DialogHeader>
                   <ScrollArea className="max-h-[65vh]">
@@ -557,13 +324,19 @@ export default function ScriptDetailPage() {
                       ) : (
                         <>
                           <div>
-                            <Label className="text-xs text-muted-foreground">Sugestão da IA</Label>
+                            <Label className="text-xs text-muted-foreground">
+                              Sugestão da IA
+                            </Label>
                             <div className="mt-1 rounded-md bg-muted p-4">
                               <Markdown className="prose-sm font-serif dark:prose-invert">
                                 {(() => {
                                   try {
-                                    const parsed = JSON.parse(adjustResult.result);
-                                    return parsed.content || adjustResult.result;
+                                    const parsed = JSON.parse(
+                                      adjustResult.result
+                                    );
+                                    return (
+                                      parsed.content || adjustResult.result
+                                    );
                                   } catch (e) {
                                     return adjustResult.result;
                                   }

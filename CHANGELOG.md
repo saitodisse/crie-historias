@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.6] - 2026-02-10
+
+### Changed
+
+- Refatoração completa da tela de "Gerar Conteúdo do Roteiro" na aplicação, substituindo a implementação anterior por um novo componente `ScriptGeneratorDialog`.
+- Melhoria na legibilidade e usabilidade da interface de geração de roteiros, removendo estilos inline complexos e adotando componentes padrão.
+- Remoção de código legado e simplificação da lógica na página de detalhes do roteiro (`script-detail.tsx`).
+
 ## [1.0.5] - 2026-02-09
 
 ### Changed

@@ -187,7 +187,9 @@ export default function PromptDetailPage() {
                     <SelectItem value="Project">Projeto</SelectItem>
                     <SelectItem value="script">Roteiro</SelectItem>
                     <SelectItem value="refinement">Refinamento</SelectItem>
-                    <SelectItem value="GLOBAL">GLOBAL (Alica em tudo)</SelectItem>
+                    <SelectItem value="GLOBAL">
+                      GLOBAL (Alica em tudo)
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
