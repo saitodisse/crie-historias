@@ -15,6 +15,7 @@ const categoryColors: Record<string, string> = {
   project: "bg-amber-500/10 text-amber-700 dark:text-amber-400",
   script: "bg-green-500/10 text-green-700 dark:text-green-400",
   refinement: "bg-purple-500/10 text-purple-700 dark:text-purple-400",
+  GLOBAL: "bg-red-500/10 text-red-700 dark:text-red-400 font-bold border border-red-200/50",
 };
 
 const categoryLabels: Record<string, string> = {
@@ -22,6 +23,7 @@ const categoryLabels: Record<string, string> = {
   project: "Projeto",
   script: "Roteiro",
   refinement: "Refinamento",
+  GLOBAL: "GLOBAL",
 };
 
 export default function PromptsPage() {
@@ -85,6 +87,7 @@ export default function PromptsPage() {
             <TabsTrigger value="character">Personagem</TabsTrigger>
             <TabsTrigger value="script">Roteiro</TabsTrigger>
             <TabsTrigger value="refinement">Refinamento</TabsTrigger>
+            <TabsTrigger value="GLOBAL">Global</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>

@@ -103,7 +103,7 @@ export interface IStorage {
   createExecution(data: InsertAIExecution): Promise<AIExecution>;
 
   exportData(): Promise<any>;
-  importData(data: any): Promise<void>;
+  importData(data: any, currentUserId?: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -516,7 +516,6 @@ export class DatabaseStorage implements IStorage {
 
     // We export everything raw
     const [
-      allUsers,
       allProjects,
       allCharacters,
       allProjectCharacters,
@@ -524,9 +523,7 @@ export class DatabaseStorage implements IStorage {
       allPrompts,
       allScriptPrompts,
       allCreativeProfiles,
-      allAiExecutions,
     ] = await Promise.all([
-      db.select().from(users),
       db.select().from(projects),
       db.select().from(characters),
       db.select().from(projectCharacters),
@@ -534,20 +531,12 @@ export class DatabaseStorage implements IStorage {
       db.select().from(prompts),
       db.select().from(scriptPrompts),
       db.select().from(creativeProfiles),
-      db.select().from(aiExecutions),
     ]);
 
     return {
       version: 1,
       timestamp: new Date().toISOString(),
       data: {
-        users: allUsers.map((u) => ({
-          ...u,
-          password: "redacted",
-          openaiKey: null,
-          geminiKey: null,
-          openrouterKey: null,
-        })),
         projects: allProjects,
         characters: allCharacters,
         projectCharacters: allProjectCharacters,
@@ -555,16 +544,15 @@ export class DatabaseStorage implements IStorage {
         prompts: allPrompts,
         scriptPrompts: allScriptPrompts,
         creativeProfiles: allCreativeProfiles,
-        aiExecutions: allAiExecutions,
       },
     };
   }
 
-  async importData(importPayload: any): Promise<void> {
+  async importData(importPayload: any, currentUserId?: number): Promise<void> {
     const { data } = importPayload;
 
     // Simple validation
-    if (!data || !data.users) {
+    if (!data) {
       throw new Error("Invalid import data format");
     }
 
@@ -572,6 +560,7 @@ export class DatabaseStorage implements IStorage {
     // We match by externalAuthId or username
     const existingUsers = await db
       .select({
+        id: users.id,
         externalAuthId: users.externalAuthId,
         username: users.username,
         openaiKey: users.openaiKey,
@@ -583,6 +572,8 @@ export class DatabaseStorage implements IStorage {
 
     await db.transaction(async (tx) => {
       // 1. Delete all existing data in correct order to avoid FK constraints
+      // If we are mapping to a specific user, we might want to only delete THEIR data
+      // but for "Restore", usually we clear the app as requested by the current logic.
       await tx.delete(aiExecutions);
       await tx.delete(scriptPrompts);
       await tx.delete(projectCharacters);
@@ -591,49 +582,65 @@ export class DatabaseStorage implements IStorage {
       await tx.delete(characters);
       await tx.delete(prompts);
       await tx.delete(creativeProfiles);
-      await tx.delete(users);
+
+      // Only delete users if we are importing new ones
+      const importingUsers = data.users && data.users.length > 0;
+      if (importingUsers) {
+        await tx.delete(users);
+      }
 
       // 2. Insert new data in correct order
       // We sanitize users from the import payload to ensure no keys/passwords are imported
-      const sanitizedUsers = data.users.map((u: any) => {
-        // Find if this user existed before and has keys to preserve
-        const existing = existingUsers.find(
-          (ex) =>
-            (u.externalAuthId && ex.externalAuthId === u.externalAuthId) ||
-            ex.username === u.username
-        );
+      if (importingUsers) {
+        const sanitizedUsers = data.users.map((u: any) => {
+          // Find if this user existed before and has keys to preserve
+          const existing = existingUsers.find(
+            (ex) =>
+              (u.externalAuthId && ex.externalAuthId === u.externalAuthId) ||
+              ex.username === u.username
+          );
 
-        return {
-          ...u,
-          // ALWAYS ignore keys and password from import payload
-          password: existing?.password || "redacted",
-          openaiKey: existing?.openaiKey || null,
-          geminiKey: existing?.geminiKey || null,
-          openrouterKey: existing?.openrouterKey || null,
-        };
-      });
+          return {
+            ...u,
+            // ALWAYS ignore keys and password from import payload
+            password: existing?.password || "redacted",
+            openaiKey: existing?.openaiKey || null,
+            geminiKey: existing?.geminiKey || null,
+            openrouterKey: existing?.openrouterKey || null,
+          };
+        });
 
-      if (sanitizedUsers.length > 0)
         await tx.insert(users).values(sanitizedUsers);
-      if (data.projects.length > 0)
-        await tx.insert(projects).values(data.projects);
-      if (data.characters.length > 0)
-        await tx.insert(characters).values(data.characters);
-      if (data.prompts.length > 0)
-        await tx.insert(prompts).values(data.prompts);
-      if (data.creativeProfiles.length > 0)
-        await tx.insert(creativeProfiles).values(data.creativeProfiles);
+      }
 
-      if (data.scripts.length > 0)
+      // Helper to remap userId if we are not importing users
+      const mapUserId = (item: any) => {
+        if (!importingUsers && currentUserId) {
+          return { ...item, userId: currentUserId };
+        }
+        return item;
+      };
+
+      if (data.projects && data.projects.length > 0)
+        await tx.insert(projects).values(data.projects.map(mapUserId));
+      if (data.characters && data.characters.length > 0)
+        await tx.insert(characters).values(data.characters.map(mapUserId));
+      if (data.prompts && data.prompts.length > 0)
+        await tx.insert(prompts).values(data.prompts.map(mapUserId));
+      if (data.creativeProfiles && data.creativeProfiles.length > 0)
+        await tx.insert(creativeProfiles).values(data.creativeProfiles.map(mapUserId));
+
+      if (data.scripts && data.scripts.length > 0)
         await tx.insert(scripts).values(data.scripts);
 
-      if (data.projectCharacters.length > 0)
+      if (data.projectCharacters && data.projectCharacters.length > 0)
         await tx.insert(projectCharacters).values(data.projectCharacters);
-      if (data.scriptPrompts.length > 0)
+      if (data.scriptPrompts && data.scriptPrompts.length > 0)
         await tx.insert(scriptPrompts).values(data.scriptPrompts);
 
-      if (data.aiExecutions.length > 0)
-        await tx.insert(aiExecutions).values(data.aiExecutions);
+      if (data.aiExecutions && data.aiExecutions.length > 0) {
+        await tx.insert(aiExecutions).values(data.aiExecutions.map(mapUserId));
+      }
 
       // 3. Reset sequences
       const tables = [

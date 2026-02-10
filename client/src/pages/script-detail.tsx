@@ -35,6 +35,7 @@ import {
   Copy,
   Send,
   MessageSquare,
+  Wand2,
 } from "lucide-react";
 import { Markdown } from "@/components/markdown";
 import type { Script, AIExecution, Prompt } from "@shared/schema";
@@ -63,6 +64,10 @@ export default function ScriptDetailPage() {
   const [aiPrompt, setAiPrompt] = useState("");
   const [selectedPromptIds, setSelectedPromptIds] = useState<number[]>([]);
   const [aiResult, setAiResult] = useState<AIResult | null>(null);
+  const [adjustOpen, setAdjustOpen] = useState(false);
+  const [adjustPrompt, setAdjustPrompt] = useState("");
+  const [adjustResult, setAdjustResult] = useState<AIResult | null>(null);
+  const [isApplyingAdjust, setIsApplyingAdjust] = useState(false);
 
   const { data: allPrompts } = useQuery<Prompt[]>({
     queryKey: ["/api/prompts"],
@@ -108,17 +113,6 @@ export default function ScriptDetailPage() {
     },
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: async () => {
-      await apiRequest("DELETE", `/api/scripts/${scriptId}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/scripts"] });
-      navigate("/scripts");
-      toast({ title: "Roteiro removido" });
-    },
-  });
-
   const generateMutation = useMutation({
     mutationFn: async () => {
       const res = await apiRequest("POST", "/api/ai/generate", {
@@ -143,6 +137,64 @@ export default function ScriptDetailPage() {
       });
     },
   });
+
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      await apiRequest("DELETE", `/api/scripts/${scriptId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/scripts"] });
+      navigate("/scripts");
+      toast({ title: "Roteiro removido" });
+    },
+  });
+
+  const adjustMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", "/api/ai/generate", {
+        scriptId,
+        projectId: script?.projectId,
+        userPrompt: adjustPrompt,
+        type: "script-adjustment",
+      });
+      return res.json() as Promise<AIResult>;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/executions"] });
+      setAdjustResult(data);
+    },
+    onError: (err: Error) => {
+      toast({
+        title: "Ajuste falhou",
+        description: err.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const applyAdjustment = () => {
+    if (adjustResult?.result) {
+      try {
+        const parsed = JSON.parse(adjustResult.result);
+        if (parsed.content) {
+          setContent(parsed.content);
+          setEditing(true);
+          setAdjustOpen(false);
+          setAdjustResult(null);
+          setAdjustPrompt("");
+          toast({ title: "Ajuste aplicado", description: "O conteúdo foi atualizado. Não esqueça de salvar." });
+        }
+      } catch (e) {
+        // Fallback if not valid JSON or missing content
+        setContent(adjustResult.result);
+        setEditing(true);
+        setAdjustOpen(false);
+        setAdjustResult(null);
+        setAdjustPrompt("");
+        toast({ title: "Ajuste aplicado", description: "O conteúdo foi atualizado. Não esqueça de salvar." });
+      }
+    }
+  };
 
   const startEditing = () => {
     if (script) {
@@ -445,6 +497,104 @@ export default function ScriptDetailPage() {
                               }}
                             >
                               Fechar
+                            </Button>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </ScrollArea>
+                </DialogContent>
+              </Dialog>
+
+              <Dialog
+                open={adjustOpen}
+                onOpenChange={(o) => {
+                  setAdjustOpen(o);
+                  if (!o) {
+                    setAdjustResult(null);
+                    setAdjustPrompt("");
+                  }
+                }}
+              >
+                <DialogTrigger asChild>
+                  <Button variant="outline" data-testid="button-adjust-ai-script">
+                    <Wand2 className="mr-2 h-4 w-4" />
+                    Ajustar com IA
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-h-[85vh] max-w-3xl">
+                  <DialogHeader>
+                    <DialogTitle>Ajustar Roteiro com IA</DialogTitle>
+                    <DialogDescription>
+                      O conteúdo atual do roteiro será enviado para a IA junto com suas instruções.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <ScrollArea className="max-h-[65vh]">
+                    <div className="space-y-4 pr-4">
+                      {!adjustResult ? (
+                        <>
+                          <Textarea
+                            value={adjustPrompt}
+                            onChange={(e) => setAdjustPrompt(e.target.value)}
+                            placeholder="ex: Traduza para português, reescreva em um tom mais dramático, melhore os diálogos..."
+                            rows={4}
+                            data-testid="input-adjust-ai-script-prompt"
+                          />
+                          <Button
+                            className="w-full"
+                            onClick={() => adjustMutation.mutate()}
+                            disabled={
+                              !adjustPrompt.trim() || adjustMutation.isPending
+                            }
+                            data-testid="button-submit-adjust-ai-script"
+                          >
+                            <Send className="mr-2 h-4 w-4" />
+                            {adjustMutation.isPending
+                              ? "Processando..."
+                              : "Enviar para IA"}
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <div>
+                            <Label className="text-xs text-muted-foreground">Sugestão da IA</Label>
+                            <div className="mt-1 rounded-md bg-muted p-4">
+                              <Markdown className="prose-sm font-serif dark:prose-invert">
+                                {(() => {
+                                  try {
+                                    const parsed = JSON.parse(adjustResult.result);
+                                    return parsed.content || adjustResult.result;
+                                  } catch (e) {
+                                    return adjustResult.result;
+                                  }
+                                })()}
+                              </Markdown>
+                            </div>
+                          </div>
+
+                          <div className="flex gap-2">
+                            <Button
+                              className="flex-1"
+                              onClick={applyAdjustment}
+                              data-testid="button-apply-adjust"
+                            >
+                              Aplicar Sugestão
+                            </Button>
+                            <Button
+                              variant="outline"
+                              onClick={() => setAdjustResult(null)}
+                            >
+                              Novo Prompt
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              onClick={() => {
+                                setAdjustOpen(false);
+                                setAdjustResult(null);
+                                setAdjustPrompt("");
+                              }}
+                            >
+                              Descartar
                             </Button>
                           </div>
                         </>

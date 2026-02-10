@@ -213,6 +213,12 @@ router.post("/ai/generate", isAuthenticated, async (req, res) => {
         "  notes?: string; // Notas adicionais\n" +
         "}\n\n" +
         "Retorne APENAS o JSON. Sem blocos de código markdown. Sem conversa.";
+    } else if (type === "script-adjustment") {
+      systemPrompt =
+        "Você é um editor de roteiros experiente. Sua tarefa é ajustar o conteúdo do roteiro seguindo as instruções do usuário.\n" +
+        "Retorne APENAS o conteúdo do roteiro ajustado/reescrito.\n" +
+        "NÃO inclua textos introdutórios como 'Aqui está o roteiro' ou 'Certo'.\n" +
+        "NÃO use formatação de bloco de código (```) a menos que faça parte do roteiro.";
     } else {
       systemPrompt = "Você é um assistente de escrita criativa habilidoso. ";
     }
@@ -305,6 +311,13 @@ router.post("/ai/generate", isAuthenticated, async (req, res) => {
       contextParts.length > 0
         ? `Contexto:\n${contextParts.join("\n")}\n\nSolicitação: ${userPrompt}${additionalInstructions}`
         : `${userPrompt}${additionalInstructions}`;
+
+    // Inject Global Prompts
+    const globalPrompts = await storage.getActivePromptsByCategory(user.id, "GLOBAL");
+    if (globalPrompts.length > 0) {
+      const globalContent = globalPrompts.map(p => p.content).join("\n---\n");
+      systemPrompt = globalContent + (systemPrompt ? "\n---\n" + systemPrompt : "");
+    }
 
     console.log(
       `\x1b[35m[AI LLM Call]\x1b[0m Model: ${model}, Temperature: ${temperature}`
@@ -421,7 +434,7 @@ router.post("/ai/generate", isAuthenticated, async (req, res) => {
                 notes: z.string().nullable().optional(),
               });
               charSchema.parse(parsed);
-            } else {
+            } else if (type === "wizard-script") {
               // wizard-script
               const scriptSchema = z.object({
                 title: z.string(),
@@ -436,7 +449,7 @@ router.post("/ai/generate", isAuthenticated, async (req, res) => {
             break;
           } catch (e: any) {
             console.log(
-              `JSON Validation failed (attempt ${attempts}/${maxRetries}):`,
+              `JSON Validation failed for type ${type} (attempt ${attempts}/${maxRetries}):`,
               e.message
             );
             if (attempts >= maxRetries) {
