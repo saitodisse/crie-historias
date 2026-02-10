@@ -88,8 +88,8 @@ export default function ProjectsPage() {
   );
 
   return (
-    <div className="flex h-full flex-col">
-      <div className="flex flex-wrap items-center justify-between gap-4 p-6 pb-4">
+    <div className="flex flex-col gap-6 p-4 md:p-6">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1
             className="text-2xl font-bold tracking-tight"
@@ -183,82 +183,76 @@ export default function ProjectsPage() {
         </div>
       </div>
 
-      <div className="px-6 pb-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar projetos..."
-            className="pl-9"
-            data-testid="input-search-projects"
-          />
-        </div>
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Buscar projetos..."
+          className="pl-9"
+          data-testid="input-search-projects"
+        />
       </div>
 
-      <div className="flex-1 overflow-auto px-6 pb-6">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {isLoading ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map((i) => (
-              <Card key={i}>
-                <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 pb-2">
-                  <Skeleton className="h-5 w-32" />
-                  <Skeleton className="h-5 w-16" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="mb-2 h-4 w-full" />
-                  <Skeleton className="h-4 w-2/3" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          [1, 2, 3].map((i) => (
+            <Card key={i}>
+              <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 pb-2">
+                <Skeleton className="h-5 w-32" />
+                <Skeleton className="h-5 w-16" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="mb-2 h-4 w-full" />
+                <Skeleton className="h-4 w-2/3" />
+              </CardContent>
+            </Card>
+          ))
         ) : filtered && filtered.length > 0 ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((project) => (
-              <Card
-                key={project.id}
-                className="hover-elevate group cursor-pointer"
-                onClick={() => navigate(`/projects/${project.id}`)}
-                data-testid={`card-project-${project.id}`}
-              >
-                <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 pb-2">
-                  <div className="flex min-w-0 items-center gap-2">
-                    <BookOpen className="h-4 w-4 shrink-0 text-primary" />
-                    <h3 className="truncate text-sm font-semibold">
-                      {project.title}
-                    </h3>
-                  </div>
-                  <Badge
-                    variant="secondary"
-                    className={statusColors[project.status] || ""}
-                  >
-                    {statusLabels[project.status] || project.status}
-                  </Badge>
-                </CardHeader>
-                <CardContent>
-                  {project.premise ? (
-                    <p className="line-clamp-2 text-sm text-muted-foreground">
-                      {project.premise}
-                    </p>
-                  ) : (
-                    <p className="text-sm italic text-muted-foreground">
-                      Sem premissa
-                    </p>
-                  )}
-                  {project.tone && (
-                    <p className="mt-2 text-xs text-muted-foreground">
-                      {project.tone}
-                    </p>
-                  )}
-                  <div className="mt-3 flex items-center justify-end">
-                    <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          filtered?.map((project) => (
+            <Card
+              key={project.id}
+              className="hover-elevate group cursor-pointer"
+              onClick={() => navigate(`/projects/${project.id}`)}
+              data-testid={`card-project-${project.id}`}
+            >
+              <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 pb-2">
+                <div className="flex min-w-0 items-center gap-2">
+                  <BookOpen className="h-4 w-4 shrink-0 text-primary" />
+                  <h3 className="truncate text-sm font-semibold">
+                    {project.title}
+                  </h3>
+                </div>
+                <Badge
+                  variant="secondary"
+                  className={statusColors[project.status] || ""}
+                >
+                  {statusLabels[project.status] || project.status}
+                </Badge>
+              </CardHeader>
+              <CardContent>
+                {project.premise ? (
+                  <p className="line-clamp-2 text-sm text-muted-foreground">
+                    {project.premise}
+                  </p>
+                ) : (
+                  <p className="text-sm italic text-muted-foreground">
+                    Sem premissa
+                  </p>
+                )}
+                {project.tone && (
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    {project.tone}
+                  </p>
+                )}
+                <div className="mt-3 flex items-center justify-end">
+                  <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+                </div>
+              </CardContent>
+            </Card>
+          ))
         ) : (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="col-span-full flex flex-col items-center justify-center py-20 text-center">
             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
               <BookOpen className="h-8 w-8 text-muted-foreground" />
             </div>

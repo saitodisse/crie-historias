@@ -493,7 +493,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="flex h-full flex-col space-y-8 overflow-auto p-6">
+    <div className="flex flex-col gap-8 p-4 md:p-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">
           Configurações de API
@@ -598,8 +598,8 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      <div className="flex h-full flex-col">
-        <div className="flex flex-wrap items-center justify-between gap-4 pb-4">
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1
               className="text-2xl font-bold tracking-tight"
@@ -638,7 +638,7 @@ export default function ProfilePage() {
           </Dialog>
         </div>
 
-        <div className="flex-1 overflow-auto pb-6">
+        <div>
           {isLoading ? (
             <div className="grid gap-4 sm:grid-cols-2">
               {[1, 2].map((i) => (

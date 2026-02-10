@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send, Sparkles, ChevronRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
@@ -180,7 +179,7 @@ export default function WizardIdea() {
               <Textarea
                 id="idea"
                 placeholder="Ex: Um grupo de crianças encontra um robô gigante enterado no quintal..."
-                className="min-h-[150px] bg-muted/30 p-4 text-lg transition-colors focus:bg-background"
+                className="min-h-[150px] bg-muted/30 p-4 text-base transition-colors focus:bg-background md:text-lg"
                 value={initialIdea}
                 onChange={(e) => setInitialIdea(e.target.value)}
               />
@@ -196,79 +195,79 @@ export default function WizardIdea() {
             </Button>
           </motion.div>
         ) : (
-          <div className="flex h-[500px] flex-col">
-            <ScrollArea className="mb-4 flex-1 pr-4">
-              <div className="space-y-4">
-                {messages.map((m, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, x: m.role === "user" ? 20 : -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className={cn(
-                      "max-w-[80%] rounded-2xl p-4",
-                      m.role === "user"
-                        ? "ml-auto rounded-tr-none bg-primary text-primary-foreground"
-                        : "mr-auto rounded-tl-none bg-muted text-foreground"
+          <div className="flex flex-col gap-6">
+            <div className="space-y-6">
+              {messages.map((m, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: m.role === "user" ? 20 : -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className={cn(
+                    "max-w-[100%] rounded-2xl p-4 md:max-w-[85%]",
+                    m.role === "user"
+                      ? "ml-auto rounded-tr-none bg-primary text-primary-foreground"
+                      : "mr-auto rounded-tl-none bg-muted text-foreground"
+                  )}
+                >
+                  <div className="max-w-full overflow-hidden">
+                    {m.role === "ai" ? (
+                      <Markdown className="prose-sm dark:prose-invert">
+                        {m.content}
+                      </Markdown>
+                    ) : (
+                      <div className="whitespace-pre-wrap font-sans">
+                        {m.content}
+                      </div>
                     )}
-                  >
-                    <div className="max-w-full">
-                      {m.role === "ai" ? (
-                        <Markdown className="prose-sm dark:prose-invert">
-                          {m.content}
-                        </Markdown>
-                      ) : (
-                        <div className="whitespace-pre-wrap font-sans">
-                          {m.content}
-                        </div>
-                      )}
-                    </div>
-                  </motion.div>
-                ))}
-                {isProcessing && (
-                  <div className="mr-auto max-w-[80%] rounded-2xl rounded-tl-none bg-muted p-4 text-foreground">
-                    <div className="flex gap-1">
-                      <span className="h-2 w-2 animate-bounce rounded-full bg-foreground/30" />
-                      <span className="h-2 w-2 animate-bounce rounded-full bg-foreground/30 [animation-delay:0.2s]" />
-                      <span className="h-2 w-2 animate-bounce rounded-full bg-foreground/30 [animation-delay:0.4s]" />
-                    </div>
                   </div>
-                )}
-              </div>
-            </ScrollArea>
+                </motion.div>
+              ))}
+              {isProcessing && (
+                <div className="mr-auto max-w-[80%] rounded-2xl rounded-tl-none bg-muted p-4 text-foreground">
+                  <div className="flex gap-1">
+                    <span className="h-2 w-2 animate-bounce rounded-full bg-foreground/30" />
+                    <span className="h-2 w-2 animate-bounce rounded-full bg-foreground/30 [animation-delay:0.2s]" />
+                    <span className="h-2 w-2 animate-bounce rounded-full bg-foreground/30 [animation-delay:0.4s]" />
+                  </div>
+                </div>
+              )}
+            </div>
 
-            <div className="space-y-4">
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Responda à IA ou peça mudanças..."
-                  value={chatInput}
-                  onChange={(e) => setChatInput(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSendChat()}
-                  disabled={isProcessing}
-                  className="h-12"
-                />
-                <Button
-                  size="icon"
-                  className="h-12 w-12 shrink-0"
-                  onClick={handleSendChat}
-                  disabled={isProcessing || !chatInput.trim()}
-                >
-                  <Send className="h-5 w-5" />
-                </Button>
-              </div>
+            <div className="sticky bottom-0 z-10 -mx-4 -mb-4 border-t bg-background/80 p-4 backdrop-blur-sm md:static md:mx-0 md:bg-transparent md:p-0">
+              <div className="space-y-4">
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Responda à IA ou peça mudanças..."
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleSendChat()}
+                    disabled={isProcessing}
+                    className="h-12 bg-background shadow-sm"
+                  />
+                  <Button
+                    size="icon"
+                    className="h-12 w-12 shrink-0 shadow-sm"
+                    onClick={handleSendChat}
+                    disabled={isProcessing || !chatInput.trim()}
+                  >
+                    <Send className="h-5 w-5" />
+                  </Button>
+                </div>
 
-              <div className="flex justify-end">
-                <Button
-                  variant="secondary"
-                  size="lg"
-                  className="px-8 shadow-md"
-                  disabled={!projectId || isProcessing}
-                  onClick={() =>
-                    navigate(`/wizard/characters?projectId=${projectId}`)
-                  }
-                >
-                  Próximo: Escolher Personagens
-                  <ChevronRight className="ml-2 h-5 w-5" />
-                </Button>
+                <div className="flex justify-end">
+                  <Button
+                    variant="secondary"
+                    size="lg"
+                    className="w-full px-8 shadow-md md:w-auto"
+                    disabled={!projectId || isProcessing}
+                    onClick={() =>
+                      navigate(`/wizard/characters?projectId=${projectId}`)
+                    }
+                  >
+                    Próximo: Escolher Personagens
+                    <ChevronRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </div>
               </div>
             </div>
           </div>

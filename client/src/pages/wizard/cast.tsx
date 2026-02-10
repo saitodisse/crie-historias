@@ -98,27 +98,27 @@ export default function WizardCast() {
 
   return (
     <WizardLayout step={2}>
-      <div className="space-y-8">
-        <div className="flex items-center justify-between">
+      <div className="space-y-6 md:space-y-8">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="space-y-1">
-            <h2 className="text-2xl font-semibold">
+            <h2 className="text-xl font-semibold md:text-2xl">
               Quem participará da Projeto?
             </h2>
-            <p className="text-muted-foreground">
+            <p className="text-sm text-muted-foreground md:text-base">
               Selecione os personagens que estarão presentes no roteiro.
             </p>
           </div>
           <Button
             variant="outline"
             onClick={() => window.open("/characters", "_blank")}
-            className="group"
+            className="group w-full md:w-auto"
           >
             <UserPlus className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
             Criar Novo
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {characters?.map((char) => {
             const isSelected = selectedIds.includes(char.id);
             return (
@@ -148,7 +148,7 @@ export default function WizardCast() {
                       )}
                     </div>
                     <div className="space-y-1">
-                      <h3 className="text-lg font-semibold">{char.name}</h3>
+                      <h3 className="text-base font-semibold md:text-lg">{char.name}</h3>
                       <p className="line-clamp-2 text-xs italic text-muted-foreground">
                         "
                         {char.personality ||
@@ -173,7 +173,7 @@ export default function WizardCast() {
         </div>
 
         {characters?.length === 0 && (
-          <div className="rounded-xl border-2 border-dashed bg-muted/20 py-12 text-center">
+          <div className="rounded-xl border-2 border-dashed bg-muted/20 py-8 text-center md:py-12">
             <p className="mb-4 text-muted-foreground">
               Você ainda não tem personagens criados.
             </p>
@@ -184,21 +184,22 @@ export default function WizardCast() {
           </div>
         )}
 
-        <div className="flex justify-between border-t pt-6 font-sans">
+        <div className="flex flex-col-reverse gap-4 border-t pt-6 font-sans md:flex-row md:justify-between">
           <Button
             variant="ghost"
+            className="w-full md:w-auto"
             onClick={() => navigate(`/wizard/idea?projectId=${projectId}`)}
           >
             <ChevronLeft className="mr-2 h-4 w-4" />
             Voltar
           </Button>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col items-center gap-4 md:flex-row">
             <span className="text-sm text-muted-foreground">
               {selectedIds.length} selecionado(s)
             </span>
             <Button
               size="lg"
-              className="px-10 shadow-lg"
+              className="w-full shadow-lg md:w-auto md:px-10"
               disabled={selectedIds.length === 0 || linkMutation.isPending}
               onClick={() => linkMutation.mutate()}
             >

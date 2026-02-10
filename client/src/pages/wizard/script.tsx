@@ -153,15 +153,15 @@ export default function WizardScript() {
 
   return (
     <WizardLayout step={3}>
-      <div className="space-y-8">
+      <div className="space-y-6 md:space-y-8">
         <div className="space-y-1">
-          <h2 className="text-2xl font-semibold">Decisões Finais</h2>
-          <p className="text-muted-foreground">
+          <h2 className="text-xl font-semibold md:text-2xl">Decisões Finais</h2>
+          <p className="text-sm text-muted-foreground md:text-base">
             Escolha o formato do roteiro e aplique estilos adicionais.
           </p>
         </div>
 
-        <div className="grid gap-8 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2 md:gap-8">
           {/* Formato */}
           <Card className="border-primary/20 bg-primary/5">
             <CardHeader>
@@ -284,20 +284,21 @@ export default function WizardScript() {
           )}
         </div>
 
-        <div className="flex justify-between border-t pt-6 font-sans">
+        <div className="flex flex-col-reverse justify-between gap-4 border-t pt-6 font-sans md:flex-row">
           <Button
             variant="ghost"
             onClick={() =>
               navigate(`/wizard/characters?projectId=${projectId}`)
             }
             disabled={generateMutation.isPending}
+            className="w-full md:w-auto"
           >
             <ChevronLeft className="mr-2 h-4 w-4" />
             Voltar
           </Button>
           <Button
             size="lg"
-            className="bg-gradient-to-r from-primary to-purple-600 px-12 shadow-lg transition-all hover:opacity-90 active:scale-95"
+            className="w-full bg-gradient-to-r from-primary to-purple-600 shadow-lg transition-all hover:opacity-90 active:scale-95 md:w-auto md:px-12"
             disabled={!selectedTemplateId || generateMutation.isPending}
             onClick={() => generateMutation.mutate()}
           >

@@ -47,8 +47,8 @@ export default function PromptsPage() {
   });
 
   return (
-    <div className="flex h-full flex-col">
-      <div className="flex flex-wrap items-center justify-between gap-4 p-6 pb-4">
+    <div className="flex flex-col gap-6 p-4 md:p-6">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1
             className="text-2xl font-bold tracking-tight"
@@ -69,7 +69,7 @@ export default function PromptsPage() {
         </Button>
       </div>
 
-      <div className="flex flex-wrap gap-3 px-6 pb-4">
+      <div className="flex flex-wrap gap-3">
         <div className="relative min-w-[200px] flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -81,7 +81,7 @@ export default function PromptsPage() {
           />
         </div>
         <Tabs value={category} onValueChange={(v) => setCategory(v)}>
-          <TabsList>
+          <TabsList className="h-auto w-full flex-wrap justify-start">
             <TabsTrigger value="all">Todos</TabsTrigger>
             <TabsTrigger value="project">Projeto</TabsTrigger>
             <TabsTrigger value="character">Personagem</TabsTrigger>
@@ -92,60 +92,56 @@ export default function PromptsPage() {
         </Tabs>
       </div>
 
-      <div className="flex-1 overflow-auto px-6 pb-6">
+      <div className="space-y-3">
         {isLoading ? (
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <Card key={i}>
-                <CardContent className="pt-4">
-                  <Skeleton className="mb-2 h-5 w-32" />
-                  <Skeleton className="h-16 w-full" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          [1, 2, 3].map((i) => (
+            <Card key={i}>
+              <CardContent className="pt-4">
+                <Skeleton className="mb-2 h-5 w-32" />
+                <Skeleton className="h-16 w-full" />
+              </CardContent>
+            </Card>
+          ))
         ) : filtered && filtered.length > 0 ? (
-          <div className="space-y-3">
-            {filtered.map((prompt) => (
-              <Card
-                key={prompt.id}
-                className="hover-elevate group cursor-pointer"
-                onClick={() => navigate(`/prompts/${prompt.id}`)}
-                data-testid={`card-prompt-${prompt.id}`}
-              >
-                <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 pb-2">
-                  <div className="flex min-w-0 flex-wrap items-center gap-2">
-                    <Sparkles className="h-4 w-4 shrink-0 text-primary" />
-                    <h3 className="text-sm font-semibold">{prompt.name}</h3>
-                    <Badge
-                      variant="secondary"
-                      className={categoryColors[prompt.category] || ""}
-                    >
-                      {categoryLabels[prompt.category] || prompt.category}
+          filtered?.map((prompt) => (
+            <Card
+              key={prompt.id}
+              className="hover-elevate group cursor-pointer"
+              onClick={() => navigate(`/prompts/${prompt.id}`)}
+              data-testid={`card-prompt-${prompt.id}`}
+            >
+              <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 pb-2">
+                <div className="flex min-w-0 flex-wrap items-center gap-2">
+                  <Sparkles className="h-4 w-4 shrink-0 text-primary" />
+                  <h3 className="text-sm font-semibold">{prompt.name}</h3>
+                  <Badge
+                    variant="secondary"
+                    className={categoryColors[prompt.category] || ""}
+                  >
+                    {categoryLabels[prompt.category] || prompt.category}
+                  </Badge>
+                  <Badge variant="secondary">
+                    {prompt.type === "system"
+                      ? "Sistema"
+                      : prompt.type === "task"
+                        ? "Tarefa"
+                        : "Auxiliar"}
+                  </Badge>
+                  {!prompt.active && (
+                    <Badge variant="secondary" className="opacity-50">
+                      Inativo
                     </Badge>
-                    <Badge variant="secondary">
-                      {prompt.type === "system"
-                        ? "Sistema"
-                        : prompt.type === "task"
-                          ? "Tarefa"
-                          : "Auxiliar"}
-                    </Badge>
-                    {!prompt.active && (
-                      <Badge variant="secondary" className="opacity-50">
-                        Inativo
-                      </Badge>
-                    )}
-                  </div>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
-                </CardHeader>
-                <CardContent>
-                  <pre className="max-h-20 overflow-hidden whitespace-pre-wrap rounded-md bg-muted p-2 font-mono text-[10px] text-muted-foreground">
-                    {prompt.content}
-                  </pre>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  )}
+                </div>
+                <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+              </CardHeader>
+              <CardContent>
+                <pre className="max-h-20 overflow-hidden whitespace-pre-wrap rounded-md bg-muted p-2 font-mono text-[10px] text-muted-foreground">
+                  {prompt.content}
+                </pre>
+              </CardContent>
+            </Card>
+          ))
         ) : (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">

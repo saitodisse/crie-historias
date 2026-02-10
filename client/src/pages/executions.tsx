@@ -75,8 +75,8 @@ export default function ExecutionsPage() {
   );
 
   return (
-    <div className="flex h-full flex-col">
-      <div className="flex flex-wrap items-center justify-between gap-4 p-6 pb-4">
+    <div className="flex flex-col gap-6 p-4 md:p-6">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1
             className="text-2xl font-bold tracking-tight"
@@ -90,94 +90,88 @@ export default function ExecutionsPage() {
         </div>
       </div>
 
-      <div className="px-6 pb-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar execuções..."
-            className="pl-9"
-            data-testid="input-search-executions"
-          />
-        </div>
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Buscar execuções..."
+          className="pl-9"
+          data-testid="input-search-executions"
+        />
       </div>
 
-      <div className="flex-1 overflow-auto px-6 pb-6">
+      <div className="space-y-3">
         {isLoading ? (
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <Card key={i}>
-                <CardContent className="pt-4">
-                  <Skeleton className="mb-2 h-5 w-48" />
-                  <Skeleton className="h-4 w-full" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          [1, 2, 3].map((i) => (
+            <Card key={i}>
+              <CardContent className="pt-4">
+                <Skeleton className="mb-2 h-5 w-48" />
+                <Skeleton className="h-4 w-full" />
+              </CardContent>
+            </Card>
+          ))
         ) : filtered && filtered.length > 0 ? (
-          <div className="space-y-3">
-            {filtered.map((exec) => (
-              <Card key={exec.id} data-testid={`card-execution-${exec.id}`}>
-                <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 pb-2">
-                  <div className="flex min-w-0 flex-wrap items-center gap-2">
-                    <History className="h-4 w-4 shrink-0 text-primary" />
-                    <span className="font-mono text-xs text-muted-foreground">
-                      #{exec.id}
-                    </span>
-                    <div className="flex items-center gap-1">
-                      <Cpu className="h-3 w-3 text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">
-                        {exec.model}
-                      </span>
-                    </div>
-                    {exec.projectTitle && (
-                      <Badge variant="secondary">{exec.projectTitle}</Badge>
-                    )}
-                    {exec.characterName && (
-                      <Badge variant="secondary">{exec.characterName}</Badge>
-                    )}
-                    {exec.scriptTitle && (
-                      <Badge variant="secondary">{exec.scriptTitle}</Badge>
-                    )}
-                  </div>
+          filtered?.map((exec) => (
+            <Card key={exec.id} data-testid={`card-execution-${exec.id}`}>
+              <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 pb-2">
+                <div className="flex min-w-0 flex-wrap items-center gap-2">
+                  <History className="h-4 w-4 shrink-0 text-primary" />
+                  <span className="font-mono text-xs text-muted-foreground">
+                    #{exec.id}
+                  </span>
                   <div className="flex items-center gap-1">
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => setSelectedExec(exec)}
-                      data-testid={`button-view-exec-${exec.id}`}
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => rerunMutation.mutate(exec)}
-                      disabled={rerunMutation.isPending}
-                      data-testid={`button-rerun-exec-${exec.id}`}
-                    >
-                      <RefreshCw className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="mb-1 line-clamp-1 text-sm">{exec.userPrompt}</p>
-                  {exec.result && (
-                    <p className="line-clamp-2 text-xs text-muted-foreground">
-                      {exec.result}
-                    </p>
-                  )}
-                  <div className="mt-2 flex items-center gap-1">
-                    <Clock className="h-3 w-3 text-muted-foreground" />
+                    <Cpu className="h-3 w-3 text-muted-foreground" />
                     <span className="text-xs text-muted-foreground">
-                      {new Date(exec.createdAt).toLocaleString("pt-BR")}
+                      {exec.model}
                     </span>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  {exec.projectTitle && (
+                    <Badge variant="secondary">{exec.projectTitle}</Badge>
+                  )}
+                  {exec.characterName && (
+                    <Badge variant="secondary">{exec.characterName}</Badge>
+                  )}
+                  {exec.scriptTitle && (
+                    <Badge variant="secondary">{exec.scriptTitle}</Badge>
+                  )}
+                </div>
+                <div className="flex items-center gap-1">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => setSelectedExec(exec)}
+                    data-testid={`button-view-exec-${exec.id}`}
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => rerunMutation.mutate(exec)}
+                    disabled={rerunMutation.isPending}
+                    data-testid={`button-rerun-exec-${exec.id}`}
+                  >
+                    <RefreshCw className="h-4 w-4" />
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <p className="mb-1 line-clamp-1 text-sm">{exec.userPrompt}</p>
+                {exec.result && (
+                  <p className="line-clamp-2 text-xs text-muted-foreground">
+                    {exec.result}
+                  </p>
+                )}
+                <div className="mt-2 flex items-center gap-1">
+                  <Clock className="h-3 w-3 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground">
+                    {new Date(exec.createdAt).toLocaleString("pt-BR")}
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+          ))
         ) : (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
@@ -205,30 +199,30 @@ export default function ExecutionsPage() {
             <ScrollArea className="max-h-[65vh]">
               <div className="space-y-4 pr-4">
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant="secondary">{selectedExec.model}</Badge>
-                  {selectedExec.projectTitle && (
-                    <Badge variant="outline">{selectedExec.projectTitle}</Badge>
+                  <Badge variant="secondary">{selectedExec!.model}</Badge>
+                  {selectedExec!.projectTitle && (
+                    <Badge variant="outline">{selectedExec!.projectTitle}</Badge>
                   )}
-                  {selectedExec.characterName && (
+                  {selectedExec!.characterName && (
                     <Badge variant="outline">
-                      {selectedExec.characterName}
+                      {selectedExec!.characterName}
                     </Badge>
                   )}
-                  {selectedExec.promptName && (
-                    <Badge variant="outline">{selectedExec.promptName}</Badge>
+                  {selectedExec!.promptName && (
+                    <Badge variant="outline">{selectedExec!.promptName}</Badge>
                   )}
                   <span className="ml-auto text-xs text-muted-foreground">
-                    {new Date(selectedExec.createdAt).toLocaleString("pt-BR")}
+                    {new Date(selectedExec!.createdAt).toLocaleString("pt-BR")}
                   </span>
                 </div>
 
-                {selectedExec.systemPromptSnapshot && (
+                {selectedExec!.systemPromptSnapshot && (
                   <div>
                     <Label className="text-xs text-muted-foreground">
                       Snapshot do Prompt de Sistema
                     </Label>
                     <pre className="mt-1 max-h-32 overflow-auto whitespace-pre-wrap rounded-md bg-muted p-3 font-mono text-xs">
-                      {selectedExec.systemPromptSnapshot}
+                      {selectedExec!.systemPromptSnapshot}
                     </pre>
                   </div>
                 )}
@@ -238,7 +232,7 @@ export default function ExecutionsPage() {
                     Prompt do Usuário
                   </Label>
                   <pre className="mt-1 whitespace-pre-wrap rounded-md bg-muted p-3 font-mono text-xs">
-                    {selectedExec.userPrompt}
+                    {selectedExec!.userPrompt}
                   </pre>
                 </div>
 
@@ -247,17 +241,17 @@ export default function ExecutionsPage() {
                     Prompt Final Montado
                   </Label>
                   <pre className="mt-1 max-h-40 overflow-auto whitespace-pre-wrap rounded-md bg-muted p-3 font-mono text-xs">
-                    {selectedExec.finalPrompt}
+                    {selectedExec!.finalPrompt}
                   </pre>
                 </div>
 
-                {Boolean(selectedExec.parameters) && (
+                {Boolean(selectedExec!.parameters) && (
                   <div>
                     <Label className="text-xs text-muted-foreground">
                       Parâmetros
                     </Label>
                     <pre className="mt-1 whitespace-pre-wrap rounded-md bg-muted p-3 font-mono text-xs">
-                      {JSON.stringify(selectedExec.parameters as any, null, 2)}
+                      {JSON.stringify(selectedExec!.parameters as any, null, 2)}
                     </pre>
                   </div>
                 )}
@@ -273,8 +267,8 @@ export default function ExecutionsPage() {
                       size="sm"
                       variant="ghost"
                       onClick={() => {
-                        if (selectedExec.result) {
-                          navigator.clipboard.writeText(selectedExec.result);
+                        if (selectedExec!.result) {
+                          navigator.clipboard.writeText(selectedExec!.result);
                           toast({ title: "Resultado copiado" });
                         }
                       }}
@@ -285,7 +279,7 @@ export default function ExecutionsPage() {
                   </div>
                   <div className="rounded-md bg-muted p-4">
                     <Markdown className="prose-sm font-serif dark:prose-invert">
-                      {selectedExec.result || "Sem resultado"}
+                      {selectedExec!.result || "Sem resultado"}
                     </Markdown>
                   </div>
                 </div>
@@ -294,7 +288,7 @@ export default function ExecutionsPage() {
                   <Button
                     variant="outline"
                     onClick={() => {
-                      rerunMutation.mutate(selectedExec);
+                      rerunMutation.mutate(selectedExec!);
                       setSelectedExec(null);
                     }}
                     disabled={rerunMutation.isPending}

@@ -94,8 +94,8 @@ export default function PromptDetailPage() {
   }
 
   return (
-    <div className="flex h-full flex-col overflow-auto">
-      <div className="flex items-center justify-between p-6 pb-4">
+    <div className="flex flex-col gap-6 p-4 md:p-6">
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Button
             size="icon"
@@ -136,7 +136,7 @@ export default function PromptDetailPage() {
         </div>
       </div>
 
-      <div className="grid gap-6 p-6 lg:grid-cols-3">
+      <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
           <Card>
             <CardHeader>

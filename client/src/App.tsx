@@ -70,14 +70,14 @@ function AuthenticatedApp() {
 
   return (
     <SidebarProvider style={style as React.CSSProperties}>
-      <div className="flex h-screen w-full">
+      <div className="flex min-h-screen w-full">
         <AppSidebar />
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-50 flex items-center justify-between gap-2 border-b bg-background p-2">
+          <header className="sticky top-0 z-50 flex items-center justify-between gap-2 border-b bg-background p-2 backdrop-blur-sm support-[backdrop-filter]:bg-background/60">
             <SidebarTrigger data-testid="button-sidebar-toggle" />
             <ThemeToggle />
           </header>
-          <main className="flex-1 overflow-hidden">
+          <main className="flex-1">
             <Router />
           </main>
         </div>

@@ -216,8 +216,8 @@ export default function ProjectDetailPage() {
   }
 
   return (
-    <div className="flex h-full flex-col overflow-auto">
-      <div className="flex flex-wrap items-center justify-between gap-4 p-6 pb-4">
+    <div className="flex flex-col gap-6 p-4 md:p-6">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <Button
             size="icon"
@@ -469,7 +469,7 @@ export default function ProjectDetailPage() {
         </div>
       </div>
 
-      <div className="px-6 pb-4">
+      <div>
         <Card>
           <CardContent className="pt-4">
             <div className="grid gap-4 sm:grid-cols-3">
@@ -542,7 +542,7 @@ export default function ProjectDetailPage() {
         </Card>
       </div>
 
-      <div className="flex-1 px-6 pb-6">
+      <div className="flex-1">
         <Tabs defaultValue="characters">
           <TabsList>
             <TabsTrigger value="characters" data-testid="tab-characters">
