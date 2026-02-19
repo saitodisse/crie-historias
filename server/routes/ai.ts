@@ -98,6 +98,14 @@ router.get("/models/:provider", isAuthenticated, async (req, res) => {
       if (!apiKey) {
         // Even without a User API Key, we can show dynamic pricing if the server has a Service Account
         const fallbackModels = [
+          "gemini-3.1-pro-preview",
+          "gemini-3-pro-preview",
+          "gemini-3-flash-preview",
+          "gemini-3-pro-image-preview",
+          "gemini-flash-latest",
+          "gemini-flash-lite-latest",
+          "imagen-4.0-generate-001",
+          "imagen-4.0-ultra-generate-001",
           "gemini-2.0-flash",
           "gemini-2.0-flash-lite",
           "gemini-1.5-flash",

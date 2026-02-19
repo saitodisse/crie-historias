@@ -43,6 +43,14 @@ const MODEL_MAPPING: Record<string, string> = {
   "Gemini 2.0 Flash": "gemini-2.0-flash",
   "Gemini 2.0 Flash-Lite": "gemini-2.0-flash-lite",
   "Gemini 2.0 Flash Lite": "gemini-2.0-flash-lite",
+  "Gemini 3.1 Pro Preview": "gemini-3.1-pro-preview",
+  "Gemini 3 Pro Preview": "gemini-3-pro-preview",
+  "Gemini 3 Flash Preview": "gemini-3-flash-preview",
+  "Nano Banana Pro": "gemini-3-pro-image-preview",
+  "Gemini Flash Latest": "gemini-flash-latest",
+  "Gemini Flash-Lite Latest": "gemini-flash-lite-latest",
+  "Imagen 4": "imagen-4.0-generate-001",
+  "Imagen 4 Ultra": "imagen-4.0-ultra-generate-001",
 };
 
 /**
