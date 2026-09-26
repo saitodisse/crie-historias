@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -5,9 +6,25 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { FileText, Trash2, BookOpen } from "lucide-react";
-import type { Script } from "@shared/schema";
+import { FileText, Trash2, BookOpen, Plus } from "lucide-react";
+import type { Script, Project } from "@shared/schema";
 
 interface ScriptWithProject extends Script {
   projectTitle?: string;
@@ -17,8 +34,44 @@ export default function ScriptsPage() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
 
+  const [open, setOpen] = useState(false);
+  const [title, setTitle] = useState("");
+  const [projectId, setProjectId] = useState<string>("");
+  const [type, setType] = useState("synopsis");
+
   const { data: scripts, isLoading } = useQuery<ScriptWithProject[]>({
     queryKey: ["/api/scripts"],
+  });
+
+  const { data: projects } = useQuery<Project[]>({
+    queryKey: ["/api/projects"],
+  });
+
+  const createMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", "/api/scripts", {
+        title,
+        projectId: Number(projectId),
+        type,
+      });
+      return res.json();
+    },
+    onSuccess: (newScript) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/scripts"] });
+      setOpen(false);
+      setTitle("");
+      setProjectId("");
+      setType("synopsis");
+      toast({ title: "Roteiro criado com sucesso" });
+      navigate(`/scripts/${newScript.id}`);
+    },
+    onError: (err: Error) => {
+      toast({
+        title: "Erro ao criar roteiro",
+        description: err.message,
+        variant: "destructive",
+      });
+    },
   });
 
   const deleteMutation = useMutation({
@@ -56,6 +109,79 @@ export default function ScriptsPage() {
           <p className="mt-1 text-sm text-muted-foreground">
             Todos os roteiros vinculados aos seus Projetos
           </p>
+        </div>
+        <div className="flex gap-2">
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button data-testid="button-create-script">
+                <Plus className="mr-2 h-4 w-4" />
+                Novo Roteiro
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Criar Novo Roteiro</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 pt-4">
+                <div className="space-y-2">
+                  <Label>Título do Roteiro</Label>
+                  <Input
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="Ex: Introdução da Jornada"
+                    data-testid="input-script-title"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Vincular História (Projeto)</Label>
+                  <Select value={projectId} onValueChange={setProjectId}>
+                    <SelectTrigger data-testid="select-script-project">
+                      <SelectValue placeholder="Selecione um projeto" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {projects?.length ? (
+                        projects.map((p) => (
+                          <SelectItem key={p.id} value={p.id.toString()}>
+                            {p.title}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <div className="p-2 text-sm text-muted-foreground">
+                          Nenhum projeto encontrado.
+                        </div>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Tipo de Roteiro</Label>
+                  <Select value={type} onValueChange={setType}>
+                    <SelectTrigger data-testid="select-script-type">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="synopsis">Sinopse</SelectItem>
+                      <SelectItem value="outline">Esboço</SelectItem>
+                      <SelectItem value="detailed">Detalhado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <Button
+                  className="mt-4 w-full"
+                  onClick={() => createMutation.mutate()}
+                  disabled={
+                    !title.trim() || !projectId || createMutation.isPending
+                  }
+                  data-testid="button-submit-script"
+                >
+                  {createMutation.isPending ? "Criando..." : "Criar Roteiro"}
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
@@ -126,7 +252,7 @@ export default function ScriptsPage() {
             <h3 className="text-lg font-semibold">Nenhum roteiro encontrado</h3>
             <p className="mt-1 max-w-sm text-sm text-muted-foreground">
               Os roteiros são criados dentro dos Projetos. Vá para um Projeto
-              para criar um.
+              para criar um ou crie um novo aqui.
             </p>
           </div>
         )}
